@@ -20,13 +20,11 @@ class StartupTest extends TestCase
     {        
         $zip = new Filesystem(new Adapter(__DIR__.'/../files/141212100024_FBM_2014120711.zip'));
         $this->assertCount(34, $zip->listContents());
-        // dd($zip);
-        // $this->assertEquals([], $zip);
 
         $blmFiles = $this->extractBlm($zip);
-        $imgFiles = $this->extractImg($zip);
-
         $this->checkBlm($blmFiles);
+
+        $imgFiles = $this->extractImg($zip);
         $this->checkImg($imgFiles);
         
         // $this->assertEquals([], $contents);
