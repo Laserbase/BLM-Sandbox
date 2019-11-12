@@ -3,44 +3,52 @@
 namespace Tests\Feature;
 
 // use Illuminate\Foundation\Testing\RefreshDatabase;
-// use 
 use Tests\TestCase;
 use League\Flysystem\Filesystem;
-use League\Flysystem\ZipArchive\ZipArchiveAdapter as Adapter;
-use \Log;
+use League\Flysystem\ZipArchive\ZipArchiveAdapter as Zip;
+use Log;
+use Src\BlmFile\BlmFile;
 
 class StartupTest extends TestCase
 {
+    protected $zip = null;
+    protected $zipFile = __DIR__.'/../files/141212100024_FBM_2014120711.zip';
+
     /**
      * A basic test example.
      *
      * @return void
      */
-    public function test_zip_test()
+    public function testInstance()
+    {
+        $this->zip = new Filesystem(new Zip($this->zipFile));
+        $this->assertInstanceOf('League\Flysystem\FileSystem', $this->zip);
+        Log::debug("file '".__FILE__."', line='".__LINE__."' ");
+    }
+    
+    public function test_zipHandling()
     {        
-        $zip = new Filesystem(new Adapter(__DIR__.'/../files/141212100024_FBM_2014120711.zip'));
-        $this->assertCount(34, $zip->listContents());
 
-        $blmFiles = $this->extractBlm($zip);
+        $this->zip = new Filesystem(new Zip($this->zipFile));
+        $this->assertCount(34, $this->zip->listContents());
+
+        $blmFiles = $this->extractBlm();
         $this->checkBlm($blmFiles);
 
-        $imgFiles = $this->extractImg($zip);
+        $imgFiles = $this->extractImg();
         $this->checkImg($imgFiles);
-        
-        // $this->assertEquals([], $contents);
 
-        // $this->assertEquals('', $contents);
-        // dd($contents);
+        $this->checkContents($blmFiles);
     }
 
     /**
      * @param \League\Flysystem\Filesystem $zip
      * @return array
      */
-    protected function extractBlm(\League\Flysystem\Filesystem $zip) 
+    protected function extractBlm() 
     {
         $result = [];
-        foreach($zip->listContents() as $file) {
+        foreach($this->zip->listContents() as $file) {
             if (\Str::upper($file['extension']) === 'BLM') {
                 $result[] = $file;
             }
@@ -53,10 +61,10 @@ class StartupTest extends TestCase
      * @param \League\Flysystem\Filesystem $zip
      * @return array
      */
-    protected function extractImg(\League\Flysystem\Filesystem $zip) 
+    protected function extractImg() 
     {
         $result = [];
-        foreach($zip->listContents() as $file) {
+        foreach($this->zip->listContents() as $file) {
             if (\Str::upper($file['extension']) !== 'BLM') {
                 $result[] = $file['basename'];
                 // array_push($result, $file['basename']);
@@ -132,5 +140,38 @@ class StartupTest extends TestCase
         ];
 
         $this->assertEquals($imgTest, $imgFiles);        
+    }
+
+    /**
+     * Check all contents of blm files in zip file
+     * @param Array $blmFiles blm files found in zip
+     * @return void
+     */
+    protected function checkContents(array $blmFiles)
+    {
+        foreach ($blmFiles as $blmFile) {
+            $this->checkContent($blmFile);
+        }
+    }
+
+    /**
+     * Check the content of blm file in zip file
+     * @param Array $blmFile file info array
+     * @return void
+     */
+    protected function checkContent(array $blmFile)
+    {
+        $filename = $blmFile['basename'];
+
+        $resource = $this->zip->readStream($filename);
+        $this->assertTrue( is_resource($resource) );
+        
+        $blm = new BlmFile();
+        $blm->setup($resource);
+
+        // $str = fgets($resource);
+
+        // $this->assertEquals('#HEADER#', trim($str));
+
     }
 }
