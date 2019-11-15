@@ -20,113 +20,139 @@ class BlmFile {
     ];
     protected $columns = [];
     protected $columnDefinition = [
-        "AGENT_REF" => 'string:mandatory:nullable',
         // "xAGENT_REF" => 'string:mandatory:nullable',
-        "BRANCH_ID" => 'string:mandatory:nullable',
-        "STATUS_ID" => 'string:mandatory:nullable',
-        "BEDROOMS" => 'string:mandatory:nullable',
-        "PRICE" => 'string:mandatory:nullable',
+
+        "AGENT_REF" => 'string:20:mandatory:mandatory',
+        "BRANCH_ID" => 'int:mandatory:mandatory', // provided by Rightmove
+        "STATUS_ID" => 'int:mandatory:mandatory', // 0 = Available
+        // 1 = SSTC
+        // 2 = SSTCM - Scotland
+        // 3 = under offer - sales
+        // 4 = reserved - sales
+        // 5 = let agreed - letting
+        
+        "CREATE_DATE" => 'date:mandatory:nullable', // YYYY-MM-DD HH:MI:SS
+        "UPDATE_DATE" => 'date:mandatory:nullable', // YYYY-MM-DD HH:MI:SS
+
+        "DISPLAY_ADDRESS" => 'string:120:mandatory:mandatory',
+        "PUBLISHED_FLAG" => 'int:mandatory:mandatory', // 0 = hidden/invisible 1 = visible
+
+        "LET_DATE_AVAILABLE" => 'date:nullable:nullable', // date:mandatory:nullable
+        "LET_BOND" => 'num:nullable:nullable', // deposit amount 
+        "ADMINISTRATION_FEE" => 'string:4096:nullable:nullable', // all fees applicable to the property
+        "LET_TYPE_ID" => 'num:nullable:nullable', // mandatory
+        // 0 = not specified
+        // 1 = long term
+        // 2 = short term
+        // 3 = student
+        // 4 = commercial
+
+        "LET_FURN_ID" => 'int:mandatory:nullable', // 
+        // 0 = furnished
+        // 1 = part furnished
+        // 2 = unfurnished
+        // 3 = not specified
+        // 4 = furnished / unfurnished ???
+
+        "LET_RENT_FREQUENCY" => 'int:mandatory:nullable', //
+        // 0 = weekly
+        // 1 = monthly - default if null
+        // 2 = quarterly
+        // 3 = annual
+        // 4 =
+        // 5 = per-person per-week - students
+
+        "LET_CONTRACT_IN_MONTHS" => 'int:2:nullable:nullable', // student
+        "LET_WASHING_MACHINE_FLAG" => 'string:1:nullable:nullable', // Y/N student
+        "LET_DISHWASHER_FLAG" => 'string:1:nullable:nullable', // Y/N student
+        "LET_BURGLAR_ALARM_FLAG" => 'string:1:nullable:nullable', // Y/N student
+        "LET_BILL_INC_WATER" => 'string:1:nullable:nullable', // Y/N student
+        "LET_BILL_INC_GAS" => 'string:1:nullable:nullable', // Y/N student
+        "LET_BILL_INC_ELECTRICITY" => 'string:1:nullable:nullable', // Y/N student
+        "LET_BILL_INC_TV_LICIENCE" => 'string:1:nullable:nullable', // Y/N student
+        "LET_BILL_INC_TV_SUBSCRIPTION" => 'string:1:nullable:nullable', // Y/N student
+        "LET_BILL_INC_INTERNET" => 'string:1:nullable:nullable', // Y/N student
+        
+        "TENURE_TYPE_ID" => 'int:nullable:nullable', // mandatory
+        "TRANS_TYPE_ID" => 'int:nullable:mandatory', // 1 = resale, 2 = lettings        
+
+        "BEDROOMS" => 'int:mandatory:mandatory',
+        "PRICE" => 'num:mandatory:mandatory',
         "PRICE_QUALIFIER" => 'string:mandatory:nullable',
-        "LET_RENT_FREQUENCY" => 'string:mandatory:nullable',
-        "LET_FURN_ID" => 'string:mandatory:nullable',
-        "ADMINISTRATION_FEE" => 'string:mandatory:nullable',
-        "ADDRESS_1" => 'string:mandatory:nullable',
-        "ADDRESS_2" => 'string:mandatory:nullable',
-        "ADDRESS_3" => 'string:mandatory:nullable',
-        "TOWN" => 'string:mandatory:nullable',
-        "POSTCODE1" => 'string:mandatory:nullable',
-        "POSTCODE2" => 'string:mandatory:nullable',
-        "FEATURE1" => 'string:mandatory:nullable',
-        "FEATURE2" => 'string:mandatory:nullable',
-        "FEATURE3" => 'string:mandatory:nullable',
-        "FEATURE4" => 'string:mandatory:nullable',
-        "FEATURE5" => 'string:mandatory:nullable',
-        "FEATURE6" => 'string:mandatory:nullable',
-        "FEATURE7" => 'string:mandatory:nullable',
-        "FEATURE8" => 'string:mandatory:nullable',
-        "FEATURE9" => 'string:mandatory:nullable',
-        "FEATURE10" => 'string:mandatory:nullable',
-        "SUMMARY" => 'string:mandatory:nullable',
-        "DESCRIPTION" => 'string:mandatory:nullable',
-        "PROP_SUB_ID" => 'string:mandatory:nullable',
-        "CREATE_DATE" => 'date:mandatory:nullable',
-        "UPDATE_DATE" => 'date:mandatory:nullable',
-        "DISPLAY_ADDRESS" => 'string:mandatory:nullable',
-        "PUBLISHED_FLAG" => 'string:mandatory:nullable',
-        "TRANS_TYPE_ID" => 'string:mandatory:nullable',
-        "NEW_HOME_FLAG" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_00" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_01" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_02" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_03" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_04" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_05" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_06" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_07" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_08" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_09" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_10" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_11" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_12" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_13" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_14" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_15" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_16" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_17" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_18" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_19" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_20" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_21" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_22" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_23" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_24" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_25" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_26" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_27" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_28" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_29" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_30" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_31" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_32" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_33" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_34" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_35" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_36" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_37" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_38" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_39" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_40" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_41" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_42" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_43" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_44" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_45" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_46" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_47" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_48" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_49" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_60" => 'string:mandatory:nullable',
-        "MEDIA_IMAGE_TEXT_60" => 'string:mandatory:nullable',
-        "MEDIA_FLOOR_PLAN_00" => 'string:mandatory:nullable',
-        "MEDIA_FLOOR_PLAN_01" => 'string:mandatory:nullable',
-        "MEDIA_FLOOR_PLAN_02" => 'string:mandatory:nullable',
-        "MEDIA_FLOOR_PLAN_03" => 'string:mandatory:nullable',
-        "MEDIA_FLOOR_PLAN_04" => 'string:mandatory:nullable',
-        "MEDIA_FLOOR_PLAN_05" => 'string:mandatory:nullable',
-        "MEDIA_FLOOR_PLAN_06" => 'string:mandatory:nullable',
-        "MEDIA_FLOOR_PLAN_07" => 'string:mandatory:nullable',
-        "MEDIA_DOCUMENT_00" => 'string:mandatory:nullable',
-        "MEDIA_DOCUMENT_01" => 'string:mandatory:nullable',
-        "MEDIA_DOCUMENT_02" => 'string:mandatory:nullable',
-        "MEDIA_DOCUMENT_03" => 'string:mandatory:nullable',
-        "MEDIA_DOCUMENT_50" => 'string:mandatory:nullable',
-        "MEDIA_DOCUMENT_TEXT_50" => 'string:mandatory:nullable',
-        "MEDIA_VIRTUAL_TOUR_00" => 'string:mandatory:nullable',
-        "MEDIA_VIRTUAL_TOUR_01" => 'string:mandatory:nullable',
-        "MEDIA_VIRTUAL_TOUR_02" => 'string:mandatory:nullable',
-        "MEDIA_VIRTUAL_TOUR_03" => 'string:mandatory:nullable'        
+        "PROP_SUB_ID" => 'int:mandatory:mandatory',
+
+        "ADDRESS_1" => 'string:60:mandatory:mandatory',
+        "ADDRESS_2" => 'string:60:mandatory:mandatory',
+        "ADDRESS_3" => 'string:60:nullable:nullable',
+        "ADDRESS_4" => 'string:60:nullable:nullable',
+        "TOWN" => 'string:60:mandatory:mandatory',
+        "POSTCODE1" => 'string:10:mandatory:mandatory',
+        "POSTCODE2" => 'string:10:mandatory:mandatory',
+
+        "FEATURE1" => 'string:200:mandatory:mandatory',
+        "FEATURE2" => 'string:200:mandatory:mandatory',
+        "FEATURE3" => 'string:200:mandatory:mandatory',
+        "FEATURE4" => 'string:200:optional:optional',
+        "FEATURE5" => 'string:200:optional:optional',
+        "FEATURE6" => 'string:200:optional:optional',
+        "FEATURE7" => 'string:200:optional:optional',
+        "FEATURE8" => 'string:200:optional:optional',
+        "FEATURE9" => 'string:200:optional:optional',
+        "FEATURE10" => 'string:200:optional:optional',
+        
+        "SUMMARY" => 'string:1024:mandatory:mandatory',
+        "DESCRIPTION" => 'string:32768:mandatory:mandatory',
+
+        "NEW_HOME_FLAG" => 'string:1:mandatory:nullable', // Y / N
+
+        "MEDIA_IMAGE_00" => 'string:100:mandatory:nullable',
+        "MEDIA_IMAGE_TEXT_00" => 'string:20::nullable:nullable',
+
+        "MEDIA_FLOOR_PLAN_00" => 'string:100:nullable:nullable',
+        "MEDIA_FLOOR_PLAN_00" => 'string:100:nullable:nullable',
+        "MEDIA_FLOOR_PLAN_TEXT_00" => 'string:20:nullable:nullable',
+
+        "MEDIA_DOCUMENT_00" => 'string:200:nullable:nullable',
+        "MEDIA_DOCUMENT_TEXT_00" => 'string:20:nullable:nullable',
+
+        "MEDIA_VIRTUAL_TOUR_00" => 'string:200:nullable:nullable',
+        "MEDIA_VIRTUAL_TOUR_TEXT_00" => 'string:20:nullable:nullable',
     ];
+    protected $columnDefinitionV3 = [
+    ];
+        
+    protected $columnDefinitionV3i = [
+        "HOUSE_NAME_NUMBER" => 'string:60:mandatory:mandatory',
+        "STREET_NAME", 'string:100:mandatory:mandatory',
+        "OS_TOWN_CITY" => 'string:100:mandatory:mandatory',
+        "OS_REGION" => 'string:100:mandatory:mandatory',
+        "ZIPCODE" => 'string:100:nullable:nullable',
+        "COUNTRY_CODE" => 'string:2:mandatory:mandatory',
+        "EXACT_LATITUDE" => 'num:15:mandatory:mandatory',
+        "EXACT_LONGDITUDE" => 'num:15:mandatory:mandatory',
+        // "" => 'string:100:mandatory:mandatory',
+
+    ];
+
     protected $errors = [];
+
+    public function __construct()
+    {
+        for ($i = 1; $i < 70; $i++) { // temp work around
+            $this->columnDefinition['MEDIA_IMAGE_'.sprintf('%02d', $i)] = 'string:100:nullable:nullable';
+            $this->columnDefinition['MEDIA_IMAGE_TEXT_'.sprintf('%02d', $i)] = 'string:20::nullable:nullable';
+
+            $this->columnDefinition['MEDIA_FLOOR_PLAN_'.sprintf('%02d', $i)] = 'string:100:nullable:nullable';
+            $this->columnDefinition['MEDIA_FLOOR_PLAN_TEXT_'.sprintf('%02d', $i)] = 'string:20::nullable:nullable';
+
+            $this->columnDefinition['MEDIA_DOCUMENT_'.sprintf('%02d', $i)] = 'string:200:nullable:nullable';
+            $this->columnDefinition['MEDIA_DOCUMENT_TEXT_'.sprintf('%02d', $i)] = 'string:20::nullable:nullable';
+            
+            $this->columnDefinition['MEDIA_VIRTUAL_TOUR_'.sprintf('%02d', $i)] = 'string:200:nullable:nullable';
+            $this->columnDefinition['MEDIA_VIRTUAL_TOUR_TEXT_'.sprintf('%02d', $i)] = 'string:20::nullable:nullable';
+            
+        }
+    }
 
     public function __set($name, $value)
     {
@@ -204,9 +230,6 @@ class BlmFile {
         }
 
         $this->validateDefinition($str);
-
-
-
     }
 
     public function readData() : Array
