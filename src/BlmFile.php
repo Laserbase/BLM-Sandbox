@@ -6,18 +6,29 @@ use Log;
 
 class BlmFile {
     protected $resource = null;
+    protected $formatDate = 'Y-m-d H:i:s';
 
     protected $header = [
-        'HEADER' => '#HEADER#',
         'Version' => "",
         'EOF' => '^',
         'EOR' => '~',
         'Property Count' => 0,
         'Generated Date' => '',
+    ];
+    protected $sections = [
+        'HEADER' => '#HEADER#',
         'DEFINITION' => '#DEFINITION#',
         'DATA' => '#DATA#',
         'END' => '#END#'
     ];
+    protected $headerMandatory = [
+        'Version',
+        'EOF',
+        'EOR',
+        'Property Count',
+        'Generated Date'
+    ];
+    protected $maxHeaderLines = 25;
     protected $columns = [];
     protected $columnDefinition = [
         // "xAGENT_REF" => 'string:mandatory:nullable',
@@ -33,7 +44,9 @@ class BlmFile {
         
         "CREATE_DATE" => 'date:mandatory:nullable', // YYYY-MM-DD HH:MI:SS
         "UPDATE_DATE" => 'date:mandatory:nullable', // YYYY-MM-DD HH:MI:SS
+    ];
 
+    protected $columnDefinitionV3 = [
         "DISPLAY_ADDRESS" => 'string:120:mandatory:mandatory',
         "PUBLISHED_FLAG" => 'int:mandatory:mandatory', // 0 = hidden/invisible 1 = visible
 
@@ -118,8 +131,6 @@ class BlmFile {
         "MEDIA_VIRTUAL_TOUR_00" => 'string:200:nullable:nullable',
         "MEDIA_VIRTUAL_TOUR_TEXT_00" => 'string:20:nullable:nullable',
     ];
-    protected $columnDefinitionV3 = [
-    ];
         
     protected $columnDefinitionV3i = [
         "HOUSE_NAME_NUMBER" => 'string:60:mandatory:mandatory',
@@ -130,8 +141,6 @@ class BlmFile {
         "COUNTRY_CODE" => 'string:2:mandatory:mandatory',
         "EXACT_LATITUDE" => 'num:15:mandatory:mandatory',
         "EXACT_LONGDITUDE" => 'num:15:mandatory:mandatory',
-        // "" => 'string:100:mandatory:mandatory',
-
     ];
 
     protected $errors = [];
@@ -179,6 +188,7 @@ class BlmFile {
 
     /**
      * @param $resource
+     * @return this
      */
     public function setup($resource)
     {
@@ -190,11 +200,12 @@ class BlmFile {
         $this->EOF = '^';
         $this->EOR = '~';
         $this->{'Property Count'} = 0;
-        $this->{'Generated Date'} = Date('Y-m-d H:i:s"');
+        $this->{'Generated Date'} = Date($this->formatDate);
 
         $this->resource = $resource;
 
         $this->readHeader();
+        $this->readDefinition();
 
         return $this;
     }
@@ -203,24 +214,62 @@ class BlmFile {
     {
         $str = $this->readLine();
 
-        if ($this->HEADER !== trim($str)) {
-            throw new \Exception('Not a valid BLM file, Header missing');
+        if ($this->sections['HEADER'] !== trim($str)) {
+            throw new \Exception("Error: Not a valid BLM file, Header '{$this->sections['HEADER']}' must be 1sr line");
         }
 
-        $this->readHeaderItem('Version');
-        $this->readHeaderItem('EOF');
-        $this->readHeaderItem('EOR');
-        $this->readHeaderItem('Property Count');
-        $this->readHeaderItem('Generated Date');
-        $this->skip();
+        $count = $this->maxHeaderLines;
+        while ($str = $this->readLine()) {
+            $count -= 1;
+            if ($count < 1) {
+                throw new \Exception("Error: Not a valid BLM file, Too many header items, attempting to read more than '{$this->maxHeaderLines}' values");
+            }
+            if (! preg_match("/^([A-Za-z 0-9]+) *:(.*)$/", trim($str), $matches)) {
+                throw new \Exception("Error: Not a valid BLM file, header item '{$name}' missing value");
+            }  
+            
+            $name = trim($matches[1]);
+            $value = trim($matches[2]);      
+            if (! $this->validateHeaderItem($name, $value)) {
+                throw new \Exception("Error: Not a valid BLM file, invalid header item '{$name}' failed with value '{$value}'");
+            }
 
-        $this->readDefinition();
+            $this->{$name} = $value;
+        }
+
+        $this->checkHeader();
+    }
+
+    protected function checkHeader()
+    {
+        $diff = array_diff($this->headerMandatory, array_keys($this->header));
+        if ($diff) {
+            throw new \Exception("Error: Not a valid BLM file, invalid header, missing item(s) '".implode("', '", $diff)."' ");
+        }
+
+        return $this->selectVersionColumnDefinitions();
+    }
+
+    protected function selectVersionColumnDefinitions()
+    {
+        switch ($this->{'Version'}) {
+            case '3': $tmp = $this->columnDefinitionV3;
+                break;
+            case '3i': $tmp = $this->columnDefinitionV3i;
+                break;
+            default: 
+                throw new \Exception("Error: Not a valid BLM file, Unknown version '".$this->{'Version'}."' ");
+        }
+        $this->columnDefinition = array_merge($this->columnDefinition, $tmp);
+
+        return $this;
     }
 
     protected function readDefinition()
     {
-        $str = $this->readLine();
-        if ($this->DEFINITION !== $str) {
+        $str = $this->skip();
+
+        if ($this->sections['DEFINITION'] !== $str) {
             throw new \Exception('Error: Not a valid BLM file, definition missing');
         }
 
@@ -230,6 +279,8 @@ class BlmFile {
         }
 
         $this->validateDefinition($str);
+
+        return $this;
     }
 
     public function readData() : Array
@@ -237,13 +288,15 @@ class BlmFile {
         throw new \Exception('Error: Not Implemented yet');
 
         $str = $this->readLine();
-        if ($this->DATA !== trim($str)) {
+        if ($this->sections['DATA'] !== trim($str)) {
             throw new \Exception('Eror: Not a valid BLM file, definition missing');
         }
-        while ($str = $this->readDataLine()) {
 
-        }
-        return [];
+        // while ($str = $this->readDataLine()) {
+            // yield
+        // }
+
+        // return [];
     }
 
     /**
@@ -255,12 +308,18 @@ class BlmFile {
         return trim(fgets($this->resource));
     }
 
-    protected function skip()
+    /**
+     * Return next non empty line
+     * @return String
+     */
+    protected function skip() : String
     {
         $str = $this->readLine();
-        if ($str !== '') {
-            throw new \Exception("Error: unable to skip blank line, found '{$str}'");
+        while ('' === $str) {
+            $str = $this->readLine();
         }
+
+        return $str;
     }
 
     protected function readHeaderItem(String $name)
@@ -275,13 +334,14 @@ class BlmFile {
         }
 
         $value = trim($matches[1]);
-        // \Log::debug("{$name}=({$value}) ");
 
         if (! $this->validateHeaderItem($name, $value)) {
             throw new \Exception("Error: Not a valid BLM file, invalid header item '{$name}' failed with value '{$value}'");
         }
 
         $this->{$name} = $value;
+
+        return $this;
     }
 
     protected function validateHeaderItem(String $name, String $value)
@@ -333,9 +393,14 @@ class BlmFile {
         }
     }
 
+    protected function readDataLine()
+    {
+        //
+    }
+
     protected function isDate(String $value)
     {
-        return Date('Y-m-d H:i:s', strtotime($value)) === $value;
+        return Date($this->formatDate, strtotime($value)) === $value;
     }
     protected function isInt(String $value)
     {
