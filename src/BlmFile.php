@@ -8,6 +8,12 @@ class BlmFile {
     protected $resource = null;
     protected $formatDate = 'Y-m-d H:i:s';
 
+    protected $sectionTags = [
+        'HEADER' => '#HEADER#',
+        'DEFINITION' => '#DEFINITION#',
+        'DATA' => '#DATA#',
+        'END' => '#END#'
+    ];
     protected $header = [
         'Version' => "",
         'EOF' => '^',
@@ -15,18 +21,10 @@ class BlmFile {
         'Property Count' => 0,
         'Generated Date' => '',
     ];
-    protected $sections = [
-        'HEADER' => '#HEADER#',
-        'DEFINITION' => '#DEFINITION#',
-        'DATA' => '#DATA#',
-        'END' => '#END#'
-    ];
     protected $headerMandatory = [
         'Version',
         'EOF',
-        'EOR',
-        'Property Count',
-        'Generated Date'
+        'EOR'
     ];
     protected $maxHeaderLines = 25;
     protected $columns = [];
@@ -214,8 +212,8 @@ class BlmFile {
     {
         $str = $this->readLine();
 
-        if ($this->sections['HEADER'] !== trim($str)) {
-            throw new \Exception("Error: Not a valid BLM file, Header '{$this->sections['HEADER']}' must be 1sr line");
+        if ($this->sectionTags['HEADER'] !== trim($str)) {
+            throw new \Exception("Error: Not a valid BLM file, Header '{$this->sectionTags['HEADER']}' must be 1sr line");
         }
 
         $count = $this->maxHeaderLines;
@@ -267,9 +265,9 @@ class BlmFile {
 
     protected function readDefinition()
     {
-        $str = $this->skip();
+        $str = $this->readContentLine();
 
-        if ($this->sections['DEFINITION'] !== $str) {
+        if ($this->sectionTags['DEFINITION'] !== $str) {
             throw new \Exception('Error: Not a valid BLM file, definition missing');
         }
 
@@ -283,20 +281,16 @@ class BlmFile {
         return $this;
     }
 
-    public function readData() : Array
+    public function readData()
     {
-        throw new \Exception('Error: Not Implemented yet');
-
-        $str = $this->readLine();
-        if ($this->sections['DATA'] !== trim($str)) {
-            throw new \Exception('Eror: Not a valid BLM file, definition missing');
+        $str = $this->readContentLine();
+        if ($this->sectionTags['DATA'] !== trim($str)) {
+            throw new \Exception('Error: Not a valid BLM file, definition missing');
         }
 
-        // while ($str = $this->readDataLine()) {
-            // yield
-        // }
+        $this->readDataLines();
 
-        // return [];
+        return $this;
     }
 
     /**
@@ -312,7 +306,7 @@ class BlmFile {
      * Return next non empty line
      * @return String
      */
-    protected function skip() : String
+    protected function readContentLine() : String
     {
         $str = $this->readLine();
         while ('' === $str) {
@@ -366,6 +360,7 @@ class BlmFile {
         }
 
         $this->columns = $columns;
+        $this->columns[] = 'Dummy'; // Work around test files ending with EOF.EOR
         $this->validateMandatoryColumns();
 
     }
@@ -393,7 +388,63 @@ class BlmFile {
         }
     }
 
-    protected function readDataLine()
+    protected function readDataLines()
+    {
+        $str = $this->readLine();
+
+        while ($str) {
+            // $count -= 1;
+            if ($str === $this->sectionTags['END']) {
+                break;
+            }
+            if ('' === $str) {
+                continue;
+            }
+
+            if ($this->EOF.$this->EOR !== substr($str, -2)) {
+                throw new \Exception("Error: Not a valid BLM file, EndOfRecord character '{$this->EOR}' missing from end of line, found '".substr($str, -2)."' ");
+            }
+
+            $this->validateData($str);
+
+            $str = $str = $this->readLine();
+        }
+
+        // return $str;
+    }
+
+    protected function validateData($str) : Array
+    {
+        $str = trim($str, $this->EOR);
+        // $str = trim($str, $this->EOF);
+        $str = trim($str);
+
+        $values = explode($this->EOF, $str);
+        $count_values = count($values);
+
+        $columns = $this->columns;
+        $count_columns = count($columns);
+        $keys = array_values($this->columns);
+
+        if ($count_values !== $count_columns) {
+            throw new \Exception("Error: Not a valid BLM file, The number of row fields '{$count_values}' is different to the number expected'{$count_columns}'");
+        }
+
+        $row = array_combine($keys, $values);
+        $this->validateDataRow($row);
+
+        return $row;
+    }
+
+    protected function validateDataRow($row)
+    {
+        foreach($row as $column) {
+            $this->validateDataColumn($column);
+        }
+
+    }
+
+    protected function validateDataColumn($column)
     {
         //
     }
