@@ -27,8 +27,7 @@ class StartupTest extends TestCase
     }
     
     public function test_zipHandling()
-    {        
-
+    {
         $this->zip = new Filesystem(new Zip($this->zipFile));
         $this->assertCount(34, $this->zip->listContents());
 
@@ -168,10 +167,10 @@ class StartupTest extends TestCase
         
         $blm = new BlmFile();
         $blm->setup($resource);
+        foreach($blm->readData() as $row) {
+            // Log::debug("test=".print_r($row,true));
+        }
 
-        // $str = fgets($resource);
-
-        // $this->assertEquals('#HEADER#', trim($str));
-
+        Log::debug("===EXIT===");
     }
 }
