@@ -31,9 +31,9 @@ class BlmFile {
     protected $columnDefinition = [
         // "xAGENT_REF" => 'string:mandatory:nullable',
 
-        "AGENT_REF" => 'string:20:mandatory:mandatory',
-        "BRANCH_ID" => 'int:mandatory:mandatory', // provided by Rightmove
-        "STATUS_ID" => 'int:mandatory:mandatory', // 0 = Available
+        "AGENT_REF" => 'string:20:mandatory:filled',
+        "BRANCH_ID" => 'int:mandatory:filled', // provided by Rightmove
+        "STATUS_ID" => 'int:mandatory:filled', // 0 = Available
         // 1 = SSTC
         // 2 = SSTCM - Scotland
         // 3 = under offer - sales
@@ -45,27 +45,27 @@ class BlmFile {
     ];
 
     protected $columnDefinitionV3 = [
-        "DISPLAY_ADDRESS" => 'string:120:mandatory:mandatory',
-        "PUBLISHED_FLAG" => 'int:mandatory:mandatory', // 0 = hidden/invisible 1 = visible
+        "DISPLAY_ADDRESS" => 'string:120:mandatory:filled',
+        "PUBLISHED_FLAG" => 'int:mandatory:filled', // 0 = hidden/invisible 1 = visible
 
-        "LET_DATE_AVAILABLE" => 'date:nullable:nullable', // date:mandatory:nullable
-        "LET_BOND" => 'num:nullable:nullable', // deposit amount 
-        "ADMINISTRATION_FEE" => 'string:4096:nullable:nullable', // all fees applicable to the property
-        "LET_TYPE_ID" => 'num:nullable:nullable', // mandatory
+        "LET_DATE_AVAILABLE" => 'date:optional:nullable', // date:mandatory:nullable
+        "LET_BOND" => 'num:optional:nullable', // deposit amount 
+        "ADMINISTRATION_FEE" => 'string:4096:optional:nullable', // all fees applicable to the property
+        "LET_TYPE_ID" => 'num:optional:nullable', // mandatory
         // 0 = not specified
         // 1 = long term
         // 2 = short term
         // 3 = student
         // 4 = commercial
 
-        "LET_FURN_ID" => 'int:mandatory:nullable', // 
+        "LET_FURN_ID" => 'int:1:mandatory:nullable', // 
         // 0 = furnished
         // 1 = part furnished
         // 2 = unfurnished
         // 3 = not specified
         // 4 = furnished / unfurnished ???
 
-        "LET_RENT_FREQUENCY" => 'int:mandatory:nullable', //
+        "LET_RENT_FREQUENCY" => 'int:1:mandatory:nullable', //
         // 0 = weekly
         // 1 = monthly - default if null
         // 2 = quarterly
@@ -73,36 +73,36 @@ class BlmFile {
         // 4 =
         // 5 = per-person per-week - students
 
-        "LET_CONTRACT_IN_MONTHS" => 'int:2:nullable:nullable', // student
-        "LET_WASHING_MACHINE_FLAG" => 'string:1:nullable:nullable', // Y/N student
-        "LET_DISHWASHER_FLAG" => 'string:1:nullable:nullable', // Y/N student
-        "LET_BURGLAR_ALARM_FLAG" => 'string:1:nullable:nullable', // Y/N student
-        "LET_BILL_INC_WATER" => 'string:1:nullable:nullable', // Y/N student
-        "LET_BILL_INC_GAS" => 'string:1:nullable:nullable', // Y/N student
-        "LET_BILL_INC_ELECTRICITY" => 'string:1:nullable:nullable', // Y/N student
-        "LET_BILL_INC_TV_LICIENCE" => 'string:1:nullable:nullable', // Y/N student
-        "LET_BILL_INC_TV_SUBSCRIPTION" => 'string:1:nullable:nullable', // Y/N student
-        "LET_BILL_INC_INTERNET" => 'string:1:nullable:nullable', // Y/N student
+        "LET_CONTRACT_IN_MONTHS" => 'int:2:optional:nullable', // student
+        "LET_WASHING_MACHINE_FLAG" => 'string:1:optional:nullable', // Y/N student
+        "LET_DISHWASHER_FLAG" => 'string:1:optional:nullable', // Y/N student
+        "LET_BURGLAR_ALARM_FLAG" => 'string:1:optional:nullable', // Y/N student
+        "LET_BILL_INC_WATER" => 'string:1:optional:nullable', // Y/N student
+        "LET_BILL_INC_GAS" => 'string:1:optional:nullable', // Y/N student
+        "LET_BILL_INC_ELECTRICITY" => 'string:1:optional:nullable', // Y/N student
+        "LET_BILL_INC_TV_LICIENCE" => 'string:1:optional:nullable', // Y/N student
+        "LET_BILL_INC_TV_SUBSCRIPTION" => 'string:1:optional:nullable', // Y/N student
+        "LET_BILL_INC_INTERNET" => 'string:1:optional:nullable', // Y/N student
         
-        "TENURE_TYPE_ID" => 'int:nullable:nullable', // mandatory
+        "TENURE_TYPE_ID" => 'int:optional:nullable', // mandatory
         "TRANS_TYPE_ID" => 'int:nullable:mandatory', // 1 = resale, 2 = lettings        
 
-        "BEDROOMS" => 'int:mandatory:mandatory',
-        "PRICE" => 'num:mandatory:mandatory',
+        "BEDROOMS" => 'int:mandatory:filled',
+        "PRICE" => 'num:mandatory:filled',
         "PRICE_QUALIFIER" => 'string:mandatory:nullable',
-        "PROP_SUB_ID" => 'int:mandatory:mandatory',
+        "PROP_SUB_ID" => 'int:mandatory:filled',
 
-        "ADDRESS_1" => 'string:60:mandatory:mandatory',
-        "ADDRESS_2" => 'string:60:mandatory:mandatory',
-        "ADDRESS_3" => 'string:60:nullable:nullable',
-        "ADDRESS_4" => 'string:60:nullable:nullable',
-        "TOWN" => 'string:60:mandatory:mandatory',
-        "POSTCODE1" => 'string:10:mandatory:mandatory',
-        "POSTCODE2" => 'string:10:mandatory:mandatory',
+        "ADDRESS_1" => 'string:60:mandatory:filled',
+        "ADDRESS_2" => 'string:60:mandatory:filled',
+        "ADDRESS_3" => 'string:60:optional:nullable',
+        "ADDRESS_4" => 'string:60:optional:nullable',
+        "TOWN" => 'string:60:mandatory:filled',
+        "POSTCODE1" => 'string:10:mandatory:filled',
+        "POSTCODE2" => 'string:10:mandatory:filled',
 
-        "FEATURE1" => 'string:200:mandatory:mandatory',
-        "FEATURE2" => 'string:200:mandatory:mandatory',
-        "FEATURE3" => 'string:200:mandatory:mandatory',
+        "FEATURE1" => 'string:200:mandatory:filled',
+        "FEATURE2" => 'string:200:mandatory:filled',
+        "FEATURE3" => 'string:200:mandatory:filled',
         "FEATURE4" => 'string:200:optional:optional',
         "FEATURE5" => 'string:200:optional:optional',
         "FEATURE6" => 'string:200:optional:optional',
@@ -111,34 +111,34 @@ class BlmFile {
         "FEATURE9" => 'string:200:optional:optional',
         "FEATURE10" => 'string:200:optional:optional',
         
-        "SUMMARY" => 'string:1024:mandatory:mandatory',
-        "DESCRIPTION" => 'string:32768:mandatory:mandatory',
+        "SUMMARY" => 'string:1024:mandatory:filled',
+        "DESCRIPTION" => 'string:32768:mandatory:filled',
 
         "NEW_HOME_FLAG" => 'string:1:mandatory:nullable', // Y / N
 
-        "MEDIA_IMAGE_00" => 'string:100:mandatory:nullable',
-        "MEDIA_IMAGE_TEXT_00" => 'string:20::nullable:nullable',
+        "MEDIA_IMAGE_00" => 'string:100:mandatory:nullable:recursive',
+        "MEDIA_IMAGE_TEXT_00" => 'string:20::optional:nullable:recursive',
 
-        "MEDIA_FLOOR_PLAN_00" => 'string:100:nullable:nullable',
-        "MEDIA_FLOOR_PLAN_00" => 'string:100:nullable:nullable',
-        "MEDIA_FLOOR_PLAN_TEXT_00" => 'string:20:nullable:nullable',
+        "MEDIA_FLOOR_PLAN_00" => 'string:100:optional:nullable:recursive',
+        "MEDIA_FLOOR_PLAN_00" => 'string:100:optional:nullable:recursive',
+        "MEDIA_FLOOR_PLAN_TEXT_00" => 'string:20:optional:nullable:recursive',
 
-        "MEDIA_DOCUMENT_00" => 'string:200:nullable:nullable',
-        "MEDIA_DOCUMENT_TEXT_00" => 'string:20:nullable:nullable',
+        "MEDIA_DOCUMENT_00" => 'string:200:optional:nullable:recursive',
+        "MEDIA_DOCUMENT_TEXT_00" => 'string:20:optional:nullable:recursive',
 
-        "MEDIA_VIRTUAL_TOUR_00" => 'string:200:nullable:nullable',
-        "MEDIA_VIRTUAL_TOUR_TEXT_00" => 'string:20:nullable:nullable',
+        "MEDIA_VIRTUAL_TOUR_00" => 'string:200:optional:nullable:recursive',
+        "MEDIA_VIRTUAL_TOUR_TEXT_00" => 'string:20:optional:nullable:recursive',
     ];
         
     protected $columnDefinitionV3i = [
-        "HOUSE_NAME_NUMBER" => 'string:60:mandatory:mandatory',
-        "STREET_NAME", 'string:100:mandatory:mandatory',
-        "OS_TOWN_CITY" => 'string:100:mandatory:mandatory',
-        "OS_REGION" => 'string:100:mandatory:mandatory',
-        "ZIPCODE" => 'string:100:nullable:nullable',
-        "COUNTRY_CODE" => 'string:2:mandatory:mandatory',
-        "EXACT_LATITUDE" => 'num:15:mandatory:mandatory',
-        "EXACT_LONGDITUDE" => 'num:15:mandatory:mandatory',
+        "HOUSE_NAME_NUMBER" => 'string:60:mandatory:filled',
+        "STREET_NAME", 'string:100:mandatory:filled',
+        "OS_TOWN_CITY" => 'string:100:mandatory:filled',
+        "OS_REGION" => 'string:100:mandatory:filled',
+        "ZIPCODE" => 'string:100:optional:nullable',
+        "COUNTRY_CODE" => 'string:2:mandatory:filled',
+        "EXACT_LATITUDE" => 'num:15:mandatory:filled',
+        "EXACT_LONGDITUDE" => 'num:15:mandatory:filled',
     ];
 
     protected $errors = [];
@@ -146,17 +146,17 @@ class BlmFile {
     public function __construct()
     {
         for ($i = 1; $i < 70; $i++) { // temp work around
-            $this->columnDefinition['MEDIA_IMAGE_'.sprintf('%02d', $i)] = 'string:100:nullable:nullable';
-            $this->columnDefinition['MEDIA_IMAGE_TEXT_'.sprintf('%02d', $i)] = 'string:20::nullable:nullable';
+            $this->columnDefinition['MEDIA_IMAGE_'.sprintf('%02d', $i)] = 'string:100:optional:nullable';
+            $this->columnDefinition['MEDIA_IMAGE_TEXT_'.sprintf('%02d', $i)] = 'string:20::optional:nullable';
 
-            $this->columnDefinition['MEDIA_FLOOR_PLAN_'.sprintf('%02d', $i)] = 'string:100:nullable:nullable';
-            $this->columnDefinition['MEDIA_FLOOR_PLAN_TEXT_'.sprintf('%02d', $i)] = 'string:20::nullable:nullable';
+            $this->columnDefinition['MEDIA_FLOOR_PLAN_'.sprintf('%02d', $i)] = 'string:100:optional:nullable';
+            $this->columnDefinition['MEDIA_FLOOR_PLAN_TEXT_'.sprintf('%02d', $i)] = 'string:20::optional:nullable';
 
-            $this->columnDefinition['MEDIA_DOCUMENT_'.sprintf('%02d', $i)] = 'string:200:nullable:nullable';
-            $this->columnDefinition['MEDIA_DOCUMENT_TEXT_'.sprintf('%02d', $i)] = 'string:20::nullable:nullable';
+            $this->columnDefinition['MEDIA_DOCUMENT_'.sprintf('%02d', $i)] = 'string:200:optional:nullable';
+            $this->columnDefinition['MEDIA_DOCUMENT_TEXT_'.sprintf('%02d', $i)] = 'string:20::optional:nullable';
             
-            $this->columnDefinition['MEDIA_VIRTUAL_TOUR_'.sprintf('%02d', $i)] = 'string:200:nullable:nullable';
-            $this->columnDefinition['MEDIA_VIRTUAL_TOUR_TEXT_'.sprintf('%02d', $i)] = 'string:20::nullable:nullable';
+            $this->columnDefinition['MEDIA_VIRTUAL_TOUR_'.sprintf('%02d', $i)] = 'string:200:optional:nullable';
+            $this->columnDefinition['MEDIA_VIRTUAL_TOUR_TEXT_'.sprintf('%02d', $i)] = 'string:20::optional:nullable';
             
         }
     }
@@ -278,17 +278,15 @@ class BlmFile {
 
         $this->validateDefinition($str);
 
-        return $this;
+        return $this->checkDataSection();
     }
 
-    public function readData()
+    protected function checkDataSection()
     {
         $str = $this->readContentLine();
         if ($this->sectionTags['DATA'] !== trim($str)) {
             throw new \Exception('Error: Not a valid BLM file, definition missing');
         }
-
-        $this->readDataLines();
 
         return $this;
     }
@@ -361,6 +359,7 @@ class BlmFile {
 
         $this->columns = $columns;
         $this->columns[] = 'Dummy'; // Work around test files ending with EOF.EOR
+        $this->validateDataSeparators();
         $this->validateMandatoryColumns();
 
     }
@@ -368,7 +367,22 @@ class BlmFile {
     protected function validateColumn(String $column)
     {
         if (! in_array($column, array_keys($this->columnDefinition))) {
-            throw new \Exception("Error: Not a valid BLM file, Unexpected column name '{$column}' ");
+            // throw new \Exception("Error: Not a valid BLM file, Unexpected column name '{$column}' ");
+            return;
+        }
+
+    }
+
+    protected function validateDataSeparators()
+    {
+        if ($this->header['EOF'] == $this->header['EOR'] ) {
+            throw new \Exception("Error: Not a valid BLM file, EndOfField character '{$this->header['EOF']}' must be different than EndOfRecord character '{$this->header['EOR']}'");
+        }
+        if (strlen($this->header['EOF']) != 1) {
+            throw new \Exception("Error: '".strlen($this->header['EOF'])."' Not a valid BLM file, EndOfField character '{$this->header['EOF']}' must be a singe character, default '^' ");
+        }
+        if (strlen($this->header['EOR']) != 1) {
+            throw new \Exception("Error: Not a valid BLM file, EndOfRecord character '{$this->header['EOR']}' must be a singe character, default '~' ");
         }
 
     }
@@ -388,35 +402,38 @@ class BlmFile {
         }
     }
 
-    protected function readDataLines()
+    public function readData()
     {
+        $count = 0;
         $str = $this->readLine();
-
         while ($str) {
-            // $count -= 1;
             if ($str === $this->sectionTags['END']) {
                 break;
             }
             if ('' === $str) {
                 continue;
             }
+            $count += 1;
 
             if ($this->EOF.$this->EOR !== substr($str, -2)) {
                 throw new \Exception("Error: Not a valid BLM file, EndOfRecord character '{$this->EOR}' missing from end of line, found '".substr($str, -2)."' ");
             }
 
-            $this->validateData($str);
+            yield $this->validateData($str);
 
-            $str = $str = $this->readLine();
+            $str = $this->readLine();
         }
 
-        // return $str;
+        if ($count != $this->{'Property Count'}) {
+            Log::debug("Warning: Expected '".$this->{'Property Count'}."' properties in file, found '{$count}'");
+        }
     }
 
     protected function validateData($str) : Array
     {
+        // Log::debug("validateData");
+
         $str = trim($str, $this->EOR);
-        // $str = trim($str, $this->EOF);
         $str = trim($str);
 
         $values = explode($this->EOF, $str);
@@ -438,15 +455,33 @@ class BlmFile {
 
     protected function validateDataRow($row)
     {
-        foreach($row as $column) {
-            $this->validateDataColumn($column);
+        // Log::debug("validateDataRow");
+
+        foreach($row as $columnName => $columnValue) {
+            $this->validateDataColumn($columnName, $columnValue);
         }
 
     }
 
-    protected function validateDataColumn($column)
+    protected function validateDataColumn($columnName, $columnValue)
     {
-        //
+        // Log::debug("validateDataColumn");
+        // Log::debug("validateDataColumn[{$columnName}, {$columnValue}]");
+        if ( preg_match("#^(.+)_(\d\d)$#", $columnName, $matches)) {
+            $name = $matches[1];
+            $number = $matches[2];
+
+            $this->validateRecursiveDataColumn($name, $number, $columnValue);
+        }
+    }
+    
+    protected function validateRecursiveDataColumn($name, $number, $columnValue)
+    {
+        Log::debug("validateRecursiveDataColumn['{$name}', '{$number}', '{$columnValue}']");
+        // $name = substr($columnName, -3);
+        // $number = substr($columnName, 0, strlen($name)-2);
+        // preg_match(".*_(.+)",$columnName, $matches);
+
     }
 
     protected function isDate(String $value)
