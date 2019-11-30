@@ -117,17 +117,17 @@ class BlmFile {
         "NEW_HOME_FLAG" => 'string:1:mandatory:nullable', // Y / N
 
         "MEDIA_IMAGE_00" => 'string:100:mandatory:nullable:recursive',
-        "MEDIA_IMAGE_TEXT_00" => 'string:20::optional:nullable:recursive',
+        "MEDIA_IMAGE" => 'string:100:optional:nullable:recursive',
+        "MEDIA_IMAGE_TEXT" => 'string:20::optional:nullable:recursive',
 
-        "MEDIA_FLOOR_PLAN_00" => 'string:100:optional:nullable:recursive',
-        "MEDIA_FLOOR_PLAN_00" => 'string:100:optional:nullable:recursive',
-        "MEDIA_FLOOR_PLAN_TEXT_00" => 'string:20:optional:nullable:recursive',
+        "MEDIA_FLOOR_PLAN" => 'string:100:optional:nullable:recursive',
+        "MEDIA_FLOOR_PLAN_TEXT" => 'string:20:optional:nullable:recursive',
 
-        "MEDIA_DOCUMENT_00" => 'string:200:optional:nullable:recursive',
-        "MEDIA_DOCUMENT_TEXT_00" => 'string:20:optional:nullable:recursive',
+        "MEDIA_DOCUMENT" => 'string:200:optional:nullable:recursive',
+        "MEDIA_DOCUMENT_TEXT" => 'string:20:optional:nullable:recursive',
 
-        "MEDIA_VIRTUAL_TOUR_00" => 'string:200:optional:nullable:recursive',
-        "MEDIA_VIRTUAL_TOUR_TEXT_00" => 'string:20:optional:nullable:recursive',
+        "MEDIA_VIRTUAL_TOUR" => 'string:200:optional:nullable:recursive',
+        "MEDIA_VIRTUAL_TOUR_TEXT" => 'string:20:optional:nullable:recursive',
     ];
         
     protected $columnDefinitionV3i = [
@@ -142,24 +142,6 @@ class BlmFile {
     ];
 
     protected $errors = [];
-
-    public function __construct()
-    {
-        for ($i = 1; $i < 70; $i++) { // temp work around
-            $this->columnDefinition['MEDIA_IMAGE_'.sprintf('%02d', $i)] = 'string:100:optional:nullable';
-            $this->columnDefinition['MEDIA_IMAGE_TEXT_'.sprintf('%02d', $i)] = 'string:20::optional:nullable';
-
-            $this->columnDefinition['MEDIA_FLOOR_PLAN_'.sprintf('%02d', $i)] = 'string:100:optional:nullable';
-            $this->columnDefinition['MEDIA_FLOOR_PLAN_TEXT_'.sprintf('%02d', $i)] = 'string:20::optional:nullable';
-
-            $this->columnDefinition['MEDIA_DOCUMENT_'.sprintf('%02d', $i)] = 'string:200:optional:nullable';
-            $this->columnDefinition['MEDIA_DOCUMENT_TEXT_'.sprintf('%02d', $i)] = 'string:20::optional:nullable';
-            
-            $this->columnDefinition['MEDIA_VIRTUAL_TOUR_'.sprintf('%02d', $i)] = 'string:200:optional:nullable';
-            $this->columnDefinition['MEDIA_VIRTUAL_TOUR_TEXT_'.sprintf('%02d', $i)] = 'string:20::optional:nullable';
-            
-        }
-    }
 
     public function __set($name, $value)
     {
@@ -213,18 +195,25 @@ class BlmFile {
         $str = $this->readLine();
 
         if ($this->sectionTags['HEADER'] !== trim($str)) {
-            throw new \Exception("Error: Not a valid BLM file, Header '{$this->sectionTags['HEADER']}' must be 1sr line");
+            throw new \Exception("Error: Not a valid BLM file, Header '{$this->sectionTags['HEADER']}' must be 1st line");
         }
 
         $count = $this->maxHeaderLines;
         while ($str = $this->readLine()) {
+            if ($this->sectionTags['DEFINITION'] === $str) {
+                break;
+            }
+
             $count -= 1;
             if ($count < 1) {
                 throw new \Exception("Error: Not a valid BLM file, Too many header items, attempting to read more than '{$this->maxHeaderLines}' values");
             }
-            if (! preg_match("/^([A-Za-z 0-9]+) *:(.*)$/", trim($str), $matches)) {
-                throw new \Exception("Error: Not a valid BLM file, header item '{$name}' missing value");
-            }  
+            if (! preg_match("/^([A-Z 0-9]+) *: *(.*)$/i", trim($str), $matches)) {
+                throw new \Exception("Error: Not a valid BLM file, header item '{$dummy}' missing value");
+            }
+            if (count($matches) <> 3) {
+                dd($str);
+            }
             
             $name = trim($matches[1]);
             $value = trim($matches[2]);      
@@ -235,7 +224,7 @@ class BlmFile {
             $this->{$name} = $value;
         }
 
-        $this->checkHeader();
+        return $this->checkHeader();
     }
 
     protected function checkHeader()
@@ -265,12 +254,6 @@ class BlmFile {
 
     protected function readDefinition()
     {
-        $str = $this->readContentLine();
-
-        if ($this->sectionTags['DEFINITION'] !== $str) {
-            throw new \Exception('Error: Not a valid BLM file, definition missing');
-        }
-
         $str = $this->readLine();
         if (! preg_match("#^[A-Z_0-9\\".$this->EOF."]+\\".$this->EOR."$#",$str)) {
             throw new \Exception("Error: Not a valid BLM file, definition incorrect found '{$str}'");
@@ -283,7 +266,7 @@ class BlmFile {
 
     protected function checkDataSection()
     {
-        $str = $this->readContentLine();
+        $str = $this->readLine();
         if ($this->sectionTags['DATA'] !== trim($str)) {
             throw new \Exception('Error: Not a valid BLM file, definition missing');
         }
@@ -292,33 +275,27 @@ class BlmFile {
     }
 
     /**
-     * read a line from HEADER/ DEFINITION
-     * @return string
-     */
-    protected function readLine()
-    {
-        return trim(fgets($this->resource));
-    }
-
-    /**
      * Return next non empty line
      * @return String
      */
-    protected function readContentLine() : String
+    protected function readLine() : String
     {
-        $str = $this->readLine();
+        $str = '';
         while ('' === $str) {
-            $str = $this->readLine();
+            $str = trim(fgets($this->resource));
         }
 
         return $str;
     }
 
+    /**
+     * 
+     */
     protected function readHeaderItem(String $name)
     {
-        $str = $this->readLine();
+        $str = $this->readContentLine();
         if (! preg_match("/^{$name} *:.*$/", $str)) {
-            throw new \Exception("Error: Not a valid BLM file, header item '{$name}' missing");
+            throw new \Exception("Error: Not a valid BLM file, header item '{$name}' missing '{$str}'");
         }
 
         if (! preg_match("/^{$name} *:(.*)$/", trim($str), $matches)) {
@@ -338,14 +315,25 @@ class BlmFile {
 
     protected function validateHeaderItem(String $name, String $value)
     {
+        Log::debug(__LINE__.", '{$name}' = '{$value}' ");
+        // mandatory
         switch ($name) {
-            case 'Version': return \in_array($value, ['3', '3i']);
+            case 'Version': return in_array($value, ['3', '3i']);
             case 'EOF': return preg_match("/^'.'$/", $value);
             case 'EOR': return preg_match("/^'.'$/", $value);
-            case 'Property Count': return $this->isInt($value);
-            case 'Generated Date': return $this->isDate($value);
-            default: return false;
         }
+
+        // Optional
+        if ($value == '') {
+            return true;
+        }
+        switch ($name) {
+            case 'Property Count': return ($value == '') ? true : $this->isInt($value);
+            case 'Generated Date': return ($value == '') ? true : $this->isDate($value);
+        }
+
+        // feed supplier
+        return true;
     }
 
     protected function validateDefinition(String $str)
@@ -358,7 +346,6 @@ class BlmFile {
         }
 
         $this->columns = $columns;
-        $this->columns[] = 'Dummy'; // Work around test files ending with EOF.EOR
         $this->validateDataSeparators();
         $this->validateMandatoryColumns();
 
@@ -366,9 +353,8 @@ class BlmFile {
 
     protected function validateColumn(String $column)
     {
-        if (! in_array($column, array_keys($this->columnDefinition))) {
-            // throw new \Exception("Error: Not a valid BLM file, Unexpected column name '{$column}' ");
-            return;
+        if (! in_array($this->cannonicalColumnName($column), array_keys($this->columnDefinition))) {
+            throw new \Exception("Error: Not a valid BLM file, Unexpected column name '{$column}' ");
         }
 
     }
@@ -389,17 +375,29 @@ class BlmFile {
 
     protected function validateMandatoryColumns()
     {
-        $mandatory = array_filter($this->columnDefinition, function($column) {
-            return strpos($column, ':mandatory') !== false;
+        $mandatory = array_filter($this->columnDefinition, function($columnDefinition) {
+            return strpos($columnDefinition, ':mandatory') !== false;
         });
 
         $mandatory = array_keys($mandatory);
-        $columns = array_values($this->columns);
+        $columns = array_map(function ($column) {
+            return $this->cannonicalColumnName($column);
+        }, $this->columns);
 
         $diff = array_diff($mandatory, $columns);
         if ($diff) {
             throw new \Exception("Error: Not a valid BLM file, Mandatory column(s) '".implode("', '", $diff)."' missing");
         }
+    }
+    protected function cannonicalColumnName($columnName)
+    {
+        if ('MEDIA_IMAGE_00' == $columnName) {
+            // skip
+        } elseif ( preg_match("#^(MEDIA.+)_(\d+)$#", $columnName, $matches)) {
+            return $matches[1];
+        }
+
+        return $columnName;
     }
 
     public function readData()
@@ -429,63 +427,76 @@ class BlmFile {
         }
     }
 
-    protected function validateData($str) : Array
+    protected function validateData(String $str) : Array
     {
-        // Log::debug("validateData");
+        $values = $this->extractRowValues($str);
+ 
+        $keys = array_values($this->columns);
+        $row = array_combine($keys, $values);
 
+        return $this->validateDataRow($row);
+    }
+
+    protected function extractRowValues(String $str) : Array
+    {
         $str = trim($str, $this->EOR);
         $str = trim($str);
 
         $values = explode($this->EOF, $str);
+
+        // The final field should be finished with the EOF delimiter and then EOR delimiter.
+        //  Which means that there is a blank slot that needs to be accounted for
+        $dummy = array_pop($values);
         $count_values = count($values);
-
-        $columns = $this->columns;
-        $count_columns = count($columns);
-        $keys = array_values($this->columns);
-
+        $count_columns = count($this->columns);
         if ($count_values !== $count_columns) {
             throw new \Exception("Error: Not a valid BLM file, The number of row fields '{$count_values}' is different to the number expected'{$count_columns}'");
         }
 
-        $row = array_combine($keys, $values);
-        $this->validateDataRow($row);
-
-        return $row;
+        return $values;
     }
 
-    protected function validateDataRow($row)
+    protected function validateDataRow(Array $row)
     {
-        // Log::debug("validateDataRow");
-
         foreach($row as $columnName => $columnValue) {
             $this->validateDataColumn($columnName, $columnValue);
         }
 
+        return $row;
     }
 
     protected function validateDataColumn($columnName, $columnValue)
     {
-        // Log::debug("validateDataColumn");
-        // Log::debug("validateDataColumn[{$columnName}, {$columnValue}]");
-        if ( preg_match("#^(.+)_(\d\d)$#", $columnName, $matches)) {
+        $columnName = $this->cannonicalColumnName($columnName);
+        if ('MEDIA_IMAGE_00' == $columnName) {
+            // skip
+        } elseif ( preg_match("#^(.+)_(\d\d)$#", $columnName, $matches)) {
             $name = $matches[1];
             $number = $matches[2];
 
-            $this->validateRecursiveDataColumn($name, $number, $columnValue);
+            return $this->validateDataColumnRecursive($name, $number, $columnValue);
         }
+        
+        $this->validateDataColumnSingle($columnName, $columnValue);
     }
-    
-    protected function validateRecursiveDataColumn($name, $number, $columnValue)
+
+    protected function validateDataColumnRecursive($name, $number, $columnValue)
     {
-        Log::debug("validateRecursiveDataColumn['{$name}', '{$number}', '{$columnValue}']");
-        // $name = substr($columnName, -3);
-        // $number = substr($columnName, 0, strlen($name)-2);
-        // preg_match(".*_(.+)",$columnName, $matches);
+        $definition = $this->columnDefinition[$name];
+        Log::debug("validateDataColumnRecursive['{$name}', '{$number}', '{$columnValue}', '{$definition}']");
 
     }
+
+    protected function validateDataColumnSingle(String $name, String $columnValue)
+    {
+        $definition = $this->columnDefinition[$name];
+        Log::debug("validateDataColumnSingle['{$name}', '{$columnValue}', '{$definition}']");
+
+    }   
 
     protected function isDate(String $value)
     {
+        $date = Date($this->formatDate, strtotime($value));
         return Date($this->formatDate, strtotime($value)) === $value;
     }
     protected function isInt(String $value)
