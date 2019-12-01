@@ -118,11 +118,11 @@ class BlmFile {
 
         "MEDIA_IMAGE_00" => 'string:100:mandatory:filled:recursive',
         "MEDIA_IMAGE" => 'string:100:optional:nullable:recursive',
-        "MEDIA_IMAGE_TEXT" => 'string:20::optional:nullable:recursive',
+        "MEDIA_IMAGE_TEXT" => 'string:20:optional:nullable:recursive',
 
         // in spec, but not in test file, coomentbout for now
         // "MEDIA_IMAGE_60" => 'string:20:mandatory:nullable:recursive', // Name of the property EPC graphic. MEDIA_IMAGE_60 is for EPC Graphics that would be shown on site.
-        // "MEDIA_IMAGE_TEXT_60" => 'string:3::mandatory:nullable:recursive', // Caption to go with the EPC of MEDIA_IMAGE_60, this MUST READ “EPC”.
+        // "MEDIA_IMAGE_TEXT_60" => 'string:3:mandatory:nullable:recursive', // Caption to go with the EPC of MEDIA_IMAGE_60, this MUST READ “EPC”.
 
         "MEDIA_FLOOR_PLAN" => 'string:100:optional:nullable:recursive',
         "MEDIA_FLOOR_PLAN_TEXT" => 'string:20:optional:nullable:recursive',
