@@ -6,6 +6,10 @@ No advantage over using file_get_contents() and parsing contents.
 
 Instead using PHP gererator function to split processing to discrete chunks so that only the current row is in memory.
 
+# 2-19-12-03 Only test available due to example tests being flawed
+```vendor/bin/phpunit --filter test_columnDefinitionsTest -vvv```
+
+
 # 2019-12-01 @Todo
 Duplicate tests using folder instead of using the zip archive 'tests/files/141212100024_FBM_2014120711.zip'
 *    which should not be altered.

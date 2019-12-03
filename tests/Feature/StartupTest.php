@@ -171,6 +171,6 @@ class StartupTest extends TestCase
             // Log::debug("test=".print_r($row,true));
         }
 
-        Log::debug("===EXIT===");
+        Log::debug("===".\basename(__FILE__)."===EXIT===");
     }
 }

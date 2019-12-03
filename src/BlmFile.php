@@ -31,118 +31,136 @@ class BlmFile {
     protected $columnDefinition = [
         // "xAGENT_REF" => 'string:mandatory:nullable',
 
-        "AGENT_REF" => 'string:20:mandatory:filled',
+        "AGENT_REF" => 'string:mandatory:filled:len=20',
         "BRANCH_ID" => 'int:mandatory:filled', // provided by Rightmove
-        "STATUS_ID" => 'int:mandatory:filled', // 0 = Available
-        // 1 = SSTC
-        // 2 = SSTCM - Scotland
-        // 3 = under offer - sales
-        // 4 = reserved - sales
-        // 5 = let agreed - letting
+        "STATUS_ID" => 'int:mandatory:filled:len=1', // 
+            // 0 = Available
+            // 1 = SSTC - Sold Subject To Completion
+            // 2 = SSTCM - Scotland - Sold Subject To Concluded Missives
+            // 3 = under offer - sales
+            // 4 = reserved - sales
+            // 5 = let agreed - letting
         
         "CREATE_DATE" => 'date:mandatory:nullable', // YYYY-MM-DD HH:MI:SS
         "UPDATE_DATE" => 'date:mandatory:nullable', // YYYY-MM-DD HH:MI:SS
     ];
 
     protected $columnDefinitionV3 = [
-        "DISPLAY_ADDRESS" => 'string:120:mandatory:filled',
-        "PUBLISHED_FLAG" => 'int:mandatory:filled', // 0 = hidden/invisible 1 = visible
+        "DISPLAY_ADDRESS" => 'string:mandatory:filled:len=120', // Address of the property that should be displayed on the Live Rightmove site
+        "PUBLISHED_FLAG" => 'int:mandatory:filled:len=1', // 0 = hidden/invisible 1 = visible
 
         "LET_DATE_AVAILABLE" => 'date:optional:nullable', // date:mandatory:nullable
         "LET_BOND" => 'num:optional:nullable', // deposit amount 
-        "ADMINISTRATION_FEE" => 'string:4096:optional:nullable', // all fees applicable to the property
-        "LET_TYPE_ID" => 'num:optional:nullable', // mandatory
-        // 0 = not specified
-        // 1 = long term
-        // 2 = short term
-        // 3 = student
-        // 4 = commercial
+        "ADMINISTRATION_FEE" => 'string:optional:nullable:len=4096', // all fees applicable to the property
+        "LET_TYPE_ID" => 'num:optional:nullable:len=1', // mandatory
+            // 0 = not specified DEFAULT
+            // 1 = long term
+            // 2 = short term
+            // 3 = student
+            // 4 = commercial
 
-        "LET_FURN_ID" => 'int:1:mandatory:nullable', // 
-        // 0 = furnished
-        // 1 = part furnished
-        // 2 = unfurnished
-        // 3 = not specified
-        // 4 = furnished / unfurnished ???
+        "LET_FURN_ID" => 'int:mandatory:nullable:len=1', // 
+            // 0 = furnished
+            // 1 = part furnished
+            // 2 = unfurnished
+            // 3 = not specified DEFAULT
+            // 4 = furnished / unfurnished ???
 
-        "LET_RENT_FREQUENCY" => 'int:1:mandatory:nullable', //
-        // 0 = weekly
-        // 1 = monthly - default if null
-        // 2 = quarterly
-        // 3 = annual
-        // 4 =
-        // 5 = per-person per-week - students
+        "LET_RENT_FREQUENCY" => 'int:mandatory:nullable:len=1', //
+            // 0 = weekly
+            // 1 = monthly - DEFAULT if null
+            // 2 = quarterly
+            // 3 = annual
+            // 4 =
+            // 5 = per-person per-week - students
 
-        "LET_CONTRACT_IN_MONTHS" => 'int:2:optional:nullable', // student
-        "LET_WASHING_MACHINE_FLAG" => 'string:1:optional:nullable', // Y/N student
-        "LET_DISHWASHER_FLAG" => 'string:1:optional:nullable', // Y/N student
-        "LET_BURGLAR_ALARM_FLAG" => 'string:1:optional:nullable', // Y/N student
-        "LET_BILL_INC_WATER" => 'string:1:optional:nullable', // Y/N student
-        "LET_BILL_INC_GAS" => 'string:1:optional:nullable', // Y/N student
-        "LET_BILL_INC_ELECTRICITY" => 'string:1:optional:nullable', // Y/N student
-        "LET_BILL_INC_TV_LICIENCE" => 'string:1:optional:nullable', // Y/N student
-        "LET_BILL_INC_TV_SUBSCRIPTION" => 'string:1:optional:nullable', // Y/N student
-        "LET_BILL_INC_INTERNET" => 'string:1:optional:nullable', // Y/N student
+        "LET_CONTRACT_IN_MONTHS" => 'int:optional:nullable:len=2', // student
+        "LET_WASHING_MACHINE_FLAG" => 'string:optional:nullable:len=1', // Y/N student
+        "LET_DISHWASHER_FLAG" => 'string:optional:nullable:len=1', // Y/N student
+        "LET_BURGLAR_ALARM_FLAG" => 'string:optional:nullable:len=1', // Y/N student
+        "LET_BILL_INC_WATER" => 'string:optional:nullable:len=1', // Y/N student
+        "LET_BILL_INC_GAS" => 'string:optional:nullable:len=1', // Y/N student
+        "LET_BILL_INC_ELECTRICITY" => 'string:optional:nullable:len=1', // Y/N student
+        "LET_BILL_INC_TV_LICIENCE" => 'string:optional:nullable:len=1', // Y/N student
+        "LET_BILL_INC_TV_SUBSCRIPTION" => 'string:optional:nullable:len=1', // Y/N student
+        "LET_BILL_INC_INTERNET" => 'string:optional:nullable:len=1', // Y/N student
         
-        "TENURE_TYPE_ID" => 'int:optional:nullable', // mandatory
-        "TRANS_TYPE_ID" => 'int:nullable:mandatory', // 1 = resale, 2 = lettings        
+        "TENURE_TYPE_ID" => 'int:optional:nullable:len=1', // mandatory
+        "TRANS_TYPE_ID" => 'int:nullable:mandatory:len=1', // 1 = resale, 2 = lettings        
 
         "BEDROOMS" => 'int:mandatory:filled',
         "PRICE" => 'num:mandatory:filled',
-        "PRICE_QUALIFIER" => 'string:mandatory:nullable',
-        "PROP_SUB_ID" => 'int:mandatory:filled',
+        "PRICE_QUALIFIER" => 'int:mandatory:nullable',
+                /*  0 – Default, 
+                    1 – POA, 
+                    2 – Guide Price, 
+                    3 – Fixed Price, 
+                    4 – Offers in Excess of, 
+                    5 – OIRO, Offers In The Region Of
+                    6 – Sale by Tender, 
+                    7 – From (new homes and commercial only), 
+                    8 UNKNOWN
+                    9 – Shared Ownership, 
+                    10 – Offers Over, 
+                    11 – Part Buy Part Rent, 
+                    12 – Shared Equity, 
+                    13 UNKNOWN
+                    14 – Equity Loan, 
+                    15 – Offers Invited
+                **/
+        "PROP_SUB_ID" => 'int:mandatory:filled', // One of the valid property types. Ref. Property Type table
 
-        "ADDRESS_1" => 'string:60:mandatory:filled',
-        "ADDRESS_2" => 'string:60:mandatory:filled',
-        "ADDRESS_3" => 'string:60:optional:nullable',
-        "ADDRESS_4" => 'string:60:optional:nullable',
-        "TOWN" => 'string:60:mandatory:filled',
-        "POSTCODE1" => 'string:10:mandatory:filled',
-        "POSTCODE2" => 'string:10:mandatory:filled',
+        "ADDRESS_1" => 'string:mandatory:filled:len=60',
+        "ADDRESS_2" => 'string:mandatory:filled:len=60',
+        "ADDRESS_3" => 'string:optional:nullable:len=60',
+        "ADDRESS_4" => 'string:optional:nullable:len=60',
+        "TOWN" => 'string:mandatory:filled:len=60',
+        "POSTCODE1" => 'string:mandatory:filled:len=10',
+        "POSTCODE2" => 'string:mandatory:filled:len=10',
 
-        "FEATURE1" => 'string:200:mandatory:filled',
-        "FEATURE2" => 'string:200:mandatory:filled',
-        "FEATURE3" => 'string:200:mandatory:filled',
-        "FEATURE4" => 'string:200:optional:optional',
-        "FEATURE5" => 'string:200:optional:optional',
-        "FEATURE6" => 'string:200:optional:optional',
-        "FEATURE7" => 'string:200:optional:optional',
-        "FEATURE8" => 'string:200:optional:optional',
-        "FEATURE9" => 'string:200:optional:optional',
-        "FEATURE10" => 'string:200:optional:optional',
+        "FEATURE1" => 'string:mandatory:filled:len=200',
+        "FEATURE2" => 'string:mandatory:filled:len=200',
+        "FEATURE3" => 'string:mandatory:filled:len=200',
+        "FEATURE4" => 'string:optional:nullable:len=200',
+        "FEATURE5" => 'string:optional:nullable:len=200',
+        "FEATURE6" => 'string:optional:nullable:len=200',
+        "FEATURE7" => 'string:optional:nullable:len=200',
+        "FEATURE8" => 'string:optional:nullable:len=200',
+        "FEATURE9" => 'string:optional:nullable:len=200',
+        "FEATURE10" => 'string:optional:nullable:len=200',
         
-        "SUMMARY" => 'string:1024:mandatory:filled',
-        "DESCRIPTION" => 'string:32768:mandatory:filled',
+        "SUMMARY" => 'string:mandatory:filled:len=1024',
+        "DESCRIPTION" => 'string:mandatory:filled:len=32768',
 
-        "NEW_HOME_FLAG" => 'string:1:mandatory:nullable', // Y / N
+        "NEW_HOME_FLAG" => 'string:mandatory:nullable:len=1', // Y / N
 
-        "MEDIA_IMAGE_00" => 'string:100:mandatory:filled:recursive',
-        "MEDIA_IMAGE" => 'string:100:optional:nullable:recursive',
-        "MEDIA_IMAGE_TEXT" => 'string:20:optional:nullable:recursive',
+        "MEDIA_IMAGE_00" => 'string:mandatory:filled:len=100:recursive',
+        "MEDIA_IMAGE" => 'string:optional:nullable:len=100:recursive',
+        "MEDIA_IMAGE_TEXT" => 'string:optional:nullable:len=20:recursive',
 
-        // in spec, but not in test file, coomentbout for now
-        // "MEDIA_IMAGE_60" => 'string:20:mandatory:nullable:recursive', // Name of the property EPC graphic. MEDIA_IMAGE_60 is for EPC Graphics that would be shown on site.
-        // "MEDIA_IMAGE_TEXT_60" => 'string:3:mandatory:nullable:recursive', // Caption to go with the EPC of MEDIA_IMAGE_60, this MUST READ “EPC”.
+        // in spec, but not in test file, coment out for now
+        // "MEDIA_IMAGE_60" => 'string:mandatory:nullable:len=20:recursive', // Name of the property EPC graphic. MEDIA_IMAGE_60 is for EPC Graphics that would be shown on site.
+        // "MEDIA_IMAGE_TEXT_60" => 'string:mandatory:nullable:len=3:recursive', // Caption to go with the EPC of MEDIA_IMAGE_60, this MUST READ “EPC”.
 
-        "MEDIA_FLOOR_PLAN" => 'string:100:optional:nullable:recursive',
-        "MEDIA_FLOOR_PLAN_TEXT" => 'string:20:optional:nullable:recursive',
+        "MEDIA_FLOOR_PLAN" => 'string:optional:nullable:len=100:recursive',
+        "MEDIA_FLOOR_PLAN_TEXT" => 'string:optional:nullable:len=20:recursive',
 
-        "MEDIA_DOCUMENT" => 'string:200:optional:nullable:recursive',
-        "MEDIA_DOCUMENT_TEXT" => 'string:20:optional:nullable:recursive',
+        "MEDIA_DOCUMENT" => 'string:optional:nullable:len=200:recursive',
+        "MEDIA_DOCUMENT_TEXT" => 'string:optional:nullable:len=20:recursive',
 
-        "MEDIA_VIRTUAL_TOUR" => 'string:200:optional:nullable:recursive',
-        "MEDIA_VIRTUAL_TOUR_TEXT" => 'string:20:optional:nullable:recursive',
+        "MEDIA_VIRTUAL_TOUR" => 'string:optional:nullable:len=200:recursive',
+        "MEDIA_VIRTUAL_TOUR_TEXT" => 'string:optional:nullable:len=20:recursive',
     ];
         
     protected $columnDefinitionV3i = [
-        "HOUSE_NAME_NUMBER" => 'string:60:mandatory:filled',
-        "STREET_NAME", 'string:100:mandatory:filled',
-        "OS_TOWN_CITY" => 'string:100:mandatory:filled',
-        "OS_REGION" => 'string:100:mandatory:filled',
-        "ZIPCODE" => 'string:100:optional:nullable',
-        "COUNTRY_CODE" => 'string:2:mandatory:filled',
-        "EXACT_LATITUDE" => 'num:15:mandatory:filled',
-        "EXACT_LONGDITUDE" => 'num:15:mandatory:filled',
+        "HOUSE_NAME_NUMBER" => 'string:mandatory:filled:len=60',
+        "STREET_NAME", 'string:mandatory:filled:len=100',
+        "OS_TOWN_CITY" => 'string:mandatory:filled:len=100',
+        "OS_REGION" => 'string:mandatory:filled:len=100',
+        "ZIPCODE" => 'string:optional:nullable:len=100',
+        "COUNTRY_CODE" => 'string:mandatory:filled:len=2',
+        "EXACT_LATITUDE" => 'num:mandatory:filled:len=15',
+        "EXACT_LONGDITUDE" => 'num:mandatory:filled:len=15',
     ];
 
     protected $errors = [];
@@ -471,32 +489,53 @@ class BlmFile {
 
     protected function validateDataColumn($columnName, $columnValue)
     {
-        $columnName = $this->cannonicalColumnName($columnName);
+        $definition = $this->definition($columnName);
+        
+        $this->validateDataColumnDefinition($columnName, $columnValue, $definition);
+    }
+
+    protected function validateDataColumnDefinition($columnName, $columnValue, $definition)
+    {
+        // is data optional?
+        if (($definition['required']) && ('' == $columnValue)) {
+            throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' missing expected value");
+        }
+
+
+    }
+
+    protected function definition(String $columnName)
+    {
+        $name = $columnName;
         if ('MEDIA_IMAGE_00' == $columnName) {
             // skip
         } elseif ( preg_match("#^(.+)_(\d\d)$#", $columnName, $matches)) {
             $name = $matches[1];
-            $number = $matches[2];
-
-            return $this->validateDataColumnRecursive($name, $number, $columnValue);
         }
-        
-        $this->validateDataColumnSingle($columnName, $columnValue);
-    }
 
-    protected function validateDataColumnRecursive($name, $number, $columnValue)
-    {
         $definition = $this->columnDefinition[$name];
-        Log::debug("validateDataColumnRecursive['{$name}', '{$number}', '{$columnValue}', '{$definition}']");
+        $def = explode(':', $definition);
 
+        $result = [];
+        $result['type'] = array_shift($def);
+        $result['mandatory'] = ('mandatory' === array_shift($def));
+        $result['required'] = ('filled' === array_shift($def));
+        $result['recursive'] = false;
+        $result['len'] = ($result['required']) ? 1 : 0;
+
+        foreach($def as $item) {
+            if ('recursive' == $item ) {
+                $result['recursive'] = true;
+                continue;
+            }
+            if ('len' == substr($item, 0, 3)) {
+                $result['len'] = substr($item, 4);
+            }
+        }
+        // Log::debug("\$columnName[{$columnName}]=".print_r($result,true));
+
+        return $result;
     }
-
-    protected function validateDataColumnSingle(String $name, String $columnValue)
-    {
-        $definition = $this->columnDefinition[$name];
-        Log::debug("validateDataColumnSingle['{$name}', '{$columnValue}', '{$definition}']");
-
-    }   
 
     protected function isDate(String $value)
     {
