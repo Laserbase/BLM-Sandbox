@@ -165,6 +165,61 @@ class BlmFile {
 
     protected $errors = [];
 
+    public function __construct()
+    {
+        foreach($this->columnDefinition as $name => $definitionString) {
+            $this->columnDefinition[$name] = $this->definition($name, $definitionString);
+        }
+        foreach($this->columnDefinitionV3 as $name => $definitionString) {
+            $this->columnDefinitionV3[$name] = $this->definition($name, $definitionString);
+        }
+        foreach($this->columnDefinitionV3i as $name => $definitionString) {
+            $this->columnDefinitionV3i[$name] = $this->definition($name, $definitionString);
+        }
+    }
+    protected function definition(String $columnName, String $definitionString)
+    {
+        $name = $columnName;
+        if ('MEDIA_IMAGE_00' == $columnName) {
+            // skip
+        } elseif ( preg_match("#^(.+)_(\d\d)$#", $columnName, $matches)) {
+            $name = $matches[1];
+        }
+
+        $def = explode(':', $definitionString);
+
+        $result = [];
+        $result['type'] = array_shift($def);
+        $result['mandatory'] = ('mandatory' === array_shift($def));
+        $result['required'] = ('filled' === array_shift($def));
+        $result['recursive'] = false;
+        $result['len'] = ($result['required']) ? 1 : 0;
+
+        foreach($def as $item) {
+            if ('recursive' == $item ) {
+                $result['recursive'] = true;
+                continue;
+            }
+            if ('len' == substr($item, 0, 3)) {
+                $result['len'] = substr($item, 4);
+            }
+        }
+        // Log::debug("\$columnName[{$columnName}]=".print_r($result,true));
+
+        return $result;
+    }
+
+    protected function cannonicalColumnName($columnName)
+    {
+        if ('MEDIA_IMAGE_00' == $columnName) {
+            // skip
+        } elseif ( preg_match("#^(MEDIA.+)_(\d+)$#", $columnName, $matches)) {
+            return $matches[1];
+        }
+
+        return $columnName;
+    }
+
     public function __set($name, $value)
     {
         if (! isset($this->header[$name]) ) {
@@ -398,7 +453,7 @@ class BlmFile {
     protected function validateMandatoryColumns()
     {
         $mandatory = array_filter($this->columnDefinition, function($columnDefinition) {
-            return strpos($columnDefinition, ':mandatory') !== false;
+            return $columnDefinition['mandatory'];
         });
 
         $mandatory = array_keys($mandatory);
@@ -410,16 +465,6 @@ class BlmFile {
         if ($diff) {
             throw new \Exception("Error: Not a valid BLM file, Mandatory column(s) '".implode("', '", $diff)."' missing");
         }
-    }
-    protected function cannonicalColumnName($columnName)
-    {
-        if ('MEDIA_IMAGE_00' == $columnName) {
-            // skip
-        } elseif ( preg_match("#^(MEDIA.+)_(\d+)$#", $columnName, $matches)) {
-            return $matches[1];
-        }
-
-        return $columnName;
     }
 
     public function readData()
@@ -489,52 +534,14 @@ class BlmFile {
 
     protected function validateDataColumn($columnName, $columnValue)
     {
-        $definition = $this->definition($columnName);
-        
-        $this->validateDataColumnDefinition($columnName, $columnValue, $definition);
-    }
+        $definition = $this->columnDefinition[ $this->cannonicalColumnName($columnName)];
 
-    protected function validateDataColumnDefinition($columnName, $columnValue, $definition)
-    {
         // is data optional?
         if (($definition['required']) && ('' == $columnValue)) {
             throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' missing expected value");
         }
 
 
-    }
-
-    protected function definition(String $columnName)
-    {
-        $name = $columnName;
-        if ('MEDIA_IMAGE_00' == $columnName) {
-            // skip
-        } elseif ( preg_match("#^(.+)_(\d\d)$#", $columnName, $matches)) {
-            $name = $matches[1];
-        }
-
-        $definition = $this->columnDefinition[$name];
-        $def = explode(':', $definition);
-
-        $result = [];
-        $result['type'] = array_shift($def);
-        $result['mandatory'] = ('mandatory' === array_shift($def));
-        $result['required'] = ('filled' === array_shift($def));
-        $result['recursive'] = false;
-        $result['len'] = ($result['required']) ? 1 : 0;
-
-        foreach($def as $item) {
-            if ('recursive' == $item ) {
-                $result['recursive'] = true;
-                continue;
-            }
-            if ('len' == substr($item, 0, 3)) {
-                $result['len'] = substr($item, 4);
-            }
-        }
-        // Log::debug("\$columnName[{$columnName}]=".print_r($result,true));
-
-        return $result;
     }
 
     protected function isDate(String $value)
