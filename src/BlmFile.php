@@ -242,6 +242,22 @@ class BlmFile {
 
         return $this->header[$name];
     }
+    public function getAllColumnDefinitions()
+    {
+        $result = [];
+
+        foreach($this->columnDefinition as $name => $definitionString) {
+            $result[$name] = $this->columnDefinition[$name];
+        }
+        foreach($this->columnDefinitionV3 as $name => $definitionString) {
+            $result[$name] = $this->columnDefinitionV3[$name];
+        }
+        // foreach($this->columnDefinitionV3i as $name => $definitionString) {
+        //     $result[$name] = $this->columnDefinitionV3i[$name];
+        // }
+
+        return $result;
+    }
 
     /**
      * @param $resource
