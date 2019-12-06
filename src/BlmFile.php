@@ -242,19 +242,27 @@ class BlmFile {
 
         return $this->header[$name];
     }
-    public function getAllColumnDefinitions()
+    public function getAllColumnDefinitions(String $version = '3')
     {
         $result = [];
 
         foreach($this->columnDefinition as $name => $definitionString) {
             $result[$name] = $this->columnDefinition[$name];
         }
-        foreach($this->columnDefinitionV3 as $name => $definitionString) {
-            $result[$name] = $this->columnDefinitionV3[$name];
+
+        switch ($version) {
+            case '3':
+                foreach($this->columnDefinitionV3 as $name => $definitionString) {
+                    $result[$name] = $this->columnDefinitionV3[$name];
+                }
+            break;
+
+            case '3i':
+                foreach($this->columnDefinitionV3i as $name => $definitionString) {
+                    $result[$name] = $this->columnDefinitionV3i[$name];
+                }
+            break;
         }
-        // foreach($this->columnDefinitionV3i as $name => $definitionString) {
-        //     $result[$name] = $this->columnDefinitionV3i[$name];
-        // }
 
         return $result;
     }
@@ -302,12 +310,12 @@ class BlmFile {
                 throw new \Exception("Error: Not a valid BLM file, Too many header items, attempting to read more than '{$this->maxHeaderLines}' values");
             }
             if (! preg_match("/^([A-Z 0-9]+) *: *(.*)$/i", trim($str), $matches)) {
-                throw new \Exception("Error: Not a valid BLM file, header item '{$dummy}' missing value");
+                throw new \Exception("Error: Not a valid BLM file, header item '{$str}' missing 'name : value' syntax");
             }
             if (count($matches) <> 3) {
-                dd($str);
+                throw new \Exception("Error: Not a valid BLM file, header item '{$str}' incorrect format expecting 'name : value' syntax");
             }
-            
+
             $name = trim($matches[1]);
             $value = trim($matches[2]);      
             if (! $this->validateHeaderItem($name, $value)) {
@@ -340,6 +348,7 @@ class BlmFile {
             default: 
                 throw new \Exception("Error: Not a valid BLM file, Unknown version '".$this->{'Version'}."' ");
         }
+
         $this->columnDefinition = array_merge($this->columnDefinition, $tmp);
 
         return $this;
