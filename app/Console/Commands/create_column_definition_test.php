@@ -52,7 +52,7 @@ class create_column_definition_test extends Command
 
         foreach($columns as $name => $dummy) {
             $outFile = $targetFile.'-'.$name.'.blm';
-            $replace = str_replace($name, $name.'xxx', $contents);
+            $replace = str_replace($name."^", '', $contents);
             
             $this->info("Creating test file '{$outFile}'");
             file_put_contents($outFile, $replace);
