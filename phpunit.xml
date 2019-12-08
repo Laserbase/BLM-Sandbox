@@ -10,6 +10,7 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false">
+    
     <testsuites>
         <testsuite name="Unit">
             <directory suffix="Test.php">./tests/Unit</directory>
@@ -17,11 +18,9 @@
 
         <testsuite name="Feature">
             <directory suffix="Test.php">./tests/Feature</directory>
-            <exclude>
-                <file>StartupTest.php</file>
-            </exclude>
         </testsuite>
     </testsuites>
+
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./app</directory>
