@@ -389,6 +389,38 @@ class BlmFile {
 
         return $str;
     }
+    /**
+     * Return next line with end of record marker
+     * @return String
+     */
+    protected function readDataLine() : String
+    {
+        $prev = '';
+        $str = '';
+        while ('' === $str) {
+            $str = trim(fgets($this->resource));
+
+            if ($str === $this->sectionTags['END']) {
+                return $str;
+            }
+            
+            if (false === strpos($str, $this->{'EOR'})) {
+                if ($prev) {
+                    $prev .= "\n".$str;
+                } else {
+                    $prev = $str;
+                }
+                
+                $str = '';
+            }
+            
+        }
+        if ($prev) {
+            $str = $prev."\n".$str;
+        }
+
+        return $str;
+    }
 
     /**
      * 
@@ -497,7 +529,7 @@ class BlmFile {
     public function readData()
     {
         $count = 0;
-        $str = $this->readLine();
+        $str = $this->readDataLine();
         while ($str) {
             if ($str === $this->sectionTags['END']) {
                 break;
@@ -513,7 +545,7 @@ class BlmFile {
 
             yield $this->validateData($str);
 
-            $str = $this->readLine();
+            $str = $this->readDataLine();
         }
 
         if ($count != $this->{'Property Count'}) {
