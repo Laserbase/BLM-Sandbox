@@ -50,8 +50,13 @@ class create_column_definition_test extends Command
         $blm = new BlmFile;
         $columns = $blm->getAllColumnDefinitions();
 
-        foreach($columns as $name => $dummy) {
-            $outFile = $targetFile.'-'.$name.'.blm';
+        foreach($columns as $name => $definition) {
+            $outFile = $targetFile.'-'.$name;
+            if ($definition['recursive']) {
+                $outFile .= '_01';
+            }
+            $outFile .= '.blm';
+
             $replace = str_replace($name."^", '', $contents);
             
             $this->info("Creating test file '{$outFile}'");
