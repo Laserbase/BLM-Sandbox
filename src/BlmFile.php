@@ -134,7 +134,7 @@ class BlmFile {
 
         "NEW_HOME_FLAG" => 'string:mandatory:nullable:len=1', // Y / N
 
-        "MEDIA_IMAGE_00" => 'string:mandatory:filled:len=100:recursive',
+        "MEDIA_IMAGE_00" => 'string:mandatory:filled:len=100',
         "MEDIA_IMAGE" => 'string:optional:nullable:len=100:recursive',
         "MEDIA_IMAGE_TEXT" => 'string:optional:nullable:len=20:recursive',
 
@@ -417,7 +417,8 @@ class BlmFile {
 
     protected function validateHeaderItem(String $name, String $value)
     {
-        Log::debug(__LINE__.", '{$name}' = '{$value}' ");
+        // Log::debug(__LINE__.", ".__METHOD__."('{$name}' = '{$value}') ");
+
         // mandatory
         switch ($name) {
             case 'Version': return in_array($value, ['3', '3i']);
@@ -442,6 +443,7 @@ class BlmFile {
     {
         $str = trim($str);
         $str = trim($str, $this->EOF.$this->EOR);
+
         $columns = explode($this->EOF, $str);
         foreach ($columns as $column) {
             $this->validateColumn($column);
