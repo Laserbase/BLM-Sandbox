@@ -21,13 +21,21 @@ class StartupTest extends TestCase
      */
     public function testInstance()
     {
+        // Log::debug("file '".\basename( __FILE__)."', line='".__LINE__."' ");
+
         $this->zip = new Filesystem(new Zip($this->zipFile));
         $this->assertInstanceOf('League\Flysystem\FileSystem', $this->zip);
-        Log::debug("file '".__FILE__."', line='".__LINE__."' ");
+
+        // Log::debug("===".\basename(__FILE__)." === EXIT ===");
     }
     
     public function test_zipHandling()
     {
+        // Log::debug("file '".\basename( __FILE__)."', line='".__LINE__."' ");
+
+        // Contents of zip file are not to spec
+        $this->expectExceptionMessage("Not a valid BLM file, Data field 'FEATURE1' missing expected value");
+
         $this->zip = new Filesystem(new Zip($this->zipFile));
         $this->assertCount(34, $this->zip->listContents());
 
@@ -38,6 +46,7 @@ class StartupTest extends TestCase
         $this->checkImg($imgFiles);
 
         $this->checkContents($blmFiles);
+        // Log::debug("=== ".\basename(__FILE__)." === EXIT ===");
     }
 
     /**
@@ -66,7 +75,6 @@ class StartupTest extends TestCase
         foreach($this->zip->listContents() as $file) {
             if (\Str::upper($file['extension']) !== 'BLM') {
                 $result[] = $file['basename'];
-                // array_push($result, $file['basename']);
             }
         }
 
@@ -171,6 +179,6 @@ class StartupTest extends TestCase
             // Log::debug("test=".print_r($row,true));
         }
 
-        Log::debug("===".\basename(__FILE__)."===EXIT===");
+        // Log::debug("=== ".\basename(__FILE__)." === EXIT ===");
     }
 }

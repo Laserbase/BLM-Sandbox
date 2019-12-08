@@ -13,6 +13,8 @@ class InitialNonZipTest extends TestCase
     
     public function test_nonZipBlmFile()
     {
+        // Log::debug("=== file '".\basename( __FILE__)."', line='".__LINE__."' ");
+
         $file = fopen($this->fileName, "r");
         $this->assertTrue( is_resource($file) );
 
@@ -22,7 +24,7 @@ class InitialNonZipTest extends TestCase
             // Log::debug("test=".print_r($row,true));
         }
 
-        Log::debug("===".\basename(__FILE__)."===EXIT===");
+        // Log::debug("=== ".\basename(__FILE__)." ===EXIT===");
     }
 
 }
