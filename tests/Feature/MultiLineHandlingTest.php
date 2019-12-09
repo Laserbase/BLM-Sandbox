@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-ini_set('memory_limit', 21000000);
+// ini_set('memory_limit', 21000000);
 
 // use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -28,7 +28,7 @@ class MultiLineHandlingTest extends TestCase
         $prev = $memoryUsage;
 
         $blm->setup($resource);
-        
+
         $memoryUsage = memory_get_usage() - $prev;
         Log::debug("=== '".\basename(__FILE__)."' memoryUsage='{$memoryUsage}', Line='".__LINE__."' === SETUP ===");
         $prev = $memoryUsage;
