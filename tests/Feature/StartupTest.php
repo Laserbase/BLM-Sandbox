@@ -34,7 +34,7 @@ class StartupTest extends TestCase
         // Log::debug("file '".\basename( __FILE__)."', line='".__LINE__."' ");
 
         // Contents of zip file are not to spec
-        $this->expectExceptionMessage("Not a valid BLM file, Data field 'FEATURE1' missing expected value");
+        $this->expectExceptionMessage("Not a valid BLM file, Data field 'FEATURE1' empty, it must have a value");
 
         $this->zip = new Filesystem(new Zip($this->zipFile));
         $this->assertCount(34, $this->zip->listContents());
