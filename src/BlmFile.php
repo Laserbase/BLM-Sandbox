@@ -33,14 +33,14 @@ class BlmFile {
 
         "AGENT_REF" => 'string:mandatory:filled:len=20',
         "BRANCH_ID" => 'int:mandatory:filled', // provided by Rightmove
-        "STATUS_ID" => 'int:mandatory:filled:len=1', // 
+        "STATUS_ID" => 'int:mandatory:filled:len=1', //
             // 0 = Available
             // 1 = SSTC - Sold Subject To Completion
             // 2 = SSTCM - Scotland - Sold Subject To Concluded Missives
             // 3 = under offer - sales
             // 4 = reserved - sales
             // 5 = let agreed - letting
-        
+
         "CREATE_DATE" => 'date:mandatory:nullable', // YYYY-MM-DD HH:MI:SS
         "UPDATE_DATE" => 'date:mandatory:nullable', // YYYY-MM-DD HH:MI:SS
     ];
@@ -50,7 +50,7 @@ class BlmFile {
         "PUBLISHED_FLAG" => 'int:mandatory:filled:len=1', // 0 = hidden/invisible 1 = visible
 
         "LET_DATE_AVAILABLE" => 'date:optional:nullable', // date:mandatory:nullable
-        "LET_BOND" => 'num:optional:nullable', // deposit amount 
+        "LET_BOND" => 'num:optional:nullable', // deposit amount
         "ADMINISTRATION_FEE" => 'string:optional:nullable:len=4096', // all fees applicable to the property
         "LET_TYPE_ID" => 'num:optional:nullable:len=1', // mandatory
             // 0 = not specified DEFAULT
@@ -59,7 +59,7 @@ class BlmFile {
             // 3 = student
             // 4 = commercial
 
-        "LET_FURN_ID" => 'int:mandatory:nullable:len=1', // 
+        "LET_FURN_ID" => 'int:mandatory:nullable:len=1', //
             // 0 = furnished
             // 1 = part furnished
             // 2 = unfurnished
@@ -84,28 +84,28 @@ class BlmFile {
         "LET_BILL_INC_TV_LICIENCE" => 'string:optional:nullable:len=1', // Y/N student
         "LET_BILL_INC_TV_SUBSCRIPTION" => 'string:optional:nullable:len=1', // Y/N student
         "LET_BILL_INC_INTERNET" => 'string:optional:nullable:len=1', // Y/N student
-        
+
         "TENURE_TYPE_ID" => 'int:optional:nullable:len=1', // mandatory
-        "TRANS_TYPE_ID" => 'int:nullable:mandatory:len=1', // 1 = resale, 2 = lettings        
+        "TRANS_TYPE_ID" => 'int:nullable:mandatory:len=1', // 1 = resale, 2 = lettings
 
         "BEDROOMS" => 'int:mandatory:filled',
         "PRICE" => 'num:mandatory:filled',
         "PRICE_QUALIFIER" => 'int:mandatory:nullable',
-                /*  0 – Default, 
-                    1 – POA, 
-                    2 – Guide Price, 
-                    3 – Fixed Price, 
-                    4 – Offers in Excess of, 
+                /*  0 – Default,
+                    1 – POA,
+                    2 – Guide Price,
+                    3 – Fixed Price,
+                    4 – Offers in Excess of,
                     5 – OIRO, Offers In The Region Of
-                    6 – Sale by Tender, 
-                    7 – From (new homes and commercial only), 
+                    6 – Sale by Tender,
+                    7 – From (new homes and commercial only),
                     8 UNKNOWN
-                    9 – Shared Ownership, 
-                    10 – Offers Over, 
-                    11 – Part Buy Part Rent, 
-                    12 – Shared Equity, 
+                    9 – Shared Ownership,
+                    10 – Offers Over,
+                    11 – Part Buy Part Rent,
+                    12 – Shared Equity,
                     13 UNKNOWN
-                    14 – Equity Loan, 
+                    14 – Equity Loan,
                     15 – Offers Invited
                 **/
         "PROP_SUB_ID" => 'int:mandatory:filled', // One of the valid property types. Ref. Property Type table
@@ -128,7 +128,7 @@ class BlmFile {
         "FEATURE8" => 'string:optional:nullable:len=200',
         "FEATURE9" => 'string:optional:nullable:len=200',
         "FEATURE10" => 'string:optional:nullable:len=200',
-        
+
         "SUMMARY" => 'string:mandatory:filled:len=1024',
         "DESCRIPTION" => 'string:mandatory:filled:len=32768',
 
@@ -151,7 +151,7 @@ class BlmFile {
         "MEDIA_VIRTUAL_TOUR" => 'string:optional:nullable:len=200:recursive',
         "MEDIA_VIRTUAL_TOUR_TEXT" => 'string:optional:nullable:len=20:recursive',
     ];
-        
+
     protected $columnDefinitionV3i = [
         "HOUSE_NAME_NUMBER" => 'string:mandatory:filled:len=60',
         "STREET_NAME", 'string:mandatory:filled:len=100',
@@ -165,19 +165,37 @@ class BlmFile {
 
     protected $errors = [];
 
+    /**
+     * set column definitions from hard coded string
+     */   
     public function __construct()
     {
         foreach($this->columnDefinition as $name => $definitionString) {
-            $this->columnDefinition[$name] = $this->definition($name, $definitionString);
+            $this->columnDefinition[$name] = $this->stringToDefinition($name, $definitionString);
         }
         foreach($this->columnDefinitionV3 as $name => $definitionString) {
-            $this->columnDefinitionV3[$name] = $this->definition($name, $definitionString);
+            $this->columnDefinitionV3[$name] = $this->stringToDefinition($name, $definitionString);
         }
         foreach($this->columnDefinitionV3i as $name => $definitionString) {
-            $this->columnDefinitionV3i[$name] = $this->definition($name, $definitionString);
+            $this->columnDefinitionV3i[$name] = $this->stringToDefinition($name, $definitionString);
         }
     }
-    protected function definition(String $columnName, String $definitionString)
+
+    /**
+     * destructor defined in case memory leak caused by circular references
+     */
+    function __destruct()
+    {
+        //
+    }
+
+    /**
+     * transform $definitionString into an associated array
+     * @param String $columnName column defined in spec
+     * @param String $definitionString hard coded column definition
+     * @return Array column definitions
+     */
+    protected function stringToDefinition(String $columnName, String $definitionString)
     {
         $name = $columnName;
         if ('MEDIA_IMAGE_00' == $columnName) {
@@ -203,13 +221,18 @@ class BlmFile {
             if ('len' == substr($item, 0, 3)) {
                 $result['len'] = substr($item, 4);
             }
+        
         }
-        // Log::debug("\$columnName[{$columnName}]=".print_r($result,true));
 
         return $result;
     }
 
-    protected function cannonicalColumnName($columnName)
+    /**
+     * return column name, strip suffix if column is recursive
+     * @param String $columnName
+     * @return String
+     */
+    protected function cannonicalColumnName(String $columnName)
     {
         if ('MEDIA_IMAGE_00' == $columnName) {
             // skip
@@ -220,12 +243,16 @@ class BlmFile {
         return $columnName;
     }
 
+    /**
+     * set header parameter
+     * @return void
+     */
     public function __set($name, $value)
     {
         if (! isset($this->header[$name]) ) {
             throw new \Exception("Error: Unknown Blm variable '{$name}'");
         }
-        
+
         switch ($name) {
             case 'EOF':
             case 'EOR': $this->header[$name] = trim($value, "'");
@@ -234,6 +261,9 @@ class BlmFile {
         }
     }
 
+    /**
+     * get header parameter
+     */
     public function __get($name)
     {
         if (! isset($this->header[$name]) ) {
@@ -242,6 +272,12 @@ class BlmFile {
 
         return $this->header[$name];
     }
+
+    /**
+     * return column definitions for the specified version
+     * @param String $version default '3'
+     * @return Array of column definitions
+     */
     public function getAllColumnDefinitions(String $version = '3')
     {
         $result = [];
@@ -268,8 +304,9 @@ class BlmFile {
     }
 
     /**
+     * given a php resource, read setup info from data file then set and check corresponding definitions
      * @param $resource
-     * @return this
+     * @return $this
      */
     public function setup($resource)
     {
@@ -286,11 +323,13 @@ class BlmFile {
         $this->resource = $resource;
 
         $this->readHeader();
-        $this->readDefinition();
-
-        return $this;
+        $this->checkHeader();
+        $this->checkDataSection();
     }
 
+    /**
+     * read header section
+     */
     protected function readHeader()
     {
         $str = $this->readLine();
@@ -317,7 +356,7 @@ class BlmFile {
             }
 
             $name = trim($matches[1]);
-            $value = trim($matches[2]);      
+            $value = trim($matches[2]);
             if (! $this->validateHeaderItem($name, $value)) {
                 throw new \Exception("Error: Not a valid BLM file, invalid header item '{$name}' failed with value '{$value}'");
             }
@@ -325,7 +364,6 @@ class BlmFile {
             $this->{$name} = $value;
         }
 
-        return $this->checkHeader();
     }
 
     protected function checkHeader()
@@ -335,7 +373,10 @@ class BlmFile {
             throw new \Exception("Error: Not a valid BLM file, invalid header, missing item(s) '".implode("', '", $diff)."' ");
         }
 
-        return $this->selectVersionColumnDefinitions();
+        $this->selectVersionColumnDefinitions();
+
+        $str = $this->readDefinition();
+        $this->validateDefinition($str);
     }
 
     protected function selectVersionColumnDefinitions()
@@ -345,25 +386,21 @@ class BlmFile {
                 break;
             case '3i': $tmp = $this->columnDefinitionV3i;
                 break;
-            default: 
+            default:
                 throw new \Exception("Error: Not a valid BLM file, Unknown version '".$this->{'Version'}."' ");
         }
 
         $this->columnDefinition = array_merge($this->columnDefinition, $tmp);
-
-        return $this;
     }
 
-    protected function readDefinition()
+    protected function readDefinition() : String
     {
         $str = $this->readLine();
         if (! preg_match("#^[A-Z_0-9\\".$this->EOF."]+\\".$this->EOR."$#",$str)) {
             throw new \Exception("Error: Not a valid BLM file, definition incorrect found '{$str}'");
         }
 
-        $this->validateDefinition($str);
-
-        return $this->checkDataSection();
+        return $str;
     }
 
     protected function checkDataSection()
@@ -373,7 +410,6 @@ class BlmFile {
             throw new \Exception('Error: Not a valid BLM file, definition missing');
         }
 
-        return $this;
     }
 
     /**
@@ -403,17 +439,17 @@ class BlmFile {
             if ($str === $this->sectionTags['END']) {
                 return $str;
             }
-            
-            if (false === strpos($str, $this->{'EOR'})) {
+
+            if (false === strpos($str, $this->EOR)) {
                 if ($prev) {
                     $prev .= "\n".$str;
                 } else {
                     $prev = $str;
                 }
-                
+
                 $str = '';
             }
-            
+
         }
         if ($prev) {
             $str = $prev."\n".$str;
@@ -423,7 +459,7 @@ class BlmFile {
     }
 
     /**
-     * 
+     *
      */
     protected function readHeaderItem(String $name)
     {
@@ -443,14 +479,10 @@ class BlmFile {
         }
 
         $this->{$name} = $value;
-
-        return $this;
     }
 
     protected function validateHeaderItem(String $name, String $value)
     {
-        // Log::debug(__LINE__.", ".__METHOD__."('{$name}' = '{$value}') ");
-
         // mandatory
         switch ($name) {
             case 'Version': return in_array($value, ['3', '3i']);
@@ -467,7 +499,7 @@ class BlmFile {
             case 'Generated Date': return ($value == '') ? true : $this->isDate($value);
         }
 
-        // feed supplier
+        // feed supplier parameters not checked
         return true;
     }
 
@@ -485,6 +517,15 @@ class BlmFile {
         $this->validateDataSeparators();
         $this->validateMandatoryColumns();
 
+    }
+
+    protected function validateColumnCount(Array $values)
+    {
+        $count_values = count($values);
+        $count_columns = count($this->columns);
+        if ($count_values !== $count_columns) {
+            throw new \Exception("Error: Not a valid BLM file, The number of row fields '{$count_values}' is different to the number expected '{$count_columns}'");
+        }
     }
 
     protected function validateColumn(String $column)
@@ -551,12 +592,23 @@ class BlmFile {
         if ($count != $this->{'Property Count'}) {
             Log::debug("Warning: Expected '".$this->{'Property Count'}."' properties in file, found '{$count}'");
         }
+
     }
 
+    /**
+     * check data row and return array of columns
+     * @param String $str
+     * @return Array of columns
+     */
     protected function validateData(String $str) : Array
     {
+        // The final field should be finished with the EOF delimiter and then EOR delimiter.
+        //  Which means that there is a blank slot that needs to be accounted for
+        //  using array_pop() to remove it
         $values = $this->extractRowValues($str);
- 
+        array_pop($values);
+        $this->validateColumnCount($values);
+
         $keys = array_values($this->columns);
         $row = array_combine($keys, $values);
 
@@ -569,15 +621,6 @@ class BlmFile {
         $str = trim($str);
 
         $values = explode($this->EOF, $str);
-
-        // The final field should be finished with the EOF delimiter and then EOR delimiter.
-        //  Which means that there is a blank slot that needs to be accounted for
-        $dummy = array_pop($values);
-        $count_values = count($values);
-        $count_columns = count($this->columns);
-        if ($count_values !== $count_columns) {
-            throw new \Exception("Error: Not a valid BLM file, The number of row fields '{$count_values}' is different to the number expected'{$count_columns}'");
-        }
 
         return $values;
     }
@@ -593,25 +636,113 @@ class BlmFile {
 
     protected function validateDataColumn($columnName, $columnValue)
     {
-        $definition = $this->columnDefinition[ $this->cannonicalColumnName($columnName)];
+        $definition = $this->columnDefinition[$this->cannonicalColumnName($columnName)];
 
-        // is data optional?
+        // check if column 'columnName' must have a columnValue
         if (($definition['required']) && ('' == $columnValue)) {
-            throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' missing expected value");
+            throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' empty, it must have a value");
         }
 
+        // check type and size is correct
+        if( ! $this->validateDataColumnType($columnName, $columnValue)) {
+            throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' contains incorrect value, expecting '{$type}', found '{$columnValue}'");
+        }
 
     }
 
+    /**
+     * is the column value a date string in the correct format
+     * @param String $value
+     * @return bool
+     */
     protected function isDate(String $value)
     {
         $date = Date($this->formatDate, strtotime($value));
         return Date($this->formatDate, strtotime($value)) === $value;
     }
-    protected function isInt(String $value)
+
+    /**
+     * validate column value against column definition
+     * @param String $name
+     * @param String $value
+     */
+    protected function validateDataColumnType(String $name, String $value)
+    {
+        $type = 'string';
+        $definition = $this->columnDefinition;
+
+        if (isset($this->columnDefinition['type'])) {
+            $type = $this->columnDefinition['type'];
+        }
+
+        switch ($type) {
+            case 'int':
+                return $this->isInt($value, $definition);
+            case 'date':
+                return $this->isDate($value, $definition);
+            case 'num':
+                return $this->isNum($value, $definition);
+            case 'string':
+                return $this->isString($value, $definition);
+            default:
+                throw new \Exception("Error: Not a valid BLM file, Column '{$name}' is an unknown type, found '{$type}' with the value '{$value}' ");
+        }
+    }
+
+    /**
+     * is the column value an int
+     * @param String $value
+     * @param Array $definition
+     * @return bool
+     */    
+    protected function isInt(String $value, Array $definition = [])
     {
         $int = strval($value);
         return ctype_digit($int) && ($int >= 0);
+    }
+
+    /**
+     * is the column value a number, possibly with decimals
+     * length if defined includes decimal point // 99.99 = 5 // pic(99.99)
+     * 
+     * @param String $value
+     * @return bool
+     */   
+    protected function isNum(String $value, Array $definition = [])
+    {
+        if (preg_match("#^\d*(\.\d*)?$#", $value)) {
+            return false;
+        }
+
+        if (isset($definition['len'])) {
+            $strlen = \strlen($value);
+            if ($strlen > $strlen) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * is the column value a string
+     * @param String $value
+     * @return bool
+     */   
+    protected function isString(String $value, Array $definition = [])
+    {
+        if (0 === count($definition)) {
+            return true;
+        }
+
+        if (isset($definition['len'])) {
+            $strlen = \strlen($value);
+            if ($strlen > $strlen) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }
