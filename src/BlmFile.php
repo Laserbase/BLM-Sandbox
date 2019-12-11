@@ -5,8 +5,9 @@ namespace Src\BlmFile;
 use Log;
 
 class BlmFile {
-    protected $resource = null;
     protected $formatDate = 'Y-m-d H:i:s';
+    protected $maxHeaderLines = 25;
+    protected $resource = null;
 
     protected $sectionTags = [
         'HEADER' => '#HEADER#',
@@ -26,9 +27,10 @@ class BlmFile {
         'EOF',
         'EOR'
     ];
-    protected $maxHeaderLines = 25;
-    protected $columns = [];
-    protected $columnDefinition = [
+
+    protected $columnKeys = [];
+    protected $columnDefinitions = [];
+    protected $columnDefinitionMaster = [
         // "xAGENT_REF" => 'string:mandatory:nullable',
 
         "AGENT_REF" => 'string:mandatory:filled:len=20',
@@ -163,30 +165,25 @@ class BlmFile {
         "EXACT_LONGDITUDE" => 'num:mandatory:filled:len=15',
     ];
 
-    protected $errors = [];
+    public function __construct()
+    {
+        $this->setupDefinitions();
+    }
 
     /**
      * set column definitions from hard coded string
      */   
-    public function __construct()
+    protected function setupDefinitions()
     {
-        foreach($this->columnDefinition as $name => $definitionString) {
-            $this->columnDefinition[$name] = $this->stringToDefinition($name, $definitionString);
+        foreach($this->columnDefinitionMaster as $name => $definitionString) {
+            $this->columnDefinitionMaster[$name] = $this->stringToDefinition($name, $definitionString);
         }
         foreach($this->columnDefinitionV3 as $name => $definitionString) {
             $this->columnDefinitionV3[$name] = $this->stringToDefinition($name, $definitionString);
         }
         foreach($this->columnDefinitionV3i as $name => $definitionString) {
             $this->columnDefinitionV3i[$name] = $this->stringToDefinition($name, $definitionString);
-        }
-    }
-
-    /**
-     * destructor defined in case memory leak caused by circular references
-     */
-    function __destruct()
-    {
-        //
+        }        
     }
 
     /**
@@ -275,26 +272,27 @@ class BlmFile {
 
     /**
      * return column definitions for the specified version
+     * 
      * @param String $version default '3'
      * @return Array of column definitions
      */
-    public function getAllColumnDefinitions(String $version = '3')
+    protected function getAllColumnDefinitions(String $version = '3')
     {
         $result = [];
 
-        foreach($this->columnDefinition as $name => $definitionString) {
-            $result[$name] = $this->columnDefinition[$name];
+        foreach($this->columnDefinitionMaster as $name => $definition) {
+            $result[$name] = $this->columnDefinitionMaster[$name];
         }
 
         switch ($version) {
             case '3':
-                foreach($this->columnDefinitionV3 as $name => $definitionString) {
+                foreach($this->columnDefinitionV3 as $name => $definition) {
                     $result[$name] = $this->columnDefinitionV3[$name];
                 }
             break;
 
             case '3i':
-                foreach($this->columnDefinitionV3i as $name => $definitionString) {
+                foreach($this->columnDefinitionV3i as $name => $definition) {
                     $result[$name] = $this->columnDefinitionV3i[$name];
                 }
             break;
@@ -366,6 +364,9 @@ class BlmFile {
 
     }
 
+    /**
+     * check header section
+     */
     protected function checkHeader()
     {
         $diff = array_diff($this->headerMandatory, array_keys($this->header));
@@ -379,20 +380,18 @@ class BlmFile {
         $this->validateDefinition($str);
     }
 
-    protected function selectVersionColumnDefinitions()
+    /**
+     * 1019-12-10 14:33 set public
+     * @return Array of column definitions
+     */
+    public function selectVersionColumnDefinitions()
     {
-        switch ($this->{'Version'}) {
-            case '3': $tmp = $this->columnDefinitionV3;
-                break;
-            case '3i': $tmp = $this->columnDefinitionV3i;
-                break;
-            default:
-                throw new \Exception("Error: Not a valid BLM file, Unknown version '".$this->{'Version'}."' ");
-        }
-
-        $this->columnDefinition = array_merge($this->columnDefinition, $tmp);
+        return $this->columnDefinitions = $this->getAllColumnDefinitions();
     }
 
+    /**
+     * read definition section
+     */
     protected function readDefinition() : String
     {
         $str = $this->readLine();
@@ -403,6 +402,10 @@ class BlmFile {
         return $str;
     }
 
+    /**
+     * check data section starts on next line
+     * @return Void
+     */
     protected function checkDataSection()
     {
         $str = $this->readLine();
@@ -425,8 +428,10 @@ class BlmFile {
 
         return $str;
     }
+
     /**
-     * Return next line with end of record marker
+     * Return next line containg end of record marker
+     *  fields may contain new line characters
      * @return String
      */
     protected function readDataLine() : String
@@ -459,11 +464,12 @@ class BlmFile {
     }
 
     /**
-     *
+     * read header item from string
      */
     protected function readHeaderItem(String $name)
     {
         $str = $this->readContentLine();
+
         if (! preg_match("/^{$name} *:.*$/", $str)) {
             throw new \Exception("Error: Not a valid BLM file, header item '{$name}' missing '{$str}'");
         }
@@ -481,6 +487,13 @@ class BlmFile {
         $this->{$name} = $value;
     }
 
+    /**
+     * check header item is correct
+     * 
+     * @param String $name name of the header item
+     * @param String $value of the header item
+     * @return Bool
+     */
     protected function validateHeaderItem(String $name, String $value)
     {
         // mandatory
@@ -503,39 +516,59 @@ class BlmFile {
         return true;
     }
 
-    protected function validateDefinition(String $str)
+    /**
+     * validate string of field names
+     * 2019-12-10 14:33 set public
+     * 
+     * @param String $str
+     * @return Void
+     */
+    public function validateDefinition(String $str)
     {
         $str = trim($str);
         $str = trim($str, $this->EOF.$this->EOR);
 
-        $columns = explode($this->EOF, $str);
-        foreach ($columns as $column) {
+        $columnKeys = explode($this->EOF, $str);
+        $this->columnKeys = $columnKeys;
+
+        foreach ($columnKeys as $column) {
             $this->validateColumn($column);
         }
 
-        $this->columns = $columns;
         $this->validateDataSeparators();
         $this->validateMandatoryColumns();
-
     }
 
+    /**
+     * check the number of columns matches expected 
+     * @param Array $values
+     * @return Void
+     */
     protected function validateColumnCount(Array $values)
     {
         $count_values = count($values);
-        $count_columns = count($this->columns);
+        $count_columns = count($this->columnKeys); // todo
         if ($count_values !== $count_columns) {
             throw new \Exception("Error: Not a valid BLM file, The number of row fields '{$count_values}' is different to the number expected '{$count_columns}'");
         }
     }
 
-    protected function validateColumn(String $column)
+    /**
+     * 
+     */
+    protected function validateColumn(String $columnName)
     {
-        if (! in_array($this->cannonicalColumnName($column), array_keys($this->columnDefinition))) {
-            throw new \Exception("Error: Not a valid BLM file, Unexpected column name '{$column}' ");
+        $columnName = $this->cannonicalColumnName($columnName);
+        if (false === array_key_exists($columnName, $this->columnDefinitions)) {
+            throw new \Exception("Error: Not a valid BLM file, Unexpected column name '{$columnName}' ");
         }
 
     }
 
+    /**
+     * check end-of-field, end-of-record characters updated from header section
+     * @return Void
+     */
     protected function validateDataSeparators()
     {
         if ($this->header['EOF'] == $this->header['EOR'] ) {
@@ -550,16 +583,20 @@ class BlmFile {
 
     }
 
+    /**
+     * check data has all mandatory columns
+     * @return Void
+     */
     protected function validateMandatoryColumns()
     {
-        $mandatory = array_filter($this->columnDefinition, function($columnDefinition) {
+        $mandatory = array_filter($this->columnDefinitions, function($columnDefinition) {
             return $columnDefinition['mandatory'];
         });
 
         $mandatory = array_keys($mandatory);
         $columns = array_map(function ($column) {
             return $this->cannonicalColumnName($column);
-        }, $this->columns);
+        }, $this->columnKeys);
 
         $diff = array_diff($mandatory, $columns);
         if ($diff) {
@@ -567,6 +604,9 @@ class BlmFile {
         }
     }
 
+    /**
+     * read a data row
+     */
     public function readData()
     {
         $count = 0;
@@ -597,10 +637,11 @@ class BlmFile {
 
     /**
      * check data row and return array of columns
+     *      2019-12-10 14:33 made public
      * @param String $str
      * @return Array of columns
      */
-    protected function validateData(String $str) : Array
+    public function validateData(String $str) : Array
     {
         // The final field should be finished with the EOF delimiter and then EOR delimiter.
         //  Which means that there is a blank slot that needs to be accounted for
@@ -609,12 +650,17 @@ class BlmFile {
         array_pop($values);
         $this->validateColumnCount($values);
 
-        $keys = array_values($this->columns);
+        $keys = array_values($this->columnKeys);
         $row = array_combine($keys, $values);
 
         return $this->validateDataRow($row);
     }
 
+    /**
+     * split string into data row array
+     * @param String $str
+     * $return Array
+     */
     protected function extractRowValues(String $str) : Array
     {
         $str = trim($str, $this->EOR);
@@ -625,6 +671,12 @@ class BlmFile {
         return $values;
     }
 
+    /**
+     * check array of data is correct
+     * 
+     * @param Array $row
+     * @return Array
+     */
     protected function validateDataRow(Array $row)
     {
         foreach($row as $columnName => $columnValue) {
@@ -634,9 +686,16 @@ class BlmFile {
         return $row;
     }
 
-    protected function validateDataColumn($columnName, $columnValue)
+    /**
+     * check a field value matches required specification
+     * 
+     * @param String $columnName
+     * @param String $columnValue
+     * @return Void
+     */
+    protected function validateDataColumn(String $columnName, String $columnValue)
     {
-        $definition = $this->columnDefinition[$this->cannonicalColumnName($columnName)];
+        $definition = $this->columnDefinitions[$this->cannonicalColumnName($columnName)];
 
         // check if column 'columnName' must have a columnValue
         if (($definition['required']) && ('' == $columnValue)) {
@@ -665,14 +724,15 @@ class BlmFile {
      * validate column value against column definition
      * @param String $name
      * @param String $value
+     * @return Void
      */
     protected function validateDataColumnType(String $name, String $value)
     {
         $type = 'string';
-        $definition = $this->columnDefinition;
+        $definition = $this->columnDefinitions[$this->cannonicalColumnName($name)];
 
-        if (isset($this->columnDefinition['type'])) {
-            $type = $this->columnDefinition['type'];
+        if (isset($this->columnDefinitions['type'])) {
+            $type = $this->columnDefinitions['type'];
         }
 
         switch ($type) {
