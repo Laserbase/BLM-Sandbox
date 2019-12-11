@@ -17,7 +17,7 @@ class ColumnDefinitionsTest extends TestCase
         $result = [];
 
         $blm = new BlmFile();
-        $columns = $blm->getAllColumnDefinitions();
+        $columns = $blm->selectVersionColumnDefinitions();
         foreach($columns as $columnName => $definition) {
             $result[$columnName] = [$columnName, $definition];
         }
@@ -38,6 +38,9 @@ class ColumnDefinitionsTest extends TestCase
         foreach($blm->readData() as $row) {
             // Log::debug("test=".print_r($row,true));
         }
+
+        fclose($file);
+        $this->assertFalse( is_resource($file) );
 
         // Log::debug("=== ".\basename(__FILE__)." ===EXIT===");
     }
