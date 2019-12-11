@@ -15,33 +15,33 @@ class MultiLineHandlingTest extends TestCase
     
     public function test_multiLineHandling()
     {
-        $memoryStart = memory_get_usage();
-        $prev = $memoryStart;
+        // $memoryStart = memory_get_usage();
+        // $prev = $memoryStart;
 
         $resource = fopen($this->fileFile, 'r');
         $this->assertTrue( is_resource($resource) );
         
         $blm = new BlmFile();
 
-        $memoryUsage = memory_get_usage() - $prev;
-        Log::debug("=== '".\basename(__FILE__)."' memoryUsage='{$memoryUsage}', Line='".__LINE__."' === NEW ===");
-        $prev = $memoryUsage;
+        // $memoryUsage = memory_get_usage() - $prev;
+        // Log::debug("=== '".\basename(__FILE__)."' memoryUsage='{$memoryUsage}', Line='".__LINE__."' === NEW ===");
+        // $prev = $memoryUsage;
 
         $blm->setup($resource);
 
-        $memoryUsage = memory_get_usage() - $prev;
-        Log::debug("=== '".\basename(__FILE__)."' memoryUsage='{$memoryUsage}', Line='".__LINE__."' === SETUP ===");
-        $prev = $memoryUsage;
+        // $memoryUsage = memory_get_usage() - $prev;
+        // Log::debug("=== '".\basename(__FILE__)."' memoryUsage='{$memoryUsage}', Line='".__LINE__."' === SETUP ===");
+        // $prev = $memoryUsage;
 
         foreach($blm->readData() as $row) {
-            $memoryUsage = memory_get_usage() - $prev;
-            Log::debug("=== '".\basename(__FILE__)."' memoryUsage='{$memoryUsage}', Line='".__LINE__."' === EACH ===");
-            $prev = $memoryUsage;
+            // $memoryUsage = memory_get_usage() - $prev;
+            // Log::debug("=== '".\basename(__FILE__)."' memoryUsage='{$memoryUsage}', Line='".__LINE__."' === EACH ===");
+            // $prev = $memoryUsage;
             // Log::debug("test=".print_r($row['AGENT_REF'],true));
         }
 
-        $memoryUsage = memory_get_usage() - $memoryStart;
-        Log::debug("=== '".\basename(__FILE__)."' memoryUsage='{$memoryUsage}', Line='".__LINE__."' === EXIT ===");
+        // $memoryUsage = memory_get_usage() - $memoryStart;
+        // Log::debug("=== '".\basename(__FILE__)."' memoryUsage='{$memoryUsage}', Line='".__LINE__."' === EXIT ===");
     }
 
 }
