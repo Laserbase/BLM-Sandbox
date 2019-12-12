@@ -48,7 +48,7 @@ class create_column_definition_test extends Command
         $targetFile = __DIR__.'/../../../tests/files/column_definitions/check';
 
         $blm = new BlmFile;
-        $columns = $blm->getAllColumnDefinitions();
+        $columns = $blm->selectVersionColumnDefinitions();
 
         foreach($columns as $name => $definition) {
             $outFile = $targetFile.'-'.$name;
