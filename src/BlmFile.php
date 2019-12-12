@@ -605,7 +605,7 @@ class BlmFile {
     }
 
     /**
-     * read a data row
+     * read next data row
      */
     public function readData()
     {
