@@ -31,11 +31,11 @@ class BlmFile {
     protected $columnKeys = [];
     protected $columnDefinitions = [];
     protected $columnDefinitionMaster = [
-        // "xAGENT_REF" => 'string:mandatory:nullable',
+        // "xAGENT_REF" => 'string|required|min:0',
 
-        "AGENT_REF" => 'string:mandatory:filled:len=20',
-        "BRANCH_ID" => 'int:mandatory:filled', // provided by Rightmove
-        "STATUS_ID" => 'int:mandatory:filled:len=1', //
+        "AGENT_REF" => 'string|required|min:1|max:20',
+        "BRANCH_ID" => 'int|required|min:1|max:10', // provided by Rightmove
+        "STATUS_ID" => 'int|required|min:1|max:1', //
             // 0 = Available
             // 1 = SSTC - Sold Subject To Completion
             // 2 = SSTCM - Scotland - Sold Subject To Concluded Missives
@@ -43,32 +43,32 @@ class BlmFile {
             // 4 = reserved - sales
             // 5 = let agreed - letting
 
-        "CREATE_DATE" => 'date:mandatory:nullable', // YYYY-MM-DD HH:MI:SS
-        "UPDATE_DATE" => 'date:mandatory:nullable', // YYYY-MM-DD HH:MI:SS
+        "CREATE_DATE" => 'date|required|min:0', // YYYY-MM-DD HH:MI:SS
+        "UPDATE_DATE" => 'date|required|min:0', // YYYY-MM-DD HH:MI:SS
     ];
 
     protected $columnDefinitionV3 = [
-        "DISPLAY_ADDRESS" => 'string:mandatory:filled:len=120', // Address of the property that should be displayed on the Live Rightmove site
-        "PUBLISHED_FLAG" => 'int:mandatory:filled:len=1', // 0 = hidden/invisible 1 = visible
+        "DISPLAY_ADDRESS" => 'string|required|min:1|max:120', // Address of the property that should be displayed on the Live Rightmove site
+        "PUBLISHED_FLAG" => 'int|required|min:1|max:1', // 0 = hidden/invisible 1 = visible
 
-        "LET_DATE_AVAILABLE" => 'date:optional:nullable', // date:mandatory:nullable
-        "LET_BOND" => 'num:optional:nullable', // deposit amount
-        "ADMINISTRATION_FEE" => 'string:optional:nullable:len=4096', // all fees applicable to the property
-        "LET_TYPE_ID" => 'num:optional:nullable:len=1', // mandatory
+        "LET_DATE_AVAILABLE" => 'date|min:0|min:0', // date|required|min:0
+        "LET_BOND" => 'num|min:0', // deposit amount
+        "ADMINISTRATION_FEE" => 'string|min:0|max:4096', // all fees applicable to the property
+        "LET_TYPE_ID" => 'num|min:0|max:1', // required
             // 0 = not specified DEFAULT
             // 1 = long term
             // 2 = short term
             // 3 = student
             // 4 = commercial
 
-        "LET_FURN_ID" => 'int:mandatory:nullable:len=1', //
+        "LET_FURN_ID" => 'int|required|min:0|max:1', //
             // 0 = furnished
             // 1 = part furnished
             // 2 = unfurnished
             // 3 = not specified DEFAULT
             // 4 = furnished / unfurnished ???
 
-        "LET_RENT_FREQUENCY" => 'int:mandatory:nullable:len=1', //
+        "LET_RENT_FREQUENCY" => 'int|required|min:0|max:1', //
             // 0 = weekly
             // 1 = monthly - DEFAULT if null
             // 2 = quarterly
@@ -76,23 +76,23 @@ class BlmFile {
             // 4 =
             // 5 = per-person per-week - students
 
-        "LET_CONTRACT_IN_MONTHS" => 'int:optional:nullable:len=2', // student
-        "LET_WASHING_MACHINE_FLAG" => 'string:optional:nullable:len=1', // Y/N student
-        "LET_DISHWASHER_FLAG" => 'string:optional:nullable:len=1', // Y/N student
-        "LET_BURGLAR_ALARM_FLAG" => 'string:optional:nullable:len=1', // Y/N student
-        "LET_BILL_INC_WATER" => 'string:optional:nullable:len=1', // Y/N student
-        "LET_BILL_INC_GAS" => 'string:optional:nullable:len=1', // Y/N student
-        "LET_BILL_INC_ELECTRICITY" => 'string:optional:nullable:len=1', // Y/N student
-        "LET_BILL_INC_TV_LICIENCE" => 'string:optional:nullable:len=1', // Y/N student
-        "LET_BILL_INC_TV_SUBSCRIPTION" => 'string:optional:nullable:len=1', // Y/N student
-        "LET_BILL_INC_INTERNET" => 'string:optional:nullable:len=1', // Y/N student
+        "LET_CONTRACT_IN_MONTHS" => 'int|min:0|max:2', // student
+        "LET_WASHING_MACHINE_FLAG" => 'string|min:0|max:1', // Y/N student
+        "LET_DISHWASHER_FLAG" => 'string|min:0|max:1', // Y/N student
+        "LET_BURGLAR_ALARM_FLAG" => 'string|min:0|max:1', // Y/N student
+        "LET_BILL_INC_WATER" => 'string|min:0|max:1', // Y/N student
+        "LET_BILL_INC_GAS" => 'string|min:0|max:1', // Y/N student
+        "LET_BILL_INC_ELECTRICITY" => 'string|min:0|max:1', // Y/N student
+        "LET_BILL_INC_TV_LICIENCE" => 'string|min:0|max:1', // Y/N student
+        "LET_BILL_INC_TV_SUBSCRIPTION" => 'string|min:0|max:1', // Y/N student
+        "LET_BILL_INC_INTERNET" => 'string|min:0|max:1', // Y/N student
 
-        "TENURE_TYPE_ID" => 'int:optional:nullable:len=1', // mandatory
-        "TRANS_TYPE_ID" => 'int:nullable:mandatory:len=1', // 1 = resale, 2 = lettings
+        "TENURE_TYPE_ID" => 'int|min:0|max:1', // required
+        "TRANS_TYPE_ID" => 'int|required|min:1|max:1', // 1 = resale, 2 = lettings
 
-        "BEDROOMS" => 'int:mandatory:filled',
-        "PRICE" => 'num:mandatory:filled',
-        "PRICE_QUALIFIER" => 'int:mandatory:nullable',
+        "BEDROOMS" => 'int|required|min:1',
+        "PRICE" => 'num|required|min:1',
+        "PRICE_QUALIFIER" => 'int|required|min:0',
                 /*  0 – Default,
                     1 – POA,
                     2 – Guide Price,
@@ -110,59 +110,61 @@ class BlmFile {
                     14 – Equity Loan,
                     15 – Offers Invited
                 **/
-        "PROP_SUB_ID" => 'int:mandatory:filled', // One of the valid property types. Ref. Property Type table
+        "PROP_SUB_ID" => 'int|required|min:1', // One of the valid property types. Ref. Property Type table
 
-        "ADDRESS_1" => 'string:mandatory:filled:len=60',
-        "ADDRESS_2" => 'string:mandatory:filled:len=60',
-        "ADDRESS_3" => 'string:optional:nullable:len=60',
-        "ADDRESS_4" => 'string:optional:nullable:len=60',
-        "TOWN" => 'string:mandatory:filled:len=60',
-        "POSTCODE1" => 'string:mandatory:filled:len=10',
-        "POSTCODE2" => 'string:mandatory:filled:len=10',
+        "ADDRESS_1" => 'string|required|min:1|max:60',
+        "ADDRESS_2" => 'string|required|min:1|max:60',
+        "ADDRESS_3" => 'string|min:0|max:60',
+        "ADDRESS_4" => 'string|min:0|max:60',
+        "TOWN" => 'string|required|min:1|max:60',
+        "POSTCODE1" => 'string|required|min:1|max:10',
+        "POSTCODE2" => 'string|required|min:1|max:10',
 
-        "FEATURE1" => 'string:mandatory:filled:len=200',
-        "FEATURE2" => 'string:mandatory:filled:len=200',
-        "FEATURE3" => 'string:mandatory:filled:len=200',
-        "FEATURE4" => 'string:optional:nullable:len=200',
-        "FEATURE5" => 'string:optional:nullable:len=200',
-        "FEATURE6" => 'string:optional:nullable:len=200',
-        "FEATURE7" => 'string:optional:nullable:len=200',
-        "FEATURE8" => 'string:optional:nullable:len=200',
-        "FEATURE9" => 'string:optional:nullable:len=200',
-        "FEATURE10" => 'string:optional:nullable:len=200',
+        "FEATURE1" => 'string|required|min:1|max:200',
+        "FEATURE2" => 'string|required|min:1|max:200',
+        "FEATURE3" => 'string|required|min:1|max:200',
+        "FEATURE4" => 'string|min:0|max:200',
+        "FEATURE5" => 'string|min:0|max:200',
+        "FEATURE6" => 'string|min:0|max:200',
+        "FEATURE7" => 'string|min:0|max:200',
+        "FEATURE8" => 'string|min:0|max:200',
+        "FEATURE9" => 'string|min:0|max:200',
+        "FEATURE10" => 'string|min:0|max:200',
 
-        "SUMMARY" => 'string:mandatory:filled:len=1024',
-        "DESCRIPTION" => 'string:mandatory:filled:len=32768',
+        "SUMMARY" => 'string|required|min:1|max:1024', // ALL HTML will be stripped page 15 of pdf
+        "DESCRIPTION" => 'string|required|min:1|max:32768', // Basic HTML tags can be used for bold, underlining, italicising page 15 of pdf
 
-        "NEW_HOME_FLAG" => 'string:mandatory:nullable:len=1', // Y / N
+        "NEW_HOME_FLAG" => 'string|required|min:0|max:1', // Y / N or empty
 
-        "MEDIA_IMAGE_00" => 'string:mandatory:filled:len=100',
-        "MEDIA_IMAGE" => 'string:optional:nullable:len=100:recursive',
-        "MEDIA_IMAGE_TEXT" => 'string:optional:nullable:len=20:recursive',
+        // All links to Floor plans, Brochures and Virtual Tours must only link to the physical media 
+        //  and not to a webpage consisting of the media and external links.
+        "MEDIA_IMAGE_00" => 'string|required|min:1|max:100',
+        "MEDIA_IMAGE" => 'string|min:0|max:100|recursive',
+        "MEDIA_IMAGE_TEXT" => 'string|min:0|max:20|recursive',
 
         // in spec, but not in test file, coment out for now
-        // "MEDIA_IMAGE_60" => 'string:mandatory:nullable:len=20:recursive', // Name of the property EPC graphic. MEDIA_IMAGE_60 is for EPC Graphics that would be shown on site.
-        // "MEDIA_IMAGE_TEXT_60" => 'string:mandatory:nullable:len=3:recursive', // Caption to go with the EPC of MEDIA_IMAGE_60, this MUST READ “EPC”.
+        // "MEDIA_IMAGE_60" => 'string|required|min:0|max:20|recursive', // Name of the property EPC graphic. MEDIA_IMAGE_60 is for EPC Graphics that would be shown on site.
+        // "MEDIA_IMAGE_TEXT_60" => 'string|required|min:0|max:3|recursive', // Caption to go with the EPC of MEDIA_IMAGE_60, this MUST READ “EPC”.
 
-        "MEDIA_FLOOR_PLAN" => 'string:optional:nullable:len=100:recursive',
-        "MEDIA_FLOOR_PLAN_TEXT" => 'string:optional:nullable:len=20:recursive',
+        "MEDIA_FLOOR_PLAN" => 'string|min:0|max:100|recursive',
+        "MEDIA_FLOOR_PLAN_TEXT" => 'string|min:0|max:20|recursive',
 
-        "MEDIA_DOCUMENT" => 'string:optional:nullable:len=200:recursive',
-        "MEDIA_DOCUMENT_TEXT" => 'string:optional:nullable:len=20:recursive',
+        "MEDIA_DOCUMENT" => 'string|min:0|max:200|recursive',
+        "MEDIA_DOCUMENT_TEXT" => 'string|min:0|max:20|recursive',
 
-        "MEDIA_VIRTUAL_TOUR" => 'string:optional:nullable:len=200:recursive',
-        "MEDIA_VIRTUAL_TOUR_TEXT" => 'string:optional:nullable:len=20:recursive',
+        "MEDIA_VIRTUAL_TOUR" => 'string|min:0|max:200|recursive',
+        "MEDIA_VIRTUAL_TOUR_TEXT" => 'string|min:0|max:20|recursive',
     ];
 
     protected $columnDefinitionV3i = [
-        "HOUSE_NAME_NUMBER" => 'string:mandatory:filled:len=60',
-        "STREET_NAME", 'string:mandatory:filled:len=100',
-        "OS_TOWN_CITY" => 'string:mandatory:filled:len=100',
-        "OS_REGION" => 'string:mandatory:filled:len=100',
-        "ZIPCODE" => 'string:optional:nullable:len=100',
-        "COUNTRY_CODE" => 'string:mandatory:filled:len=2',
-        "EXACT_LATITUDE" => 'num:mandatory:filled:len=15',
-        "EXACT_LONGDITUDE" => 'num:mandatory:filled:len=15',
+        "HOUSE_NAME_NUMBER" => 'string|required|min:1|max:60',
+        "STREET_NAME", 'string|required|min:1|max:100',
+        "OS_TOWN_CITY" => 'string|required|min:1|max:100',
+        "OS_REGION" => 'string|required|min:1|max:100',
+        "ZIPCODE" => 'string|min:0|max:100',
+        "COUNTRY_CODE" => 'string|required|min:1|max:2',
+        "EXACT_LATITUDE" => 'num|required|min:1|max:15',
+        "EXACT_LONGDITUDE" => 'num|required|min:1|max:15',
     ];
 
     public function __construct()
@@ -201,26 +203,36 @@ class BlmFile {
             $name = $matches[1];
         }
 
-        $def = explode(':', $definitionString);
+        $def = explode('|', $definitionString);
 
         $result = [];
         $result['type'] = array_shift($def);
-        $result['mandatory'] = ('mandatory' === array_shift($def));
-        $result['required'] = ('filled' === array_shift($def));
+        $result['required'] = false;
         $result['recursive'] = false;
-        $result['len'] = ($result['required']) ? 1 : 0;
+        $result['min'] = 0;
+        $result['max'] = 4096;
 
         foreach($def as $item) {
+            if ('required' == $item ) {
+                $result['required'] = true;
+                continue;
+            }
             if ('recursive' == $item ) {
                 $result['recursive'] = true;
                 continue;
             }
-            if ('len' == substr($item, 0, 3)) {
-                $result['len'] = substr($item, 4);
+
+            $type = substr($item, 0, 3);
+            $size = substr($item, 4);
+            if ($type === 'min') {
+                $result['min'] = (int) $size;
+            }
+            if ($type === 'max') {
+                $result['max'] = (int) $size;
             }
         
         }
-
+// dd($columnName, $type, $result);
         return $result;
     }
 
@@ -584,13 +596,13 @@ class BlmFile {
     }
 
     /**
-     * check data has all mandatory columns
+     * check definition for has all mandatory columns
      * @return Void
      */
     protected function validateMandatoryColumns()
     {
         $mandatory = array_filter($this->columnDefinitions, function($columnDefinition) {
-            return $columnDefinition['mandatory'];
+            return $columnDefinition['required'];
         });
 
         $mandatory = array_keys($mandatory);
@@ -696,10 +708,16 @@ class BlmFile {
     protected function validateDataColumn(String $columnName, String $columnValue)
     {
         $definition = $this->columnDefinitions[$this->cannonicalColumnName($columnName)];
+        $strlen = strlen($columnValue);
 
         // check if column 'columnName' must have a columnValue
-        if (($definition['required']) && ('' == $columnValue)) {
+        if (($definition['min'] > 0) && (0 === $strlen)) {
             throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' empty, it must have a value");
+        }
+
+        // check if column 'columnName' is too large
+        if (strlen($columnValue) > $definition['max']) {
+            throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' is too big, maximum length is '{$definition['max']}', found '{$strlen}' ");
         }
 
         // check type and size is correct
@@ -803,6 +821,134 @@ class BlmFile {
         }
 
         return true;
+    }
+
+    /**
+     * check property sub id is valid for drop down search on rightmove.com
+     * 
+     * @param Int $propSubId
+     * @return Bool
+     */
+    protected function isPropSubId(Int $propSubId)
+    {
+        // PROP_SUB_ID | Property Type | Search Criteria Type'],
+        static $prop_sub_id = [
+            0 => ['Not Specified', 'Not Specified'], //  (ONLY)
+            1 => ['Terraced', 'Houses'],
+            2 => ['End of Terrace', 'Houses'],
+            3 => ['Semi-Detached', 'Houses'],
+            4 => ['Detached', 'Houses'],
+            5 => ['Mews', 'Houses'],
+            6 => ['Cluster House', 'Houses'],
+            7 => ['Ground Flat', 'Flats / Apartments'],
+            8 => ['Flat', 'Flats / Apartments'],
+            9 => ['Studio', 'Flats / Apartments'],
+            10 => ['Ground Maisonette', 'Flats / Apartments'],
+            11 => ['Maisonette', 'Flats / Apartments'],
+            12 => ['Bungalow', 'Bungalows'],
+            13 => ['Terraced Bungalow', 'Bungalows'],
+            14 => ['Semi-Detached Bungalow', 'Bungalows'],
+            15 => ['Detached Bungalow', 'Bungalows'],
+            16 => ['Mobile Home', 'Mobile / Park Homes'],
+            20 => ['Land', 'Land'],
+            21 => ['Link Detached', 'House Houses'],
+            22 => ['Town House', 'Houses'],
+            23 => ['Cottage', 'Houses'],
+            24 => ['Chalet', 'Houses'],
+            27 => ['Villa', 'Houses'],
+            28 => ['Apartment', 'Flats / Apartments'],
+            29 => ['Penthouse', 'Flats / Apartments'],
+            30 => ['Finca', 'Houses'],
+            43 => ['Barn Conversion', 'Character Property'],
+            44 => ['Serviced Apartments', 'Flats / Apartments'],
+            45 => ['Parking', 'Garage / Parking'],
+            46 => ['Sheltered Housing', 'Retirement Property'],
+            47 => ['Retirement Property', 'Retirement Property'],
+            48 => ['House Share', 'House / Flat Share'],
+            49 => ['Flat Share', 'House / Flat Share'],
+            50 => ['Park Home', 'Mobile / Park Homes'],
+            51 => ['Garages', 'Garage / Parking'],
+            52 => ['Farm House', 'Character Property'],
+            53 => ['Equestrian Facility', 'Character Property'],
+            56 => ['Duplex', 'Flats / Apartments'],
+            59 => ['Triplex', 'Flats / Apartments'],
+            62 => ['Longere', 'Character Property'],
+            65 => ['Gite', 'Character Property'],
+            68 => ['Barn', 'Character Property'],
+            71 => ['Trulli', 'Character Property'],
+            74 => ['Mill', 'Character Property'],
+            77 => ['Ruins', 'Character Property'],
+            80 => ['Restaurant', 'Commercial Property'],
+            83 => ['Cafe', 'Commercial Property'],
+            86 => ['Mill', 'Commercial Property'],
+            92 => ['Castle', 'Character Property'],
+            95 => ['Village', 'House Houses'],
+            101 => ['Cave House', 'Character Property'],
+            104 => ['Cortijo', 'Character Property'],
+            107 => ['Farm Land', 'Land'],
+            110 => ['Plot', 'Land'],
+            113 => ['Country House', 'Character Property'],
+            116 => ['Stone House', 'Character Property'],
+            117 => ['Caravan', 'Mobile / Park Homes'],
+            118 => ['Lodge', 'Character Property'],
+            119 => ['Log Cabin', 'Character Property'],
+            120 => ['Manor House', 'Character Property'],
+            121 => ['Stately Home', 'Character Property'],
+            125 => ['Off-Plan', 'Land'],
+            128 => ['Semi-detached Villa', 'Houses'],
+            131 => ['Detached Villa', 'Houses'],
+            134 => ['Bar / Nightclub', 'Commercial Property'],
+            137 => ['Shop', 'Commercial Property'],
+            140 => ['Riad', 'Character Property'],
+            141 => ['House Boat', 'Character Property'],
+            142 => ['Hotel Room', 'Flats / Apartments'],
+            143 => ['Block of Apartments', 'Flats / Apartments'],
+            144 => ['Private Halls', 'Flats / Apartments'],
+            178 => ['Office', 'Commercial Property'],
+            181 => ['Business Park', 'Commercial Property'],
+            184 => ['Serviced Office', 'Commercial Property'],
+            187 => ['Retail Property (high street)', 'Commercial Property'],
+            190 => ['Retail Property (out of town)', 'Commercial Property'],
+            193 => ['Convenience Store', 'Commercial Property'],
+            196 => ['Garage', 'Commercial Property'],
+            199 => ['Hairdresser / Barber Shop', 'Commercial Property'],
+            202 => ['Hotel', 'Commercial Property'],
+            205 => ['Petrol Station', 'Commercial Property'],
+            208 => ['Post Office', 'Commercial Property'],
+            211 => ['Pub', 'Commercial Property'],
+            214 => ['Workshop', 'Commercial Property'],
+            217 => ['Distribution Warehouse', 'Commercial Property'],
+            220 => ['Factory', 'Commercial Property'],
+            223 => ['Heavy Industrial', 'Commercial Property'],
+            226 => ['Industrial Park', 'Commercial Property'],
+            229 => ['Light Industrial', 'Commercial Property'],
+            232 => ['Storage', 'Commercial Property'],
+            235 => ['Showroom', 'Commercial Property'],
+            238 => ['Warehouse', 'Commercial Property'],
+            241 => ['Land', 'Commercial Property'],
+            244 => ['Commercial Development', 'Commercial Property'],
+            247 => ['Industrial Development', 'Commercial Property'],
+            250 => ['Residential Development', 'Commercial Property'],
+            253 => ['Commercial Property', 'Commercial Property'],
+            256 => ['Data Centre', 'Commercial Property'],
+            259 => ['Farm', 'Commercial Property'],
+            262 => ['Healthcare Facility', 'Commercial Property'],
+            265 => ['Marine Property', 'Commercial Property'],
+            268 => ['Mixed Use', 'Commercial Property'],
+            271 => ['Research & Development Facility', 'Commercial Property'],
+            274 => ['Science Park', 'Commercial Property'],
+            277 => ['Guest House', 'Commercial Property'],
+            280 => ['Hospitality', 'Commercial Property'],
+            283 => ['Leisure Facility', 'Commercial Property'],
+            298 => ['Takeaway', 'Commercial Property'],
+            301 => ['Childcare Facility', 'Commercial Property'],
+            304 => ['Smallholding', 'Land'],
+            307 => ['Place of Worship', 'Commercial Property'],
+            310 => ['Trade Counter', 'Commercial Property'],
+            511 => ['Coach House', 'Flats / Apartments'],
+        ];
+
+        return isset($prop_sub_id[$propSubId]);
     }
 
 }

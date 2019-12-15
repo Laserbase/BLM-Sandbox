@@ -62,7 +62,7 @@ class ColumnDefinitionsTest extends TestCase
         $file = fopen($fileName, "r");
         $this->assertTrue( is_resource($file) );
         
-        if ($columnDefinition['mandatory']) {
+        if ($columnDefinition['required']) {
             $this->expectExceptionMessage("Mandatory column(s) '{$columnName}' missing");
         }
 
