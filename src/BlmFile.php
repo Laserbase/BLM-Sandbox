@@ -666,7 +666,11 @@ class BlmFile {
         //  Which means that there is a blank slot that needs to be accounted for
         //  using array_pop() to remove it
         $values = $this->extractRowValues($str);
-        array_pop($values);
+        $tmp = array_pop($values);
+        if ('' !== $tmp) {
+            $strlen = strlen($tmp);
+            throw new \Exception("Error: Not a valid BLM file, Data between final End-Of-Field and End-Of-Record, found '{$strlen}' characters, must be blank");
+        }
         $this->validateColumnCount($values);
 
         $keys = array_values($this->columnKeys);
