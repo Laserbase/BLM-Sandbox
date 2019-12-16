@@ -63,7 +63,7 @@ class ColumnDefinitionsTest extends TestCase
         $this->assertTrue( is_resource($file) );
         
         if ($columnDefinition['required']) {
-            $this->expectExceptionMessage("Mandatory column(s) '{$columnName}' missing");
+            $this->expectExceptionMessage("Required column(s) '{$columnName}' missing");
         }
 
         $blm = new BlmFile();

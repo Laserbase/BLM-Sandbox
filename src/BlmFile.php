@@ -22,7 +22,7 @@ class BlmFile {
         'Property Count' => 0,
         'Generated Date' => '',
     ];
-    protected $headerMandatory = [
+    protected $headerRequired = [
         'Version',
         'EOF',
         'EOR'
@@ -31,7 +31,14 @@ class BlmFile {
     protected $columnKeys = [];
     protected $columnDefinitions = [];
     protected $columnDefinitionMaster = [
-        // "xAGENT_REF" => 'string|required|min:0',
+        // 'type|required|min:0|max:10:recursive'
+        //      type = string | date | int | num
+        //      required = column must be in data feed
+        // min:0 = value is optional
+        //      otherwise value must be given
+        // max:n = maximum length in characters for a column value
+        // recursive = field name can be repeated
+        //       with an underscore followed by an index number
 
         "AGENT_REF" => 'string|required|min:1|max:20',
         "BRANCH_ID" => 'int|required|min:1|max:10', // provided by Rightmove
@@ -232,7 +239,7 @@ class BlmFile {
             }
         
         }
-// dd($columnName, $type, $result);
+
         return $result;
     }
 
@@ -381,7 +388,7 @@ class BlmFile {
      */
     protected function checkHeader()
     {
-        $diff = array_diff($this->headerMandatory, array_keys($this->header));
+        $diff = array_diff($this->headerRequired, array_keys($this->header));
         if ($diff) {
             throw new \Exception("Error: Not a valid BLM file, invalid header, missing item(s) '".implode("', '", $diff)."' ");
         }
@@ -508,7 +515,7 @@ class BlmFile {
      */
     protected function validateHeaderItem(String $name, String $value)
     {
-        // mandatory
+        // required
         switch ($name) {
             case 'Version': return in_array($value, ['3', '3i']);
             case 'EOF': return preg_match("/^'.'$/", $value);
@@ -548,7 +555,7 @@ class BlmFile {
         }
 
         $this->validateDataSeparators();
-        $this->validateMandatoryColumns();
+        $this->validateRequiredColumns();
     }
 
     /**
@@ -596,23 +603,23 @@ class BlmFile {
     }
 
     /**
-     * check definition for has all mandatory columns
+     * check definition for has all required columns
      * @return Void
      */
-    protected function validateMandatoryColumns()
+    protected function validateRequiredColumns()
     {
-        $mandatory = array_filter($this->columnDefinitions, function($columnDefinition) {
+        $required = array_filter($this->columnDefinitions, function($columnDefinition) {
             return $columnDefinition['required'];
         });
 
-        $mandatory = array_keys($mandatory);
+        $required = array_keys($required);
         $columns = array_map(function ($column) {
             return $this->cannonicalColumnName($column);
         }, $this->columnKeys);
 
-        $diff = array_diff($mandatory, $columns);
+        $diff = array_diff($required, $columns);
         if ($diff) {
-            throw new \Exception("Error: Not a valid BLM file, Mandatory column(s) '".implode("', '", $diff)."' missing");
+            throw new \Exception("Error: Not a valid BLM file, Required column(s) '".implode("', '", $diff)."' missing");
         }
     }
 
