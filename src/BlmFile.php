@@ -61,7 +61,7 @@ class BlmFile {
         "LET_DATE_AVAILABLE" => 'date|min:0|min:0', // date|required|min:0
         "LET_BOND" => 'num|min:0', // deposit amount
         "ADMINISTRATION_FEE" => 'string|min:0|max:4096', // all fees applicable to the property
-        "LET_TYPE_ID" => 'num|min:0|max:1', // required
+        "LET_TYPE_ID" => 'num|min:0|max:1', // column required, data optional
             // 0 = not specified DEFAULT
             // 1 = long term
             // 2 = short term
@@ -83,6 +83,7 @@ class BlmFile {
             // 4 =
             // 5 = per-person per-week - students
 
+        // LET_TYPE_ID === 3
         "LET_CONTRACT_IN_MONTHS" => 'int|min:0|max:2', // student
         "LET_WASHING_MACHINE_FLAG" => 'string|min:0|max:1', // Y/N student
         "LET_DISHWASHER_FLAG" => 'string|min:0|max:1', // Y/N student
@@ -145,18 +146,18 @@ class BlmFile {
 
         // All links to Floor plans, Brochures and Virtual Tours must only link to the physical media 
         //  and not to a webpage consisting of the media and external links.
-        "MEDIA_IMAGE_00" => 'string|required|min:1|max:100',
-        "MEDIA_IMAGE" => 'string|min:0|max:100|recursive',
+        "MEDIA_IMAGE_00" => 'string|required|min:1|max:100|media:img',
+        "MEDIA_IMAGE" => 'string|min:0|max:100|recursive|media:img',
         "MEDIA_IMAGE_TEXT" => 'string|min:0|max:20|recursive',
 
         // in spec, but not in test file, coment out for now
-        // "MEDIA_IMAGE_60" => 'string|required|min:0|max:20|recursive', // Name of the property EPC graphic. MEDIA_IMAGE_60 is for EPC Graphics that would be shown on site.
-        // "MEDIA_IMAGE_TEXT_60" => 'string|required|min:0|max:3|recursive', // Caption to go with the EPC of MEDIA_IMAGE_60, this MUST READ “EPC”.
+        // "MEDIA_IMAGE_60" => 'string|required|min:0|max:20|recursive|media:img', // Name of the property EPC graphic. MEDIA_IMAGE_60 is for EPC Graphics that would be shown on site.
+        // "MEDIA_IMAGE_TEXT_60" => 'string|required|min:0|max:3|recursive|', // Caption to go with the EPC of MEDIA_IMAGE_60, this MUST READ “EPC”.
 
-        "MEDIA_FLOOR_PLAN" => 'string|min:0|max:100|recursive',
+        "MEDIA_FLOOR_PLAN" => 'string|min:0|max:100|recursive|media:flp',
         "MEDIA_FLOOR_PLAN_TEXT" => 'string|min:0|max:20|recursive',
 
-        "MEDIA_DOCUMENT" => 'string|min:0|max:200|recursive',
+        "MEDIA_DOCUMENT" => 'string|min:0|max:200|recursive|media:doc',
         "MEDIA_DOCUMENT_TEXT" => 'string|min:0|max:20|recursive',
 
         "MEDIA_VIRTUAL_TOUR" => 'string|min:0|max:200|recursive',
@@ -172,6 +173,12 @@ class BlmFile {
         "COUNTRY_CODE" => 'string|required|min:1|max:2',
         "EXACT_LATITUDE" => 'num|required|min:1|max:15',
         "EXACT_LONGDITUDE" => 'num|required|min:1|max:15',
+    ];
+
+    protected $imageExtension = [
+        'img' => ['.jpg', '.gif', '.png'],
+        'flp' => ['.jpg', '.gif', '.png'],
+        'doc' => ['.pdf']
     ];
 
     public function __construct()
@@ -210,32 +217,38 @@ class BlmFile {
             $name = $matches[1];
         }
 
-        $def = explode('|', $definitionString);
+        $definitions = explode('|', $definitionString);
 
-        $result = [];
-        $result['type'] = array_shift($def);
-        $result['required'] = false;
-        $result['recursive'] = false;
-        $result['min'] = 0;
-        $result['max'] = 4096;
+        $result = [
+            'type' => array_shift($definitions),
+            'required' => false,
+            'recursive' => false,
+            'min' => 0,
+            'max' => 4096,
+            'media' => ''
+        ];
 
-        foreach($def as $item) {
-            if ('required' == $item ) {
+        foreach($definitions as $definition) {
+            if ('required' == $definition ) {
                 $result['required'] = true;
                 continue;
             }
-            if ('recursive' == $item ) {
+            if ('recursive' == $definition ) {
                 $result['recursive'] = true;
                 continue;
             }
 
-            $type = substr($item, 0, 3);
-            $size = substr($item, 4);
-            if ($type === 'min') {
-                $result['min'] = (int) $size;
-            }
-            if ($type === 'max') {
-                $result['max'] = (int) $size;
+            $key = substr($definition, 0, strpos($definition, ':'));
+            $value = substr($definition, strpos($definition, ':')+1);
+
+            switch ($key) {
+                case 'min':
+                case 'max':
+                    $result[$key] = (int) $value;
+                break;
+                case 'media':
+                    $result[$key] = $value;
+                break;
             }
         
         }
@@ -316,6 +329,7 @@ class BlmFile {
                 }
             break;
         }
+        // dd($result);
 
         return $result;
     }
@@ -719,37 +733,37 @@ class BlmFile {
     protected function validateDataColumn(String $columnName, String $columnValue)
     {
         $definition = $this->columnDefinitions[$this->cannonicalColumnName($columnName)];
+        $type = $definition['type'];
+        $min = $definition['min'];
+        $max = $definition['max'];
         $strlen = strlen($columnValue);
 
+        // check if column 'columnName' is optional
+        if ((0 === $min) && (0 === $strlen) ) {
+            return;
+        }
+
         // check if column 'columnName' must have a columnValue
-        if (($definition['min'] > 0) && (0 === $strlen)) {
-            throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' empty, it must have a value");
+        if ($strlen < $min) {
+            throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' is too small, minimum length is '{$min}', found '{$strlen}'");
         }
 
         // check if column 'columnName' is too large
-        if (strlen($columnValue) > $definition['max']) {
-            throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' is too big, maximum length is '{$definition['max']}', found '{$strlen}' ");
+        if ($strlen > $max) {
+            throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' is too big, maximum length is '{$max}', found '{$strlen}' ");
         }
 
         // check type and size is correct
-        if( ! $this->validateDataColumnType($columnName, $columnValue)) {
-            throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' contains incorrect value, expecting '{$type}', found '{$columnValue}'");
-        }
+        $this->validateDataColumnType($columnName, $columnValue);
+
+        // check media definitions IMG, FLP, DOC
+        $this->validateMediaType($columnName, $columnValue, $definition);
+            // throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' contains incorrect value, expecting '{$type}', found '{$columnValue}'");
+        
 
     }
 
-    /**
-     * is the column value a date string in the correct format
-     * @param String $value
-     * @return bool
-     */
-    protected function isDate(String $value)
-    {
-        $date = Date($this->formatDate, strtotime($value));
-        return Date($this->formatDate, strtotime($value)) === $value;
-    }
-
-    /**
+        /**
      * validate column value against column definition
      * @param String $name
      * @param String $value
@@ -759,32 +773,48 @@ class BlmFile {
     {
         $type = 'string';
         $definition = $this->columnDefinitions[$this->cannonicalColumnName($name)];
-
-        if (isset($this->columnDefinitions['type'])) {
-            $type = $this->columnDefinitions['type'];
+        if (0 === count($definition)) {
+            return;
         }
 
+        $type = $definition['type'];
         switch ($type) {
-            case 'int':
-                return $this->isInt($value, $definition);
             case 'date':
-                return $this->isDate($value, $definition);
+                $this->isDate($name, $value, $definition);
+                return;
+            case 'int':
+                $this->isInt($name, $value, $definition);
+                return;
             case 'num':
-                return $this->isNum($value, $definition);
+                $this->isNum($name, $value, $definition);
+                return;
             case 'string':
-                return $this->isString($value, $definition);
+                $this->isString($name, $value, $definition);
+                return;
             default:
                 throw new \Exception("Error: Not a valid BLM file, Column '{$name}' is an unknown type, found '{$type}' with the value '{$value}' ");
         }
     }
 
     /**
+     * is the column value a date string in the correct format
+     * @param String $value
+     * @return bool
+     */
+    protected function isDate(String $value)
+    {
+        return Date($this->formatDate, strtotime($value)) === $value;
+    }
+
+    /**
      * is the column value an int
+     * 
+     * @param String $name used for reporting
      * @param String $value
      * @param Array $definition
      * @return bool
      */    
-    protected function isInt(String $value, Array $definition = [])
+    protected function isInt(String $name, String $value, Array $definition = [])
     {
         $int = strval($value);
         return ctype_digit($int) && ($int >= 0);
@@ -794,20 +824,14 @@ class BlmFile {
      * is the column value a number, possibly with decimals
      * length if defined includes decimal point // 99.99 = 5 // pic(99.99)
      * 
+     * @param String $name used for reporting
      * @param String $value
      * @return bool
      */   
-    protected function isNum(String $value, Array $definition = [])
+    protected function isNum(String $name, String $value, Array $definition = [])
     {
         if (preg_match("#^\d*(\.\d*)?$#", $value)) {
             return false;
-        }
-
-        if (isset($definition['len'])) {
-            $strlen = \strlen($value);
-            if ($strlen > $strlen) {
-                return false;
-            }
         }
 
         return true;
@@ -815,24 +839,54 @@ class BlmFile {
 
     /**
      * is the column value a string
+     * 
+     * @param String $name used for reporting
      * @param String $value
      * @return bool
      */   
-    protected function isString(String $value, Array $definition = [])
+    protected function isString(String $name, String $value, Array $definition = [])
     {
-        if (0 === count($definition)) {
-            return true;
-        }
-
-        if (isset($definition['len'])) {
-            $strlen = \strlen($value);
-            if ($strlen > $strlen) {
-                return false;
-            }
-        }
-
-        return true;
+        // $this->validateMedia($name, $value, $definition);
     }
+
+    /**
+     * validateMedia
+     * 
+     * @param String $name used for reporting
+     * @param String $value
+     * @param Array $definition = []
+     */
+    protected function validateMediaType(String $name, String $value, Array $definition = [])
+    {
+        if (! isset($definition['media'])) {
+            // not a media column
+            return;
+        }
+
+        $media = $definition['media'];
+        if ('' === $media) {
+            return;
+        }
+
+        switch ($media) {
+            case 'img':
+                throw new \Exception("Error: Not a valid BLM file, media '{$name}' ");
+            break;
+
+            case 'flp':
+            break;
+
+            case 'doc':
+            break;
+
+            default:
+            throw new \Exception("Error: Not a valid BLM file, Column '{$name}' is an unknown media type, found '{$media}' ");
+
+        }
+
+        
+    }
+
 
     /**
      * check property sub id is valid for drop down search on rightmove.com
