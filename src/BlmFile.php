@@ -720,6 +720,10 @@ class BlmFile {
             $this->validateDataColumn($columnName, $columnValue);
         }
 
+        // check media definitions IMG, FLP, DOC
+        // $this->validateMediaRules($row);
+        // throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' contains incorrect value, expecting '{$type}', found '{$columnValue}'");
+    
         return $row;
     }
 
@@ -758,8 +762,6 @@ class BlmFile {
 
         // check media definitions IMG, FLP, DOC
         $this->validateMediaType($columnName, $columnValue, $definition);
-            // throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' contains incorrect value, expecting '{$type}', found '{$columnValue}'");
-        
 
     }
 
@@ -780,16 +782,16 @@ class BlmFile {
         $type = $definition['type'];
         switch ($type) {
             case 'date':
-                $this->isDate($name, $value, $definition);
+                $this->isDate($value);
                 return;
             case 'int':
-                $this->isInt($name, $value, $definition);
+                $this->isInt($value);
                 return;
             case 'num':
-                $this->isNum($name, $value, $definition);
+                $this->isNum($value);
                 return;
             case 'string':
-                $this->isString($name, $value, $definition);
+                $this->isString($value);
                 return;
             default:
                 throw new \Exception("Error: Not a valid BLM file, Column '{$name}' is an unknown type, found '{$type}' with the value '{$value}' ");
@@ -798,6 +800,7 @@ class BlmFile {
 
     /**
      * is the column value a date string in the correct format
+     * 
      * @param String $value
      * @return bool
      */
@@ -809,12 +812,10 @@ class BlmFile {
     /**
      * is the column value an int
      * 
-     * @param String $name used for reporting
      * @param String $value
-     * @param Array $definition
      * @return bool
      */    
-    protected function isInt(String $name, String $value, Array $definition = [])
+    protected function isInt(String $value)
     {
         $int = strval($value);
         return ctype_digit($int) && ($int >= 0);
@@ -824,11 +825,10 @@ class BlmFile {
      * is the column value a number, possibly with decimals
      * length if defined includes decimal point // 99.99 = 5 // pic(99.99)
      * 
-     * @param String $name used for reporting
      * @param String $value
      * @return bool
      */   
-    protected function isNum(String $name, String $value, Array $definition = [])
+    protected function isNum(String $value)
     {
         if (preg_match("#^\d*(\.\d*)?$#", $value)) {
             return false;
@@ -840,13 +840,12 @@ class BlmFile {
     /**
      * is the column value a string
      * 
-     * @param String $name used for reporting
      * @param String $value
      * @return bool
      */   
-    protected function isString(String $name, String $value, Array $definition = [])
+    protected function isString(String $value)
     {
-        // $this->validateMedia($name, $value, $definition);
+        return true;
     }
 
     /**
@@ -858,6 +857,10 @@ class BlmFile {
      */
     protected function validateMediaType(String $name, String $value, Array $definition = [])
     {
+        if ([] === $definition) {
+            // not passed
+            return;
+        }
         if (! isset($definition['media'])) {
             // not a media column
             return;
@@ -865,18 +868,20 @@ class BlmFile {
 
         $media = $definition['media'];
         if ('' === $media) {
+            // media column without special handling
             return;
         }
 
         switch ($media) {
-            case 'img':
-                throw new \Exception("Error: Not a valid BLM file, media '{$name}' ");
-            break;
-
-            case 'flp':
-            break;
-
             case 'doc':
+            case 'img':
+            case 'flp':
+                $extension = strtolower(substr($value, -4));
+                $allowed = $this->imageExtension[$media];
+
+                if (! in_array($extension, $allowed)) {
+                    throw new \Exception("Error: Not a valid BLM file, media column '{$name}', value '{$value}' must end in one of '".implode("', '", $allowed)."'");
+                }
             break;
 
             default:
