@@ -15,7 +15,7 @@ class IsMediaTypeCorrectTest extends TestCase
     protected $columnData = '';
 
     // Required Columns
-    private $req = [ 
+    private $requiredColumns = [ 
         'AGENT_REF' => 'XX99XX_FBM2766',
         'BRANCH_ID' => 'XX99XX',
         'STATUS_ID' => '1',
@@ -41,24 +41,44 @@ class IsMediaTypeCorrectTest extends TestCase
         'SUMMARY' => 'whatever whatever whatever whatever',
         'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
         'NEW_HOME_FLAG' => '0',
-        'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_01'
-
     ];
     
-    public function test_IsImgMediaTypeCorrectTest()
+    public function test_IsImgMediaTypeMissingExtensionTest()
     {
-        $this->columnKeys = implode('^', array_keys($this->req)).'^~';
-        $this->columnData = implode('^', array_values($this->req)).'^~';
+        $requiredColumns = $this->requiredColumns;
+        $requiredColumns['MEDIA_IMAGE_00'] = 'XX99XX_FBM2766_IMG_01';
+
+        $columnKeys = implode('^', array_keys($requiredColumns)).'^~';
+        $columnData = implode('^', array_values($requiredColumns)).'^~';
 
         $blm = new BlmFile();
         $blm->Version = '3';
 
         $blm->selectVersionColumnDefinitions('3');
 
-        $blm->validateDefinition($this->columnKeys);
+        $blm->validateDefinition($columnKeys);
 
-        $this->expectExceptionMessage("Error: Not a valid BLM file, media");
-        $row = $blm->validateData($this->columnData);
+        $this->expectExceptionMessage("Error: Not a valid BLM file, media column 'MEDIA_IMAGE_00', value 'XX99XX_FBM2766_IMG_01' must end in one of '.jpg', '.gif', '.png'");
+        $row = $blm->validateData($columnData);
+    }
+
+    public function test_IsImgMediaTypeUnknownTest()
+    {
+        $requiredColumns = $this->requiredColumns;
+        $requiredColumns['MEDIA_IMAGE_00'] = 'XX99XX_FBM2766_IMG_01.xxx';
+
+        $columnKeys = implode('^', array_keys($requiredColumns)).'^~';
+        $columnData = implode('^', array_values($requiredColumns)).'^~';
+
+        $blm = new BlmFile();
+        $blm->Version = '3';
+
+        $blm->selectVersionColumnDefinitions('3');
+
+        $blm->validateDefinition($columnKeys);
+
+        $this->expectExceptionMessage("Error: Not a valid BLM file, media column 'MEDIA_IMAGE_00', value 'XX99XX_FBM2766_IMG_01.xxx' must end in one of '.jpg', '.gif', '.png'");
+        $row = $blm->validateData($columnData);
     }
 
 }
