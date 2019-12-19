@@ -8,7 +8,7 @@ Instead using PHP gererator function to split processing to discrete chunks so t
 
 # 2019-1219 Create HISTORY.md from README.md
 - Add test for '\' behaviour before End-of-Field marker
-
+- Add row check for each 'media-text' column has a matching 'media' column
 
 # 2019-12-19 Clean up comments
 - Next stage finish inter-field dependencies

@@ -772,9 +772,7 @@ class BlmFile {
             $this->validateDataColumn($columnName, $columnValue);
         }
 
-        // check media definitions IMG, FLP, DOC
-        // $this->validateRowRules($row);
-        // throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' contains incorrect value, expecting '{$type}', found '{$columnValue}'");
+        $this->validateRowRules($row);
     
         return $row;
     }
@@ -823,15 +821,39 @@ class BlmFile {
      */
     protected function validateRowRules(Array $row)
     {
-        // MEDIA_IMAGE_00             - main image
-        // MEDIA_IMAGE_01..59         - IMG, FLP, DOC
-        // MEDIA_IMAGE_60..99         - is for EPC HIP images
-        // MEDIA_IMAGE_TEXT_60..99    - must contain EPC, HIP only
-        // MEDIA_IMAGE_TEXT_00..99    - must have an entry in MEDIA_IMAGE_01..99
-        // MEDIA_<type>_..            - must be valid filename <BRANCH_ID>_<AGENT_REF>_<type>_##.ext
-        // MEDIA_DOCUMENT_00..49      - filename of document
-        // MEDIA_DOCUMENT_50..99      - filename of EPC
-        // MEDIA_DOCUMENT_TEXT_50..99 - must read EPC or HIP
+        // MEDIA_IMAGE_00               - main image
+        // MEDIA_IMAGE_01..59           - IMG
+        // MEDIA_IMAGE_60..99           - is for EPC, HIP images
+        // MEDIA_IMAGE_TEXT_60..99      - must contain EPC, HIP only
+        // MEDIA_IMAGE_TEXT_00..99      - must have an entry in MEDIA_IMAGE_01..99
+        // MEDIA_<type>_..              - must be valid filename <BRANCH_ID>_<AGENT_REF>_<type>_##.ext
+        // MEDIA_DOCUMENT_00..49        - DOC, filename of document
+        // MEDIA_DOCUMENT_50..99        - filename of EPC
+        // MEDIA_DOCUMENT_TEXT_50       - must read 'EPC'
+        // MEDIA_DOCUMENT_TEXT_51..99   - must read 'EPC' or 'HIP'
+        // MEDIA_FLOOR_PLAN_01..99      - FLP
+        // MEDIA_FLOOR_PLAN_TEXT_01..99 -
+
+        $this->checkAllMediaTextColumnsForOrphans($row);
+    }
+
+    /**
+     * checkAllMediaTextColumnsForOrphans
+     */
+    protected function checkAllMediaTextColumnsForOrphans($row)
+    {
+        $textColumns = [];
+        foreach ($row as $name => $value) {
+            if (preg_match("#^MEDIA_.*_TEXT_.*$#", $name)) {
+                $textColumns[$name] = str_replace('TEXT_', '', $name);
+            }
+        }
+        
+        foreach ($textColumns as $textColumn => $mediaColumn) {
+            if (! isset($row[$mediaColumn])) {
+                throw new \Exception("Error: Not a valid BLM file, Media text column '{$mediaColumn}' missing media column '{$textColumn}'");
+            }
+        }
     }
 
     /**
