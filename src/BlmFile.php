@@ -16,7 +16,7 @@ class BlmFile {
         'END' => '#END#'
     ];
     protected $header = [
-        'Version' => "",
+        'Version' => "3",
         'EOF' => '^',
         'EOR' => '~',
         'Property Count' => 0,
@@ -184,6 +184,7 @@ class BlmFile {
     public function __construct()
     {
         $this->setupDefinitions();
+        $this->setupHeaderDefaults();
     }
 
     /**
@@ -201,9 +202,22 @@ class BlmFile {
             $this->columnDefinitionV3i[$name] = $this->stringToDefinition($name, $definitionString);
         }        
     }
+    /**
+     * setup Header Defaults
+     */
+    protected function setupHeaderDefaults()
+    {
+        $this->Version = "3";
+        $this->EOF = '^';
+        $this->EOR = '~';
+        $this->{'Property Count'} = 0;
+        $this->{'Generated Date'} = Date($this->formatDate);
+
+    }
 
     /**
      * transform $definitionString into an associated array
+     * 
      * @param String $columnName column defined in spec
      * @param String $definitionString hard coded column definition
      * @return Array column definitions
@@ -258,6 +272,7 @@ class BlmFile {
 
     /**
      * return column name, strip suffix if column is recursive
+     * 
      * @param String $columnName
      * @return String
      */
@@ -274,6 +289,7 @@ class BlmFile {
 
     /**
      * set header parameter
+     * 
      * @return void
      */
     public function __set($name, $value)
@@ -292,8 +308,12 @@ class BlmFile {
 
     /**
      * get header parameter
+     * 
+     * @param String $name 
+     * @return String header value
+     * @throws Exception on name parameter not part of headers
      */
-    public function __get($name)
+    public function __get(String $name)
     {
         if (! isset($this->header[$name]) ) {
             throw new \Exception("Error: Unknown Blm variable '{$name}'");
@@ -305,12 +325,15 @@ class BlmFile {
     /**
      * return column definitions for the specified version
      * 
-     * @param String $version default '3'
+     * @param String $version default ''
      * @return Array of column definitions
      */
-    protected function getAllColumnDefinitions(String $version = '3')
+    protected function getAllColumnDefinitions(String $version = '')
     {
         $result = [];
+        if ('' === $version) {
+            $version = $this->Version;
+        }
 
         foreach($this->columnDefinitionMaster as $name => $definition) {
             $result[$name] = $this->columnDefinitionMaster[$name];
@@ -328,14 +351,17 @@ class BlmFile {
                     $result[$name] = $this->columnDefinitionV3i[$name];
                 }
             break;
+
+            default:
+                throw new \Exception("Error: Not a valid BLM file, File Version missing");
         }
-        // dd($result);
 
         return $result;
     }
 
     /**
      * given a php resource, read setup info from data file then set and check corresponding definitions
+     * 
      * @param $resource
      * @return $this
      */
@@ -344,12 +370,7 @@ class BlmFile {
         if (! is_resource($resource)) {
             throw new \Exception('Error: Not A file Resource');
         }
-
-        $this->Version = "3";
-        $this->EOF = '^';
-        $this->EOR = '~';
-        $this->{'Property Count'} = 0;
-        $this->{'Generated Date'} = Date($this->formatDate);
+        $this->setupHeaderDefaults();
 
         $this->resource = $resource;
 
@@ -398,7 +419,7 @@ class BlmFile {
     }
 
     /**
-     * check header section
+     * check ##HEADER## section
      */
     protected function checkHeader()
     {
@@ -414,7 +435,9 @@ class BlmFile {
     }
 
     /**
-     * 1019-12-10 14:33 set public
+     * 2019-12-10 14:33 set public
+     *      set and return array of $this->columnDefinitions
+     * 
      * @return Array of column definitions
      */
     public function selectVersionColumnDefinitions()
@@ -423,7 +446,10 @@ class BlmFile {
     }
 
     /**
-     * read definition section
+     * read ##DEFINITION## section
+     * 
+     * @return String of column names
+     * @throws Exception on line format error
      */
     protected function readDefinition() : String
     {
@@ -437,7 +463,9 @@ class BlmFile {
 
     /**
      * check data section starts on next line
+     * 
      * @return Void
+     * @throws Exception on missing ##DATA## section line
      */
     protected function checkDataSection()
     {
@@ -450,6 +478,8 @@ class BlmFile {
 
     /**
      * Return next non empty line
+     *      contrast with readDataLine() whick allows fields to have carriage returns
+     * 
      * @return String
      */
     protected function readLine() : String
@@ -465,6 +495,8 @@ class BlmFile {
     /**
      * Return next line containg end of record marker
      *  fields may contain new line characters
+     *      contrast with readLine() which expects to read a single line
+     * 
      * @return String
      */
     protected function readDataLine() : String
@@ -497,14 +529,18 @@ class BlmFile {
     }
 
     /**
-     * read header item from string
+     * read named ##HEADER## item from string
+     *      sets header 0n success
+     * 
+     * @throws Exception on name/value not as expected
+     * @todo change to any header item in any order including feed-supplier created items
      */
     protected function readHeaderItem(String $name)
     {
         $str = $this->readContentLine();
 
         if (! preg_match("/^{$name} *:.*$/", $str)) {
-            throw new \Exception("Error: Not a valid BLM file, header item '{$name}' missing '{$str}'");
+            throw new \Exception("Error: Not a valid BLM file, header item '{$name}' missing, found '{$str}'");
         }
 
         if (! preg_match("/^{$name} *:(.*)$/", trim($str), $matches)) {
@@ -574,8 +610,10 @@ class BlmFile {
 
     /**
      * check the number of columns matches expected 
+     * 
      * @param Array $values
      * @return Void
+     * @throws Exception on number of columns in data mismatches the number of columns in the ##DEFINITION## section
      */
     protected function validateColumnCount(Array $values)
     {
@@ -587,7 +625,9 @@ class BlmFile {
     }
 
     /**
+     * validateColumn
      * 
+     * @throws Exception on column name not in the specification
      */
     protected function validateColumn(String $columnName)
     {
@@ -600,7 +640,10 @@ class BlmFile {
 
     /**
      * check end-of-field, end-of-record characters updated from header section
+     * 
      * @return Void
+     * @throws Exception on incorrect EOF (End-Of-Field) and EOR (End-Of-Record) characters
+     * @todo check for regex characters handled as separators
      */
     protected function validateDataSeparators()
     {
@@ -617,8 +660,11 @@ class BlmFile {
     }
 
     /**
-     * check definition for has all required columns
+     * check ##DEFINITION## section
+     *      for has all required columns
+     * 
      * @return Void
+     * @throws Exception on missing required columns
      */
     protected function validateRequiredColumns()
     {
@@ -638,7 +684,10 @@ class BlmFile {
     }
 
     /**
-     * read next data row
+     * read and yield next data row
+     * 
+     * @return Void
+     * @throws Exception on incorrect data termination
      */
     public function readData()
     {
@@ -671,8 +720,10 @@ class BlmFile {
     /**
      * check data row and return array of columns
      *      2019-12-10 14:33 made public
+     * 
      * @param String $str
-     * @return Array of columns
+     * @return Array of [columnsName => columnValue]
+     * @throws Exception on data founf in data termination sequence
      */
     public function validateData(String $str) : Array
     {
@@ -694,9 +745,10 @@ class BlmFile {
     }
 
     /**
-     * split string into data row array
+     * split string into an array of row data
+     * 
      * @param String $str
-     * $return Array
+     * @return Array of data column values
      */
     protected function extractRowValues(String $str) : Array
     {
@@ -721,7 +773,7 @@ class BlmFile {
         }
 
         // check media definitions IMG, FLP, DOC
-        // $this->validateMediaRules($row);
+        // $this->validateRowRules($row);
         // throw new \Exception("Error: Not a valid BLM file, Data field '{$columnName}' contains incorrect value, expecting '{$type}', found '{$columnValue}'");
     
         return $row;
@@ -733,6 +785,7 @@ class BlmFile {
      * @param String $columnName
      * @param String $columnValue
      * @return Void
+     * @throws Exception on data value not in specified size
      */
     protected function validateDataColumn(String $columnName, String $columnValue)
     {
@@ -765,11 +818,29 @@ class BlmFile {
 
     }
 
-        /**
+    /**
+     * check that inter column relationships are correct
+     */
+    protected function validateRowRules(Array $row)
+    {
+        // MEDIA_IMAGE_00             - main image
+        // MEDIA_IMAGE_01..59         - IMG, FLP, DOC
+        // MEDIA_IMAGE_60..99         - is for EPC HIP images
+        // MEDIA_IMAGE_TEXT_60..99    - must contain EPC, HIP only
+        // MEDIA_IMAGE_TEXT_00..99    - must have an entry in MEDIA_IMAGE_01..99
+        // MEDIA_<type>_..            - must be valid filename <BRANCH_ID>_<AGENT_REF>_<type>_##.ext
+        // MEDIA_DOCUMENT_00..49      - filename of document
+        // MEDIA_DOCUMENT_50..99      - filename of EPC
+        // MEDIA_DOCUMENT_TEXT_50..99 - must read EPC or HIP
+    }
+
+    /**
      * validate column value against column definition
+     * 
      * @param String $name
      * @param String $value
      * @return Void
+     * @throws Exception on column type not defined
      */
     protected function validateDataColumnType(String $name, String $value)
     {
@@ -830,11 +901,7 @@ class BlmFile {
      */   
     protected function isNum(String $value)
     {
-        if (preg_match("#^\d*(\.\d*)?$#", $value)) {
-            return false;
-        }
-
-        return true;
+        return preg_match("#^\d*(\.\d*)?$#", $value);
     }
 
     /**
