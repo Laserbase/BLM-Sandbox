@@ -6,7 +6,12 @@ No advantage over using file_get_contents() and parsing contents.
 
 Instead using PHP gererator function to split processing to discrete chunks so that only the current row is in memory.
 
-# 2-19-12-03 Only test available due to example tests being flawed
+# 2019-12-19 Clean up comments
+- Next stage finish inter-field dependencies
+- Move this to history
+- Create real README
+
+# 2019-12-03 Only test available due to example tests being flawed
 ```vendor/bin/phpunit --filter test_columnDefinitionsTest -vvv```
 
 
