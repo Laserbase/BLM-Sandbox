@@ -835,6 +835,7 @@ class BlmFile {
         // MEDIA_FLOOR_PLAN_TEXT_01..99 -
 
         $this->checkAllMediaTextColumnsForOrphans($row);
+        $this->checkAllMediaFilenameFormat($row);
     }
 
     /**
@@ -845,15 +846,87 @@ class BlmFile {
         $textColumns = [];
         foreach ($row as $name => $value) {
             if (preg_match("#^MEDIA_.*_TEXT_.*$#", $name)) {
-                $textColumns[$name] = str_replace('TEXT_', '', $name);
+                $mediaColumn = str_replace('TEXT_', '', $name);
+                if (! isset($row[$mediaColumn])) {
+                    throw new \Exception("Error: Not a valid BLM file, Media text column '{$name}' missing media column '{$mediaColumn}'");
+                }
             }
         }
+    }
+
+    /**
+     * checkAllMediaFilenameFormat
+     */
+    protected function checkAllMediaFilenameFormat(Array $row)
+    {
+        // dd($name, $value, $result);
+        // <AGENT_REF>_<MEDIATYPE>_<n>.<file extension>
+        $regex = "#^(.*)_(.*)_([0-9]{2,2})(\.[A-Za-z]{3,3})$#";
         
-        foreach ($textColumns as $textColumn => $mediaColumn) {
-            if (! isset($row[$mediaColumn])) {
-                throw new \Exception("Error: Not a valid BLM file, Media text column '{$mediaColumn}' missing media column '{$textColumn}'");
+        // if (!preg_match($regex, $value, $matches)) {
+        //     dd('value=',$value);
+        // }
+        // dd($matches);
+
+        $definition = [];
+
+        $branchId = '';
+        $agentRef = '';
+        $mediaType = '';
+        $extension = '';
+        
+        $mediaColumns = [];
+        foreach ($row as $name => $value) {
+            $definition = $this->columnDefinitions[$this->cannonicalColumnName($name)];
+            if ('' === $definition['media']) {
+                continue;
             }
+            if (('' === $value) && (0 === $definition['min'])) {
+                // value optional
+                continue;
+            }
+
+            if (0 !== strpos($name, "MEDIA_")) {
+                continue;
+            }
+            if (strpos($name, "TEXT")) {
+                continue;
+            }
+
+            if (! preg_match($regex, $value, $matches)) {
+                throw new \Exception("Error: Not a valid BLM file, Media text column '{$name}' wrong format, found '{$value}', expected format is '<BRANCH>_<AGENT_REF>_<MEDIATYPE>_<INDEX>.<FILE EXTENSION>'");
+            }
+
+            $mediaTypes = array_keys($this->imageExtension);
+            $mediaType = $definition['media'];
+            if (! in_array($mediaType, $mediaTypes)) {
+                throw new \Exception("Error: Not a valid BLM file, (1) Media column '{$name}' file name using unknown media type '{$mediaType}', expecting one of '".implode("', '", $mediaTypes)."', found '{$value}'");
+            }
+
+            $agentRefFound = $matches[1];
+            $mediaFound = $matches[2];
+            $indexFound = $matches[3];
+            $extensionFound = $matches[4];
+
+            $agentRefExpected = $row['AGENT_REF'];
+            $mediaExpected = strtoupper($mediaType);
+            $indexExpected = substr($name, -2);
+            $extensionExpected = strtolower($extensionFound);
+
+            if ($agentRefFound !== $agentRefExpected) {
+                throw new \Exception("Error: Not a valid BLM file, (2) Media file name not in correct format, must begin with '{$agentRefExpected}', found '{$value}'");
+            }
+
+            if ($mediaFound !== $mediaExpected) {
+                throw new \Exception("Error: Not a valid BLM file, (3) Media column '{$name}' file name not in correct format, must begin with '{$agentRefExpected}_{$mediaExpected}_', found '{$value}'");
+            }
+
+            if ($indexFound !== $indexExpected) {
+                throw new \Exception("Error: Not a valid BLM file, (4) Media column '{$name}' file name not in correct format, must begin with '{$agentRefExpected}_{$mediaExpected}_{$indexExpected}', found '{$value}'");
+            }
+
         }
+
     }
 
     /**
@@ -978,7 +1051,6 @@ class BlmFile {
 
         }
 
-        
     }
 
 

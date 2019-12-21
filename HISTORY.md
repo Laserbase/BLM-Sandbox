@@ -6,6 +6,9 @@ No advantage over using file_get_contents() and parsing contents.
 
 Instead using PHP gererator function to split processing to discrete chunks so that only the current row is in memory.
 
+# 2019-12-20 Check media filenames
+- Add test media files are in the format <AGENT_REF>_<MEDIATYPE>_<n>.<file extension>
+
 # 2019-1219 Create HISTORY.md from README.md
 - Add test for '\' behaviour before End-of-Field marker
 - Add row check for each 'media-text' column has a matching 'media' column
