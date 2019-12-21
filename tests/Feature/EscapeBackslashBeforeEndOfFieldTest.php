@@ -41,7 +41,7 @@ class EscapeBackslashBeforeEndOfFieldTest extends TestCase
         'SUMMARY' => 'whatever whatever whatever whatever',
         'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
         'NEW_HOME_FLAG' => '0',
-        'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_01.jpg'
+        'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_00.jpg'
     ];
     
     public function test_EscapeBackslashBeforeEndOfFieldTest()
