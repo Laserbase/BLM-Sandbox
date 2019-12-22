@@ -10,6 +10,7 @@ Instead using PHP gererator function to split processing to discrete chunks so t
 - Add test for caption is not 'EPC' or 'HIP' for property images
 - Add test for correct caption for 'ERP' or 'EPC' certificates
 - Add test that each certificate has a caption
+- Add test for all MEDIA fields MUST appear after all other fields
 
 # 2019-12-20 Check media filenames
 - Add test media files are in the format <AGENT_REF>_<MEDIATYPE>_<n>.<file extension>

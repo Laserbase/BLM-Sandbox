@@ -150,20 +150,22 @@ class BlmFile {
         //  and not to a webpage consisting of the media and external links.
         "MEDIA_IMAGE_00" => 'string|required|min:1|max:100|media:img',
         "MEDIA_IMAGE" => 'string|min:0|max:100|recursive|media:img',
-        "MEDIA_IMAGE_TEXT" => 'string|min:0|max:20|recursive',
+        "MEDIA_IMAGE_TEXT" => 'string|min:0|max:20|recursive|media:text',
 
         // in spec, but not in test file, coment out for now
         // "MEDIA_IMAGE_60" => 'string|required|min:0|max:20|recursive|media:img', // Name of the property EPC graphic. MEDIA_IMAGE_60 is for EPC Graphics that would be shown on site.
-        // "MEDIA_IMAGE_TEXT_60" => 'string|required|min:0|max:3|recursive|', // Caption to go with the EPC of MEDIA_IMAGE_60, this MUST READ “EPC”.
+        // "MEDIA_IMAGE_TEXT_60" => 'string|required|min:0|max:3|recursive|media:text', // Caption to go with the EPC of MEDIA_IMAGE_60, this MUST READ “EPC”.
 
         "MEDIA_FLOOR_PLAN" => 'string|min:0|max:100|recursive|media:flp',
-        "MEDIA_FLOOR_PLAN_TEXT" => 'string|min:0|max:20|recursive',
+        "MEDIA_FLOOR_PLAN_TEXT" => 'string|min:0|max:20|recursive|media:text',
 
         "MEDIA_DOCUMENT" => 'string|min:0|max:200|recursive|media:doc',
-        "MEDIA_DOCUMENT_TEXT" => 'string|min:0|max:20|recursive',
+        "MEDIA_DOCUMENT_TEXT" => 'string|min:0|max:20|recursive|media:text',
+        // "MEDIA_DOCUMENT_60" => 'string|min:0|max:200|recursive|media:doc',
+        // "MEDIA_DOCUMENT_TEXT_60" => 'string|min:0|max:20|recursive|media:text',
 
-        "MEDIA_VIRTUAL_TOUR" => 'string|min:0|max:200|recursive',
-        "MEDIA_VIRTUAL_TOUR_TEXT" => 'string|min:0|max:20|recursive',
+        "MEDIA_VIRTUAL_TOUR" => 'string|min:0|max:200|recursive|media:tour',
+        "MEDIA_VIRTUAL_TOUR_TEXT" => 'string|min:0|max:20|recursive|media:text',
     ];
 
     protected $columnDefinitionV3i = [
@@ -608,6 +610,7 @@ class BlmFile {
 
         $this->validateDataSeparators();
         $this->validateRequiredColumns();
+        $this->validateMediaColumnsMustAppearAfterAllOtherFields();
     }
 
     /**
@@ -682,6 +685,24 @@ class BlmFile {
         $diff = array_diff($required, $columns);
         if ($diff) {
             throw new \Exception("Error: Not a valid BLM file, Required column(s) '".implode("', '", $diff)."' missing");
+        }
+    }
+
+    /**
+     * validateMediaColumnsMustAppearAfterAllOtherFields()
+     */
+    protected function validateMediaColumnsMustAppearAfterAllOtherFields()
+    {
+        $mediaFound = false;
+        foreach ($this->columnKeys as $index => $name) {
+            if (0 === strpos($name, 'MEDIA_')) {
+                $mediaFound = true;
+                continue;
+            }
+
+            if ($mediaFound) {
+                throw new \Exception("Error: Not a valid BLM file, Column '{$name}' found after media columns, media Columns Must Appear After All Other Fields");                
+            }
         }
     }
 
@@ -841,6 +862,7 @@ class BlmFile {
         $this->checkAllImageCaption($row);
         $this->checkEpcHipCertificatesCaption($row);
         $this->checkEpcHipHaveCaption($row);
+
     }
 
     /**
@@ -864,7 +886,6 @@ class BlmFile {
      */
     protected function checkAllMediaFilenameFormat(Array $row)
     {
-        // dd($name, $value, $result);
         // <AGENT_REF>_<MEDIATYPE>_<n>.<file extension>
         $regex = "#^(.*)_(.*)_([0-9]{2,2})(\.[A-Za-z]{3,3})$#";
         
@@ -1135,6 +1156,11 @@ class BlmFile {
                 if (! in_array($extension, $allowed)) {
                     throw new \Exception("Error: Not a valid BLM file, media column '{$name}', value '{$value}' must end in one of '".implode("', '", $allowed)."'");
                 }
+            break;
+            
+            case 'tour':
+            case 'text':    
+                // skip
             break;
 
             default:
