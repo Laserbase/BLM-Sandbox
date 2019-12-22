@@ -840,6 +840,7 @@ class BlmFile {
         $this->checkAllMediaFilenameFormat($row);
         $this->checkAllImageCaption($row);
         $this->checkEpcHipCertificatesCaption($row);
+        $this->checkEpcHipHaveCaption($row);
     }
 
     /**
@@ -962,7 +963,6 @@ class BlmFile {
      */
     protected function checkEpcHipCertificatesCaption($row)
     {
-        $mediaColumns = [];
         foreach ($row as $name => $value) {
             if (0 !== strpos($name, "MEDIA_DOCUMENT_TEXT")) {
                 continue;
@@ -982,6 +982,42 @@ class BlmFile {
             }
 
         }
+    }
+
+    /**
+     * checkEpcHipHaveCaption($row)
+     * 
+     * @param Array $row of property data
+     */
+    protected function checkEpcHipHaveCaption(Array $row)
+    {
+        foreach ($row as $name => $value) {
+            if (0 !== strpos($name, "MEDIA_")) {
+                continue;
+            }
+            if (strpos($name, "TEXT")) {
+                continue;
+            }
+
+            $certificateType = 'certificate document';
+            $lastCertificateIndex = $this->lastDocumentIndex;
+            if (0 === strpos($name, "MEDIA_IMAGE")) {
+                $certificateType = 'certificate image';
+                $lastCertificateIndex = $this->lastMediaImageIndex;
+            }
+
+            $index = substr($name, -2);
+            if ($index <= $lastCertificateIndex) {
+                continue;
+            }
+
+            $target = substr($name, 0, strlen($name)-3).'_TEXT_'.$index;
+            if (! isset($row[$target])) {
+                throw new \Exception("Error: Not a valid BLM file, Missing {$certificateType} caption, Field '{$target}' must have a caption of 'HIP' or 'EPC'");
+            }
+
+        }
+
     }
 
     /**

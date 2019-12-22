@@ -78,7 +78,6 @@ class MediaFilesnamesAreInCorrectFormatTest extends TestCase
 
         $requiredColumns = $this->requiredColumns;
         $requiredColumns[$name] = $value;
-        $requiredColumns[$name] = $value;
 
         $columnKeys = implode('^', array_keys($requiredColumns)).'^~';
         $columnData = implode('^', array_values($requiredColumns)).'^~';

@@ -42,9 +42,14 @@ class HipEpcAreNotUsedForPropertyImagesTest extends TestCase
         'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
         'NEW_HOME_FLAG' => '0',
         'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_00.jpg',
+
         'MEDIA_IMAGE_59' => 'XX99XX_FBM2766_IMG_59.jpg',
         'MEDIA_IMAGE_60' => 'XX99XX_FBM2766_IMG_60.jpg',
         'MEDIA_IMAGE_61' => 'XX99XX_FBM2766_IMG_61.jpg',
+
+        'MEDIA_IMAGE_TEXT_59' => 'caption',
+        'MEDIA_IMAGE_TEXT_60' => 'HIP',
+        'MEDIA_IMAGE_TEXT_61' => 'EPC',
     ];
 
     public function listMediaColumns()
@@ -72,10 +77,9 @@ class HipEpcAreNotUsedForPropertyImagesTest extends TestCase
      */
     public function test_HipEpcAreNotUsedForPropertyImages(String $name, String $value, String $result)
     {
-        // dd("name='{$name}'");
-
         $requiredColumns = $this->requiredColumns;
-        $requiredColumns[$name] = $value;
+        unset($requiredColumns[$name]);
+
         $requiredColumns[$name] = $value;
 
         $columnKeys = implode('^', array_keys($requiredColumns)).'^~';

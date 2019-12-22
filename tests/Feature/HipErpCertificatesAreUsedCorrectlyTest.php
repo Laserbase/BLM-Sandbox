@@ -43,27 +43,20 @@ class HipErpCertificatesAreUsedCorrectlyTest extends TestCase
         'NEW_HOME_FLAG' => '0',
         'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_00.jpg',
 
-        'MEDIA_DOCUMENT_49' => 'XX99XX_FBM2766_DOC_49.pdf',
+        'MEDIA_IMAGE_60' => 'XX99XX_FBM2766_IMG_60.jpg',
         'MEDIA_DOCUMENT_50' => 'XX99XX_FBM2766_DOC_50.pdf',
-        'MEDIA_DOCUMENT_51' => 'XX99XX_FBM2766_DOC_51.pdf',
     ];
 
     public function listMediaColumns()
     {
         return [
-             // IMG name          - value                      - result
-             ['MEDIA_DOCUMENT_TEXT_49', 'caption', ""],
-             ['MEDIA_DOCUMENT_TEXT_49', 'HIP'    , "Certificate image caption 'MEDIA_DOCUMENT_TEXT_49' must not be 'HIP' or 'EPC', found 'HIP'"],
-             ['MEDIA_DOCUMENT_TEXT_49', 'EPC'    , "Certificate image caption 'MEDIA_DOCUMENT_TEXT_49' must not be 'HIP' or 'EPC', found 'EPC'"],
+            ['MEDIA_IMAGE_TEXT_60', 'HIP', "Missing certificate document caption, Field 'MEDIA_DOCUMENT_TEXT_50' must have a caption of 'HIP' or 'EPC'"],
+            ['MEDIA_IMAGE_TEXT_60', 'EPC', "Missing certificate document caption, Field 'MEDIA_DOCUMENT_TEXT_50' must have a caption of 'HIP' or 'EPC'"],
  
-             ['MEDIA_DOCUMENT_TEXT_50', 'caption', "HIP/EPC Certificate caption 'MEDIA_DOCUMENT_TEXT_50' must be 'HIP' or 'EPC', found 'caption'"],
-             ['MEDIA_DOCUMENT_TEXT_50', 'HIP'    , ""],
-             ['MEDIA_DOCUMENT_TEXT_50', 'EPC'    , ""],
- 
-             ['MEDIA_DOCUMENT_TEXT_51', 'caption', "HIP/EPC Certificate caption 'MEDIA_DOCUMENT_TEXT_51' must be 'HIP' or 'EPC', found 'caption'"],
-             ['MEDIA_DOCUMENT_TEXT_51', 'HIP'    , ""],
-             ['MEDIA_DOCUMENT_TEXT_51', 'EPC'    , ""],
+            ['MEDIA_DOCUMENT_TEXT_50', 'HIP', "Missing certificate image caption, Field 'MEDIA_IMAGE_TEXT_60' must have a caption of 'HIP' or 'EPC'"],
+            ['MEDIA_DOCUMENT_TEXT_50', 'EPC', "Missing certificate image caption, Field 'MEDIA_IMAGE_TEXT_60' must have a caption of 'HIP' or 'EPC'"],
 
+             
         ];
     }
     
@@ -74,7 +67,6 @@ class HipErpCertificatesAreUsedCorrectlyTest extends TestCase
     public function test_HipErpCertificatesAreUsedCorrectlyTest(String $name, String $value, String $result)
     {
         $requiredColumns = $this->requiredColumns;
-        $requiredColumns[$name] = $value;
         $requiredColumns[$name] = $value;
 
         $columnKeys = implode('^', array_keys($requiredColumns)).'^~';
