@@ -8,6 +8,7 @@ class BlmFile {
     protected $formatDate = 'Y-m-d H:i:s';
     protected $maxHeaderLines = 25;
     protected $resource = null;
+    protected $lastMediaImageIndex = 59;
 
     protected $sectionTags = [
         'HEADER' => '#HEADER#',
@@ -836,6 +837,7 @@ class BlmFile {
 
         $this->checkAllMediaTextColumnsForOrphans($row);
         $this->checkAllMediaFilenameFormat($row);
+        $this->checkAllImageCaption($row);
     }
 
     /**
@@ -863,11 +865,6 @@ class BlmFile {
         // <AGENT_REF>_<MEDIATYPE>_<n>.<file extension>
         $regex = "#^(.*)_(.*)_([0-9]{2,2})(\.[A-Za-z]{3,3})$#";
         
-        // if (!preg_match($regex, $value, $matches)) {
-        //     dd('value=',$value);
-        // }
-        // dd($matches);
-
         $definition = [];
 
         $branchId = '';
@@ -927,6 +924,33 @@ class BlmFile {
 
         }
 
+    }
+
+    /**
+     * checkAllImageCaption($row);
+     */
+    protected function checkAllImageCaption($row)
+    {
+        $mediaColumns = [];
+        foreach ($row as $name => $value) {
+            if (0 !== strpos($name, "MEDIA_IMAGE_TEXT")) {
+                continue;
+            }
+            $index = (Int) substr($name, -2);
+            $found = in_array($value, ['HIP', 'EPC']);
+            
+            if ($found) {
+                if ($index <= $this->lastMediaImageIndex) {
+                    throw new \Exception("Error: Not a valid BLM file, Property image caption '{$name}' must not be 'HIP' or 'EPC', found '{$value}'");
+                }
+                continue;
+            }
+
+            if ($index > $this->lastMediaImageIndex) {
+                throw new \Exception("Error: Not a valid BLM file, HIP/EPC image caption '{$name}' must be 'HIP' or 'EPC', found '{$value}'");
+            }
+
+        }
     }
 
     /**
