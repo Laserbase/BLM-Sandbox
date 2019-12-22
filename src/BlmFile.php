@@ -9,6 +9,7 @@ class BlmFile {
     protected $maxHeaderLines = 25;
     protected $resource = null;
     protected $lastMediaImageIndex = 59;
+    protected $lastDocumentIndex = 49;
 
     protected $sectionTags = [
         'HEADER' => '#HEADER#',
@@ -838,6 +839,7 @@ class BlmFile {
         $this->checkAllMediaTextColumnsForOrphans($row);
         $this->checkAllMediaFilenameFormat($row);
         $this->checkAllImageCaption($row);
+        $this->checkEpcHipCertificatesCaption($row);
     }
 
     /**
@@ -948,6 +950,35 @@ class BlmFile {
 
             if ($index > $this->lastMediaImageIndex) {
                 throw new \Exception("Error: Not a valid BLM file, HIP/EPC image caption '{$name}' must be 'HIP' or 'EPC', found '{$value}'");
+            }
+
+        }
+    }
+
+    /**
+     * checkEpcHipCertificatesCaption($row)
+     * 
+     * @param Array $row of property data
+     */
+    protected function checkEpcHipCertificatesCaption($row)
+    {
+        $mediaColumns = [];
+        foreach ($row as $name => $value) {
+            if (0 !== strpos($name, "MEDIA_DOCUMENT_TEXT")) {
+                continue;
+            }
+            $index = (Int) substr($name, -2);
+            $found = in_array($value, ['HIP', 'EPC']);
+            
+            if ($found) {
+                if ($index <= $this->lastDocumentIndex) {
+                    throw new \Exception("Error: Not a valid BLM file, Certificate image caption '{$name}' must not be 'HIP' or 'EPC', found '{$value}'");
+                }
+                continue;
+            }
+
+            if ($index > $this->lastDocumentIndex) {
+                throw new \Exception("Error: Not a valid BLM file, HIP/EPC Certificate caption '{$name}' must be 'HIP' or 'EPC', found '{$value}'");
             }
 
         }

@@ -8,6 +8,7 @@ Instead using PHP gererator function to split processing to discrete chunks so t
 
 # 2019-12-22 Check that EPC and HIP graphics are in correct index
 - Add test for caption is not 'EPC' or 'HIP' for property images
+- Add test for correct caption for 'ERP' or 'EPC' certificates
 
 # 2019-12-20 Check media filenames
 - Add test media files are in the format <AGENT_REF>_<MEDIATYPE>_<n>.<file extension>
