@@ -21,15 +21,69 @@ class create_column_definition_test extends Command
      */
     protected $description = 'Command create_column_definition_test';
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    private $data = [
+        'AGENT_REF' => 'XX99XX_FBM2766',
+        'BRANCH_ID' => 'XX99XX',
+        'STATUS_ID' => '1',
+        'CREATE_DATE' => '2019-12-17 15:49:30',
+        'UPDATE_DATE' => '2019-12-17 15:49:30',
+        'DISPLAY_ADDRESS' => 'SZ ADF TestingEstate Agency. ZG Test (ML), Snowdon Drive, Winterhill, Milton Keynes, MK6 1AJ',
+        'PUBLISHED_FLAG' => '1',
+        'LET_FURN_ID' => '',
+        'LET_RENT_FREQUENCY' => '',
+        'TRANS_TYPE_ID' => '1',
+        'BEDROOMS' => '4',
+        'PRICE' => '250000',
+        'PRICE_QUALIFIER' => '',
+        'PROP_SUB_ID' => '0',
+        'ADDRESS_1' => 'SZ ADF TestingEstate Agency. ZG Test (ML)',
+        'ADDRESS_2' => 'Snowdon Drive, Winterhill',
+        'TOWN' => 'Milton Keynes',
+        'POSTCODE1' => 'MK6',
+        'POSTCODE2' => '1AJ',
+        'FEATURE1' => 'House',
+        'FEATURE2' => 'Garden',
+        'FEATURE3' => 'Lake',
+        'SUMMARY' => 'whatever whatever whatever whatever',
+        'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
+        'NEW_HOME_FLAG' => '0',
+
+        // letting
+        'LET_DATE_AVAILABLE' => 'XX99XX_FBM2766',
+        'LET_BOND' => 'XX99XX_FBM2766',
+        'ADMINISTRATION_FEE' => 'XX99XX_FBM2766',
+        'LET_TYPE_ID' => 'XX99XX_FBM2766',
+        'LET_FURN_ID' => 'XX99XX_FBM2766',
+        'LET_RENT_FREQUENCY' => 'XX99XX_FBM2766',
+        'LET_CONTRACT_IN_MONTHS' => 'XX99XX_FBM2766',
+        'LET_WASHING_MACHINE_FLAG' => 'XX99XX_FBM2766',
+        'LET_DISHWASHER_FLAG' => 'XX99XX_FBM2766',
+        'LET_BURGLAR_ALARM_FLAG' => 'XX99XX_FBM2766',
+        'LET_BILL_INC_WATER' => 'XX99XX_FBM2766',
+        'LET_BILL_INC_GAS' => 'XX99XX_FBM2766',
+        'LET_BILL_INC_ELECTRICITY' => 'XX99XX_FBM2766',
+        'LET_BILL_INC_TV_LICIENCE' => 'XX99XX_FBM2766',
+        'LET_BILL_INC_TV_SUBSCRIPTION' => 'XX99XX_FBM2766',
+        'LET_BILL_INC_INTERNET' => 'XX99XX_FBM2766',
+        'TENURE_TYPE_ID' => 'XX99XX_FBM2766',
+
+        // commercial
+        'MIN_SIZE_ENTERED' => 'XX99XX_FBM2766',
+        'MAX_SIZE_ENTERED' => 'XX99XX_FBM2766',
+        'AREA_SIZE_UNIT_ID' => 'XX99XX_FBM2766',
+        'BUSINESS_FOR_SALE_FLAG' => 'XX99XX_FBM2766',
+        'PRICE_PER_UNIT' => 'XX99XX_FBM2766',
+        'COMM_CLASS_ORDER_1' => 'XX99XX_FBM2766',
+        'COMM_CLASS_ORDER_2' => 'XX99XX_FBM2766',
+        'COMM_CLASS_ORDER_3' => 'XX99XX_FBM2766',
+        'COMM_CLASS_ORDER_4' => 'XX99XX_FBM2766',
+        'COMM_CLASS_ORDER_5' => 'XX99XX_FBM2766',
+        'COMM_CLASS_ORDER_6' => 'XX99XX_FBM2766',
+
+        // media
+        'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_00.jpg',
+        'MEDIA_IMAGE_TEXT_00' => 'caption',
+    ];
 
     /**
      * Execute the console command.
@@ -44,23 +98,41 @@ class create_column_definition_test extends Command
         $inFile = __DIR__.'/../../../tests/files/column_definitions/check-columns.blm';
         $this->info("inFile = '{$inFile}'");
 
-        $contents = file_get_contents($inFile);
+        $template = file_get_contents($inFile);
         $targetFile = __DIR__.'/../../../tests/files/column_definitions/check';
 
         $blm = new BlmFile;
         $columns = $blm->selectVersionColumnDefinitions();
+        // dd($columns);
+        // $definition = implode("^", array_keys($columns));
+        // $contents = str_replace('{{DEFINITION}}', $definition, $template);
 
         foreach($columns as $name => $definition) {
+            // $this->info("        '{$name}' => 'XX99XX_FBM2766',");
+            // continue;
+            $data = $this->data;
+            if (! isset($data[$name])) {
+                continue;
+            }
+            unset($data[$name]);
+
+            $keys = array_keys($data);
+            $data = array_values($data);
+
+            $defs = implode("^", $keys);
+            $data = implode("^", $data);
+
+            $contents = str_replace('{{DEFINITION}}', $defs, $template);
+            $contents = str_replace('{{DATA}}', $data, $contents);
+
             $outFile = $targetFile.'-'.$name;
             if ($definition['recursive']) {
                 $outFile .= '_01';
             }
             $outFile .= '.blm';
 
-            $replace = str_replace($name."^", '', $contents);
-            
             $this->info("Creating test file '{$outFile}'");
-            file_put_contents($outFile, $replace);
+            file_put_contents($outFile, $contents);
 
         }
 

@@ -6,6 +6,10 @@ No advantage over using file_get_contents() and parsing contents.
 
 Instead using PHP gererator function to split processing to discrete chunks so that only the current row is in memory.
 
+
+# 2019-12-23 Check student letting only appear if (LET_TYPE_ID === 3)
+- Add check for letting columns only have values if the correct LET_TYPE_ID is set
+
 # 2019-12-22 Check that EPC and HIP graphics are in correct index
 - Add test for caption is not 'EPC' or 'HIP' for property images
 - Add test for correct caption for 'ERP' or 'EPC' certificates

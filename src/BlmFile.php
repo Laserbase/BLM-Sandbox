@@ -10,6 +10,8 @@ class BlmFile {
     protected $resource = null;
     protected $lastMediaImageIndex = 59;
     protected $lastDocumentIndex = 49;
+    protected $letTypeId_StudentLetting = 3;
+    protected $letTypeId_CommercialLetting = 4;
 
     protected $sectionTags = [
         'HEADER' => '#HEADER#',
@@ -85,20 +87,11 @@ class BlmFile {
             // 4 =
             // 5 = per-person per-week - students
 
-        // LET_TYPE_ID === 3
-        "LET_CONTRACT_IN_MONTHS" => 'int|min:0|max:2', // student
-        "LET_WASHING_MACHINE_FLAG" => 'string|min:0|max:1', // Y/N student
-        "LET_DISHWASHER_FLAG" => 'string|min:0|max:1', // Y/N student
-        "LET_BURGLAR_ALARM_FLAG" => 'string|min:0|max:1', // Y/N student
-        "LET_BILL_INC_WATER" => 'string|min:0|max:1', // Y/N student
-        "LET_BILL_INC_GAS" => 'string|min:0|max:1', // Y/N student
-        "LET_BILL_INC_ELECTRICITY" => 'string|min:0|max:1', // Y/N student
-        "LET_BILL_INC_TV_LICIENCE" => 'string|min:0|max:1', // Y/N student
-        "LET_BILL_INC_TV_SUBSCRIPTION" => 'string|min:0|max:1', // Y/N student
-        "LET_BILL_INC_INTERNET" => 'string|min:0|max:1', // Y/N student
 
         "TENURE_TYPE_ID" => 'int|min:0|max:1', // required
         "TRANS_TYPE_ID" => 'int|required|min:1|max:1', // 1 = resale, 2 = lettings
+
+        "NEW_HOME_FLAG" => 'string|required|min:0|max:1', // Y / N or empty
 
         "BEDROOMS" => 'int|required|min:1',
         "PRICE" => 'num|required|min:1',
@@ -141,18 +134,91 @@ class BlmFile {
         "FEATURE9" => 'string|min:0|max:200',
         "FEATURE10" => 'string|min:0|max:200',
 
-        "SUMMARY" => 'string|required|min:1|max:1024', // ALL HTML will be stripped page 15 of pdf
-        "DESCRIPTION" => 'string|required|min:1|max:32768', // Basic HTML tags can be used for bold, underlining, italicising page 15 of pdf
+        "SUMMARY" => 'string|required|min:1|max:1024', 
+            /* ALL HTML will be stripped
+                Only 300 characters will be displayed on site. 
+            */
 
-        "NEW_HOME_FLAG" => 'string|required|min:0|max:1', // Y / N or empty
+        "DESCRIPTION" => 'string|required|min:1|max:32768', 
+            /* Basic HTML tags can be used for bold, underlining, italicising
+                ??? <b></b> vs <strong></strong> vs both ???
+            */
 
+
+    ];
+
+    protected $columnDefinitionV3_StudentLettings = [
+        // LET_TYPE_ID === 3 = Student -------------------------------------
+        "LET_CONTRACT_IN_MONTHS" => 'int|min:0|max:2', // student
+        "LET_WASHING_MACHINE_FLAG" => 'string|min:0|max:1', // Y/N student
+        "LET_DISHWASHER_FLAG" => 'string|min:0|max:1', // Y/N student
+        "LET_BURGLAR_ALARM_FLAG" => 'string|min:0|max:1', // Y/N student
+        "LET_BILL_INC_WATER" => 'string|min:0|max:1', // Y/N student
+        "LET_BILL_INC_GAS" => 'string|min:0|max:1', // Y/N student
+        "LET_BILL_INC_ELECTRICITY" => 'string|min:0|max:1', // Y/N student
+        "LET_BILL_INC_TV_LICIENCE" => 'string|min:0|max:1', // Y/N student
+        "LET_BILL_INC_TV_SUBSCRIPTION" => 'string|min:0|max:1', // Y/N student
+        "LET_BILL_INC_INTERNET" => 'string|min:0|max:1', // Y/N student
+        //------------------------------------------------------------------
+    ];
+    protected $columnDefinitionV3_CommercialLettings = [
+        // LET_TYPE_ID === 4 // (Commercial only) ---------------------------
+        "MIN_SIZE_ENTERED" => 'num|min:0|max:15', // (Commercial only)
+        "MAX_SIZE_ENTERED" => 'num|min:0|max:15', // (Commercial only)
+
+        "AREA_SIZE_UNIT_ID" => 'int|min:0|max:1', // (Commercial only)
+            /* The unit of the size of the area.
+               1 - sq ft, 
+               2 - sq ms, 
+               3 - acres, 
+               4 - hectares
+            */
+
+        "BUSINESS_FOR_SALE_FLAG" => 'int|min:0|max:1', // (Commercial only)
+            /* 
+                0 - Not a business for sale; 
+                1 - Business for sale
+            */
+
+        "PRICE_PER_UNIT" => 'num|min:0|max:15', // (Commercial only)
+
+        /* COMM_CLASS_ORDER (Commercial only)
+            Specifies the Use Class Order from this: http://www.gvagrimley.co.uk/PreBuilt/PDR/other/GVAGUseClassOrder.pdf
+            Options are: 
+                A1, Shops
+                A2, Professional and Financial Services
+                A3, Restaurants and Cafes
+                A4, Drinking Establishments
+                A5, Hot Food Takeaways
+                B1, Business
+                B2, General Industrial
+                B8, Storage and Distribution
+                C1, Hotels
+                C2, Residential Institutions
+                C2A, 
+                C3, Dwellinghouses
+                D1, Non-residential Institutions
+                D2, Assembly and Leisure
+                sui_generis_1, // Casinos and Amusement Arcades / Centres
+                sui_generis_2  // Betting Offices and Pay Day Loan Shops
+            */
+        "COMM_CLASS_ORDER_1" => 'string|min:0|max:100', // (Commercial only)
+        "COMM_CLASS_ORDER_2" => 'string|min:0|max:100', // (Commercial only)
+        "COMM_CLASS_ORDER_3" => 'string|min:0|max:100', // (Commercial only)
+        "COMM_CLASS_ORDER_4" => 'string|min:0|max:100', // (Commercial only)
+        "COMM_CLASS_ORDER_5" => 'string|min:0|max:100', // (Commercial only)
+        "COMM_CLASS_ORDER_6" => 'string|min:0|max:100', // (Commercial only)
+        //-------------------------------------------------------------------
+    ];
+    protected $columnDefinitionV3_Media = [
+        //-------------------------------------------------------------------
         // All links to Floor plans, Brochures and Virtual Tours must only link to the physical media 
         //  and not to a webpage consisting of the media and external links.
         "MEDIA_IMAGE_00" => 'string|required|min:1|max:100|media:img',
         "MEDIA_IMAGE" => 'string|min:0|max:100|recursive|media:img',
         "MEDIA_IMAGE_TEXT" => 'string|min:0|max:20|recursive|media:text',
 
-        // in spec, but not in test file, coment out for now
+        // in spec, but not in test file, comment out for now
         // "MEDIA_IMAGE_60" => 'string|required|min:0|max:20|recursive|media:img', // Name of the property EPC graphic. MEDIA_IMAGE_60 is for EPC Graphics that would be shown on site.
         // "MEDIA_IMAGE_TEXT_60" => 'string|required|min:0|max:3|recursive|media:text', // Caption to go with the EPC of MEDIA_IMAGE_60, this MUST READ “EPC”.
 
@@ -161,11 +227,12 @@ class BlmFile {
 
         "MEDIA_DOCUMENT" => 'string|min:0|max:200|recursive|media:doc',
         "MEDIA_DOCUMENT_TEXT" => 'string|min:0|max:20|recursive|media:text',
-        // "MEDIA_DOCUMENT_60" => 'string|min:0|max:200|recursive|media:doc',
-        // "MEDIA_DOCUMENT_TEXT_60" => 'string|min:0|max:20|recursive|media:text',
+        // "MEDIA_DOCUMENT_50" => 'string|min:0|max:200|recursive|media:doc',
+        // "MEDIA_DOCUMENT_TEXT_50" => 'string|min:0|max:3|recursive|media:text',
 
         "MEDIA_VIRTUAL_TOUR" => 'string|min:0|max:200|recursive|media:tour',
         "MEDIA_VIRTUAL_TOUR_TEXT" => 'string|min:0|max:20|recursive|media:text',
+        //-------------------------------------------------------------------
     ];
 
     protected $columnDefinitionV3i = [
@@ -199,9 +266,20 @@ class BlmFile {
         foreach($this->columnDefinitionMaster as $name => $definitionString) {
             $this->columnDefinitionMaster[$name] = $this->stringToDefinition($name, $definitionString);
         }
+        //---------------------------------------------------------------------
         foreach($this->columnDefinitionV3 as $name => $definitionString) {
             $this->columnDefinitionV3[$name] = $this->stringToDefinition($name, $definitionString);
         }
+        foreach($this->columnDefinitionV3_StudentLettings as $name => $definitionString) {
+            $this->columnDefinitionV3[$name] = $this->stringToDefinition($name, $definitionString);
+        }
+        foreach($this->columnDefinitionV3_CommercialLettings as $name => $definitionString) {
+            $this->columnDefinitionV3[$name] = $this->stringToDefinition($name, $definitionString);
+        }
+        foreach($this->columnDefinitionV3_Media as $name => $definitionString) {
+            $this->columnDefinitionV3[$name] = $this->stringToDefinition($name, $definitionString);
+        }
+        //---------------------------------------------------------------------
         foreach($this->columnDefinitionV3i as $name => $definitionString) {
             $this->columnDefinitionV3i[$name] = $this->stringToDefinition($name, $definitionString);
         }        
@@ -862,6 +940,7 @@ class BlmFile {
         $this->checkAllImageCaption($row);
         $this->checkEpcHipCertificatesCaption($row);
         $this->checkEpcHipHaveCaption($row);
+        $this->checkLettingDependantFields($row);
 
     }
 
@@ -1039,6 +1118,55 @@ class BlmFile {
 
         }
 
+    }
+
+    /**
+     * checkLettingDependantFields
+     * 
+     * @param Array $row of data
+     * @throws Exception on Letting field used on non letting data
+     */
+    protected function checkLettingDependantFields($row)
+    {
+        $letTypeId = $row['LET_TYPE_ID'] ?? 0;
+
+        $studentLettings = array_keys($this->columnDefinitionV3_StudentLettings);
+        $commercialLettings = array_keys($this->columnDefinitionV3_CommercialLettings);
+
+        foreach ($row as $name => $value) {
+            if (! $this->checkLettingDependantField($name, $value, $letTypeId, $this->letTypeId_StudentLetting, $studentLettings)) {
+                throw new \Exception("Error: Not a valid BLM file, Column '{$name}' is for Student Letting only");
+            }
+            if (! $this->checkLettingDependantField($name, $value, $letTypeId, $this->letTypeId_CommercialLetting, $commercialLettings)) {
+                throw new \Exception("Error: Not a valid BLM file, Column '{$name}' is for Commercial Letting only");
+            }
+            
+        }
+        
+    }
+
+    /**
+     * checkLettingDependantField
+     * @param String $name of column 
+     * @param String $value of column, ignore empty columns
+     * @param Int $letTypeId of the row
+     * @param Int $expectedLetTypeId of the letting type (Student vs Commercial)
+     * @param Array $lettingColumns of the letting type (Student vs Commercial)
+     * @return Boolean false if the letting type of the row dosn't match the letting type of the column name
+     */
+    protected function checkLettingDependantField(String $name, String $value, Int $letTypeId, Int $expectedLetTypeId, Array $lettingColumns)
+    {
+        if ('' === $value) {
+            return true; // allow rows of different let type id to appear in data
+        }
+        if ($letTypeId == $expectedLetTypeId) {
+            return true; // skip expected letting type
+        }
+        if (false === in_array($name, $lettingColumns)) {
+            return true; // skip non letting columns
+        }
+
+        return false;
     }
 
     /**
