@@ -28,7 +28,7 @@ class MediaFilesnamesAreInCorrectFormatTest extends TestCase
         'TRANS_TYPE_ID' => '1',
         'BEDROOMS' => '4',
         'PRICE' => '250000',
-        'PRICE_QUALIFIER' => '',
+        'PRICE_QUALIFIER' => '2', // 2 – Guide Price,
         'PROP_SUB_ID' => '0',
         'ADDRESS_1' => 'SZ ADF TestingEstate Agency. ZG Test (ML)',
         'ADDRESS_2' => 'Snowdon Drive, Winterhill',
@@ -38,6 +38,7 @@ class MediaFilesnamesAreInCorrectFormatTest extends TestCase
         'FEATURE1' => 'House',
         'FEATURE2' => 'Garden',
         'FEATURE3' => 'Lake',
+        'LET_TYPE_ID' => '0', // 0 = not specified DEFAULT
         'SUMMARY' => 'whatever whatever whatever whatever',
         'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
         'NEW_HOME_FLAG' => '0',

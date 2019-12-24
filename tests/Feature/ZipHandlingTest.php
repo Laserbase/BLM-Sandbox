@@ -172,12 +172,13 @@ class ZipHandlingTest extends TestCase
 
         $resource = $this->zip->readStream($filename);
         $this->assertTrue( is_resource($resource) );
+        $this->expectExceptionMessage("Error: Not a valid BLM file, Required column(s) 'LET_TYPE_ID' missing");
         
         $blm = new BlmFile();
         $blm->setup($resource);
-        foreach($blm->readData() as $row) {
-            // Log::debug("test=".print_r($row,true));
-        }
+        // foreach($blm->readData() as $row) {
+        //     // Log::debug("test=".print_r($row,true));
+        // }
 
         // Log::debug("=== ".\basename(__FILE__)." === EXIT ===");
     }

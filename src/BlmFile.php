@@ -65,7 +65,7 @@ class BlmFile {
         "LET_DATE_AVAILABLE" => 'date|min:0|min:0', // date|required|min:0
         "LET_BOND" => 'num|min:0', // deposit amount
         "ADMINISTRATION_FEE" => 'string|min:0|max:4096', // all fees applicable to the property
-        "LET_TYPE_ID" => 'num|min:0|max:1', // column required, data optional
+        "LET_TYPE_ID" => 'num|required|min:0|max:1', // column required, data optional
             // 0 = not specified DEFAULT
             // 1 = long term
             // 2 = short term
@@ -77,7 +77,7 @@ class BlmFile {
             // 1 = part furnished
             // 2 = unfurnished
             // 3 = not specified DEFAULT
-            // 4 = furnished / unfurnished ???
+            // 4 = furnished / unfurnished ??? @todo resolve conflict
 
         "LET_RENT_FREQUENCY" => 'int|required|min:0|max:1', //
             // 0 = weekly
@@ -95,7 +95,7 @@ class BlmFile {
 
         "BEDROOMS" => 'int|required|min:1',
         "PRICE" => 'num|required|min:1',
-        "PRICE_QUALIFIER" => 'int|required|min:0',
+        "PRICE_QUALIFIER" => 'int|required|min:0|max:2',
                 /*  0 – Default,
                     1 – POA,
                     2 – Guide Price,
@@ -148,7 +148,7 @@ class BlmFile {
     ];
 
     protected $columnDefinitionV3_StudentLettings = [
-        // LET_TYPE_ID === 3 = Student -------------------------------------
+        // LET_TYPE_ID === 3 // (Student Lettings Only) ---------------------
         "LET_CONTRACT_IN_MONTHS" => 'int|min:0|max:2', // student
         "LET_WASHING_MACHINE_FLAG" => 'string|min:0|max:1', // Y/N student
         "LET_DISHWASHER_FLAG" => 'string|min:0|max:1', // Y/N student
@@ -159,7 +159,7 @@ class BlmFile {
         "LET_BILL_INC_TV_LICIENCE" => 'string|min:0|max:1', // Y/N student
         "LET_BILL_INC_TV_SUBSCRIPTION" => 'string|min:0|max:1', // Y/N student
         "LET_BILL_INC_INTERNET" => 'string|min:0|max:1', // Y/N student
-        //------------------------------------------------------------------
+        //-------------------------------------------------------------------
     ];
     protected $columnDefinitionV3_CommercialLettings = [
         // LET_TYPE_ID === 4 // (Commercial only) ---------------------------

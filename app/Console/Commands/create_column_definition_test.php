@@ -34,7 +34,7 @@ class create_column_definition_test extends Command
         'TRANS_TYPE_ID' => '1',
         'BEDROOMS' => '4',
         'PRICE' => '250000',
-        'PRICE_QUALIFIER' => '',
+        'PRICE_QUALIFIER' => '2', // 2 – Guide Price,
         'PROP_SUB_ID' => '0',
         'ADDRESS_1' => 'SZ ADF TestingEstate Agency. ZG Test (ML)',
         'ADDRESS_2' => 'Snowdon Drive, Winterhill',
@@ -44,6 +44,7 @@ class create_column_definition_test extends Command
         'FEATURE1' => 'House',
         'FEATURE2' => 'Garden',
         'FEATURE3' => 'Lake',
+        'LET_TYPE_ID' => '0', // 0 = not specified DEFAULT
         'SUMMARY' => 'whatever whatever whatever whatever',
         'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
         'NEW_HOME_FLAG' => '0',
@@ -52,19 +53,18 @@ class create_column_definition_test extends Command
         'LET_DATE_AVAILABLE' => 'XX99XX_FBM2766',
         'LET_BOND' => 'XX99XX_FBM2766',
         'ADMINISTRATION_FEE' => 'XX99XX_FBM2766',
-        'LET_TYPE_ID' => 'XX99XX_FBM2766',
-        'LET_FURN_ID' => 'XX99XX_FBM2766',
-        'LET_RENT_FREQUENCY' => 'XX99XX_FBM2766',
-        'LET_CONTRACT_IN_MONTHS' => 'XX99XX_FBM2766',
-        'LET_WASHING_MACHINE_FLAG' => 'XX99XX_FBM2766',
-        'LET_DISHWASHER_FLAG' => 'XX99XX_FBM2766',
-        'LET_BURGLAR_ALARM_FLAG' => 'XX99XX_FBM2766',
-        'LET_BILL_INC_WATER' => 'XX99XX_FBM2766',
-        'LET_BILL_INC_GAS' => 'XX99XX_FBM2766',
-        'LET_BILL_INC_ELECTRICITY' => 'XX99XX_FBM2766',
-        'LET_BILL_INC_TV_LICIENCE' => 'XX99XX_FBM2766',
-        'LET_BILL_INC_TV_SUBSCRIPTION' => 'XX99XX_FBM2766',
-        'LET_BILL_INC_INTERNET' => 'XX99XX_FBM2766',
+        'LET_FURN_ID' => 'Y',
+        'LET_RENT_FREQUENCY' => 'Y',
+        'LET_CONTRACT_IN_MONTHS' => 'Y',
+        'LET_WASHING_MACHINE_FLAG' => 'Y',
+        'LET_DISHWASHER_FLAG' => 'Y',
+        'LET_BURGLAR_ALARM_FLAG' => 'Y',
+        'LET_BILL_INC_WATER' => 'Y',
+        'LET_BILL_INC_GAS' => 'Y',
+        'LET_BILL_INC_ELECTRICITY' => 'Y',
+        'LET_BILL_INC_TV_LICIENCE' => 'Y',
+        'LET_BILL_INC_TV_SUBSCRIPTION' => 'Y',
+        'LET_BILL_INC_INTERNET' => 'Y',
         'TENURE_TYPE_ID' => 'XX99XX_FBM2766',
 
         // commercial
@@ -73,12 +73,8 @@ class create_column_definition_test extends Command
         'AREA_SIZE_UNIT_ID' => 'XX99XX_FBM2766',
         'BUSINESS_FOR_SALE_FLAG' => 'XX99XX_FBM2766',
         'PRICE_PER_UNIT' => 'XX99XX_FBM2766',
-        'COMM_CLASS_ORDER_1' => 'XX99XX_FBM2766',
-        'COMM_CLASS_ORDER_2' => 'XX99XX_FBM2766',
-        'COMM_CLASS_ORDER_3' => 'XX99XX_FBM2766',
-        'COMM_CLASS_ORDER_4' => 'XX99XX_FBM2766',
-        'COMM_CLASS_ORDER_5' => 'XX99XX_FBM2766',
-        'COMM_CLASS_ORDER_6' => 'XX99XX_FBM2766',
+        'COMM_CLASS_ORDER_1' => 'A1',
+        'COMM_CLASS_ORDER_2' => 'A2',
 
         // media
         'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_00.jpg',
@@ -112,6 +108,7 @@ class create_column_definition_test extends Command
             // continue;
             $data = $this->data;
             if (! isset($data[$name])) {
+                $this->info("NOT SET '{$name}'");
                 continue;
             }
             unset($data[$name]);
@@ -131,7 +128,7 @@ class create_column_definition_test extends Command
             }
             $outFile .= '.blm';
 
-            $this->info("Creating test file '{$outFile}'");
+            $this->info("Creating test file '".basename($outFile)."'");
             file_put_contents($outFile, $contents);
 
         }

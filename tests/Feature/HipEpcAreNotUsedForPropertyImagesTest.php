@@ -28,7 +28,7 @@ class HipEpcAreNotUsedForPropertyImagesTest extends TestCase
         'TRANS_TYPE_ID' => '1',
         'BEDROOMS' => '4',
         'PRICE' => '250000',
-        'PRICE_QUALIFIER' => '',
+        'PRICE_QUALIFIER' => '2', // 2 – Guide Price,
         'PROP_SUB_ID' => '0',
         'ADDRESS_1' => 'SZ ADF TestingEstate Agency. ZG Test (ML)',
         'ADDRESS_2' => 'Snowdon Drive, Winterhill',
@@ -38,6 +38,7 @@ class HipEpcAreNotUsedForPropertyImagesTest extends TestCase
         'FEATURE1' => 'House',
         'FEATURE2' => 'Garden',
         'FEATURE3' => 'Lake',
+        'LET_TYPE_ID' => '0', // 0 = not specified DEFAULT
         'SUMMARY' => 'whatever whatever whatever whatever',
         'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
         'NEW_HOME_FLAG' => '0',
@@ -55,7 +56,7 @@ class HipEpcAreNotUsedForPropertyImagesTest extends TestCase
     public function listMediaColumns()
     {
         return [
-             // IMG name          - value                      - result
+             // IMG name           - value    - result
              ['MEDIA_IMAGE_TEXT_59', 'caption', ""],
              ['MEDIA_IMAGE_TEXT_59', 'HIP'    , "Property image caption 'MEDIA_IMAGE_TEXT_59' must not be 'HIP' or 'EPC', found 'HIP'"],
              ['MEDIA_IMAGE_TEXT_59', 'EPC'    , "Property image caption 'MEDIA_IMAGE_TEXT_59' must not be 'HIP' or 'EPC', found 'EPC'"],

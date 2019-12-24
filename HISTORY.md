@@ -7,6 +7,9 @@ No advantage over using file_get_contents() and parsing contents.
 Instead using PHP gererator function to split processing to discrete chunks so that only the current row is in memory.
 
 
+# 2019-12-24 Set LET_TYPE_ID to required as per spec
+- Change assertions to catch missing required field
+
 # 2019-12-23 Check student letting only appear if (LET_TYPE_ID === 3)
 - Add check for letting columns only have values if the correct LET_TYPE_ID is set
 

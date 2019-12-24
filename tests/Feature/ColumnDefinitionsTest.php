@@ -51,7 +51,7 @@ class ColumnDefinitionsTest extends TestCase
      */
     public function test_allColumnDefinitionsAreInspected($columnName, $columnDefinition)
     {
-        // Log::debug("=== Test All Column Definitions Are Inspected - '{$columnName}' ===");
+        Log::debug("=== Test All Column Definitions Are Inspected - '{$columnName}' ===");
 
         $fileName = __DIR__.'/../files/column_definitions/check-'.$columnName;
         if ($columnDefinition['recursive']) {
