@@ -6,6 +6,8 @@ No advantage over using file_get_contents() and parsing contents.
 
 Instead using PHP gererator function to split processing to discrete chunks so that only the current row is in memory.
 
+# 2019-12-24 Allow reading of #HEADER# items to be in any order
+- Add test to ensure header items are no longer in a stipulated order
 
 # 2019-12-24 Set LET_TYPE_ID to required as per spec
 - Change assertions to catch missing required field

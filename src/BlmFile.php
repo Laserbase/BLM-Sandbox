@@ -64,8 +64,8 @@ class BlmFile {
 
         "LET_DATE_AVAILABLE" => 'date|min:0|min:0', // date|required|min:0
         "LET_BOND" => 'num|min:0', // deposit amount
-        "ADMINISTRATION_FEE" => 'string|min:0|max:4096', // all fees applicable to the property
-        "LET_TYPE_ID" => 'num|required|min:0|max:1', // column required, data optional
+        "ADMINISTRATION_FEE" => 'string|min:0|max:4096', // all fees applicable to the property added 2014-09-22
+        "LET_TYPE_ID" => 'int|required|min:0|max:1', // column required, data optional
             // 0 = not specified DEFAULT
             // 1 = long term
             // 2 = short term
@@ -376,10 +376,6 @@ class BlmFile {
      */
     public function __set($name, $value)
     {
-        if (! isset($this->header[$name]) ) {
-            throw new \Exception("Error: Unknown Blm variable '{$name}'");
-        }
-
         switch ($name) {
             case 'EOF':
             case 'EOR': $this->header[$name] = trim($value, "'");
@@ -458,6 +454,10 @@ class BlmFile {
 
         $this->readHeader();
         $this->checkHeader();
+
+        $str = $this->readDefinition(); // @todo move to checking definition
+        $this->validateDefinition($str);
+        
         $this->checkDataSection();
     }
 
@@ -511,9 +511,6 @@ class BlmFile {
         }
 
         $this->selectVersionColumnDefinitions();
-
-        $str = $this->readDefinition();
-        $this->validateDefinition($str);
     }
 
     /**
