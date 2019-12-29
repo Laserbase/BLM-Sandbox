@@ -16,8 +16,8 @@ class AllMediaTextColumnsHaveAMediaColumnTest extends TestCase
 
     // Required Columns
     private $requiredColumns = [ 
-        'AGENT_REF' => 'XX99XX_FBM2766',
-        'BRANCH_ID' => 'XX99XX',
+        'AGENT_REF' => '999999_FBM2766',
+        'BRANCH_ID' => '999999',
         'STATUS_ID' => '1',
         'CREATE_DATE' => '2019-12-17 15:49:30',
         'UPDATE_DATE' => '2019-12-17 15:49:30',
@@ -41,13 +41,13 @@ class AllMediaTextColumnsHaveAMediaColumnTest extends TestCase
         'LET_TYPE_ID' => '0', // 0 = not specified DEFAULT
         'SUMMARY' => 'whatever whatever whatever whatever',
         'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
-        'NEW_HOME_FLAG' => '0',
+        'NEW_HOME_FLAG' => 'Y',
     ];
     
     public function test_MediaImage()
     {
         $requiredColumns = $this->requiredColumns;
-        $requiredColumns['MEDIA_IMAGE_00'] = 'XX99XX_FBM2766_IMG_01.jpg';
+        $requiredColumns['MEDIA_IMAGE_00'] = '999999_FBM2766_IMG_01.jpg';
         $requiredColumns['MEDIA_IMAGE_TEXT_01'] = 'NO MEDIA_IMAGE_01';
 
         $columnKeys = implode('^', array_keys($requiredColumns)).'^~';

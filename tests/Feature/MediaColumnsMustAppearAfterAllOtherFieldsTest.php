@@ -17,8 +17,8 @@ class MediaColumnsMustAppearAfterAllOtherFieldsTest extends TestCase
     // Required Columns
     private $requiredColumns = [ 
         'ok' => [
-        'AGENT_REF' => 'XX99XX_FBM2766',
-        'BRANCH_ID' => 'XX99XX',
+        'AGENT_REF' => '999999_FBM2766',
+        'BRANCH_ID' => '999999',
         'STATUS_ID' => '1',
         'CREATE_DATE' => '2019-12-17 15:49:30',
         'UPDATE_DATE' => '2019-12-17 15:49:30',
@@ -42,13 +42,13 @@ class MediaColumnsMustAppearAfterAllOtherFieldsTest extends TestCase
         'LET_TYPE_ID' => '0', // 0 = not specified DEFAULT
         'SUMMARY' => 'whatever whatever whatever whatever',
         'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
-        'NEW_HOME_FLAG' => '0',
-        'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_00.jpg',
+        'NEW_HOME_FLAG' => 'N',
+        'MEDIA_IMAGE_00' => '999999_FBM2766_IMG_00.jpg',
         'MEDIA_IMAGE_TEXT_00' => 'caption',
         ],
         'error' => [
-            'AGENT_REF' => 'XX99XX_FBM2766',
-            'BRANCH_ID' => 'XX99XX',
+            'AGENT_REF' => '999999_FBM2766',
+            'BRANCH_ID' => '999999',
             'STATUS_ID' => '1',
             'CREATE_DATE' => '2019-12-17 15:49:30',
             'UPDATE_DATE' => '2019-12-17 15:49:30',
@@ -70,10 +70,10 @@ class MediaColumnsMustAppearAfterAllOtherFieldsTest extends TestCase
             'FEATURE2' => 'Garden',
             'FEATURE3' => 'Lake',
             'LET_TYPE_ID' => '0', // 0 = not specified DEFAULT
-            'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_00.jpg',
+            'MEDIA_IMAGE_00' => '999999_FBM2766_IMG_00.jpg',
             'SUMMARY' => 'whatever whatever whatever whatever',
             'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
-            'NEW_HOME_FLAG' => '0',
+            'NEW_HOME_FLAG' => 'N',
             'MEDIA_IMAGE_TEXT_00' => 'caption',
             ]
     ];
@@ -106,7 +106,7 @@ class MediaColumnsMustAppearAfterAllOtherFieldsTest extends TestCase
 
         $row = $blm->validateData($columnData);
         if ('ok' === $option) {
-            $this->assertEquals($row['AGENT_REF'], 'XX99XX_FBM2766');
+            $this->assertEquals($row['AGENT_REF'], '999999_FBM2766');
         }
     
     }

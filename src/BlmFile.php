@@ -43,16 +43,11 @@ class BlmFile {
         // max:n = maximum length in characters for a column value
         // recursive = field name can be repeated
         //       with an underscore followed by an index number
+        // enum = enumerated int
 
         "AGENT_REF" => 'string|required|min:1|max:20',
         "BRANCH_ID" => 'int|required|min:1|max:10', // provided by Rightmove
-        "STATUS_ID" => 'int|required|min:1|max:1', //
-            // 0 = Available
-            // 1 = SSTC - Sold Subject To Completion
-            // 2 = SSTCM - Scotland - Sold Subject To Concluded Missives
-            // 3 = under offer - sales
-            // 4 = reserved - sales
-            // 5 = let agreed - letting
+        "STATUS_ID" => 'enum|required|min:1|max:1', //
 
         "CREATE_DATE" => 'date|required|min:0', // YYYY-MM-DD HH:MI:SS
         "UPDATE_DATE" => 'date|required|min:0', // YYYY-MM-DD HH:MI:SS
@@ -60,59 +55,24 @@ class BlmFile {
 
     protected $columnDefinitionV3 = [
         "DISPLAY_ADDRESS" => 'string|required|min:1|max:120', // Address of the property that should be displayed on the Live Rightmove site
-        "PUBLISHED_FLAG" => 'int|required|min:1|max:1', // 0 = hidden/invisible 1 = visible
+        "PUBLISHED_FLAG" => 'enum|required|min:1|max:1', // 0 = hidden/invisible 1 = visible
 
         "LET_DATE_AVAILABLE" => 'date|min:0|min:0', // date|required|min:0
         "LET_BOND" => 'num|min:0', // deposit amount
         "ADMINISTRATION_FEE" => 'string|min:0|max:4096', // all fees applicable to the property added 2014-09-22
-        "LET_TYPE_ID" => 'int|required|min:0|max:1', // column required, data optional
-            // 0 = not specified DEFAULT
-            // 1 = long term
-            // 2 = short term
-            // 3 = student
-            // 4 = commercial
+        "LET_TYPE_ID" => 'enum|required|min:0|max:1|default:0', // column required, data optional
+        "LET_FURN_ID" => 'enum|required|min:0|max:1', // column required, data optional
+        "LET_RENT_FREQUENCY" => 'enum|required|min:0|max:1|default:1',
 
-        "LET_FURN_ID" => 'int|required|min:0|max:1', //
-            // 0 = furnished
-            // 1 = part furnished
-            // 2 = unfurnished
-            // 3 = not specified DEFAULT
-            // 4 = furnished / unfurnished ??? @todo resolve conflict
+        "TENURE_TYPE_ID" => 'int|min:0|max:1', // required in spec - not in data
+        "TRANS_TYPE_ID" => 'enum|required|min:1|max:1', // 1 = resale, 2 = lettings
 
-        "LET_RENT_FREQUENCY" => 'int|required|min:0|max:1', //
-            // 0 = weekly
-            // 1 = monthly - DEFAULT if null
-            // 2 = quarterly
-            // 3 = annual
-            // 4 =
-            // 5 = per-person per-week - students
-
-
-        "TENURE_TYPE_ID" => 'int|min:0|max:1', // required
-        "TRANS_TYPE_ID" => 'int|required|min:1|max:1', // 1 = resale, 2 = lettings
-
-        "NEW_HOME_FLAG" => 'string|required|min:0|max:1', // Y / N or empty
+        "NEW_HOME_FLAG" => 'enum|required|min:0|max:1|default:N', // Y / N or empty
 
         "BEDROOMS" => 'int|required|min:1',
         "PRICE" => 'num|required|min:1',
-        "PRICE_QUALIFIER" => 'int|required|min:0|max:2',
-                /*  0 – Default,
-                    1 – POA,
-                    2 – Guide Price,
-                    3 – Fixed Price,
-                    4 – Offers in Excess of,
-                    5 – OIRO, Offers In The Region Of
-                    6 – Sale by Tender,
-                    7 – From (new homes and commercial only),
-                    8 UNKNOWN
-                    9 – Shared Ownership,
-                    10 – Offers Over,
-                    11 – Part Buy Part Rent,
-                    12 – Shared Equity,
-                    13 UNKNOWN
-                    14 – Equity Loan,
-                    15 – Offers Invited
-                **/
+        "PRICE_QUALIFIER" => 'enum|required|min:0|max:2|default:0',
+        
         "PROP_SUB_ID" => 'int|required|min:1', // One of the valid property types. Ref. Property Type table
 
         "ADDRESS_1" => 'string|required|min:1|max:60',
@@ -149,16 +109,16 @@ class BlmFile {
 
     protected $columnDefinitionV3_StudentLettings = [
         // LET_TYPE_ID === 3 // (Student Lettings Only) ---------------------
-        "LET_CONTRACT_IN_MONTHS" => 'int|min:0|max:2', // student
-        "LET_WASHING_MACHINE_FLAG" => 'string|min:0|max:1', // Y/N student
-        "LET_DISHWASHER_FLAG" => 'string|min:0|max:1', // Y/N student
-        "LET_BURGLAR_ALARM_FLAG" => 'string|min:0|max:1', // Y/N student
-        "LET_BILL_INC_WATER" => 'string|min:0|max:1', // Y/N student
-        "LET_BILL_INC_GAS" => 'string|min:0|max:1', // Y/N student
-        "LET_BILL_INC_ELECTRICITY" => 'string|min:0|max:1', // Y/N student
-        "LET_BILL_INC_TV_LICIENCE" => 'string|min:0|max:1', // Y/N student
-        "LET_BILL_INC_TV_SUBSCRIPTION" => 'string|min:0|max:1', // Y/N student
-        "LET_BILL_INC_INTERNET" => 'string|min:0|max:1', // Y/N student
+        "LET_CONTRACT_IN_MONTHS" => 'int|min:0|max:2|default:N', // student
+        "LET_WASHING_MACHINE_FLAG" => 'enum|min:0|max:1|default:N', // Y/N student
+        "LET_DISHWASHER_FLAG" => 'enum|min:0|max:1|default:N', // Y/N student
+        "LET_BURGLAR_ALARM_FLAG" => 'enum|min:0|max:1|default:N', // Y/N student
+        "LET_BILL_INC_WATER" => 'enum|min:0|max:1|default:N', // Y/N student
+        "LET_BILL_INC_GAS" => 'enum|min:0|max:1|default:N', // Y/N student
+        "LET_BILL_INC_ELECTRICITY" => 'enum|min:0|max:1|default:N', // Y/N student
+        "LET_BILL_INC_TV_LICIENCE" => 'enum|min:0|max:1|default:N', // Y/N student
+        "LET_BILL_INC_TV_SUBSCRIPTION" => 'enum|min:0|max:1|default:N', // Y/N student
+        "LET_BILL_INC_INTERNET" => 'enum|min:0|max:1|default:N', // Y/N student
         //-------------------------------------------------------------------
     ];
     protected $columnDefinitionV3_CommercialLettings = [
@@ -166,20 +126,9 @@ class BlmFile {
         "MIN_SIZE_ENTERED" => 'num|min:0|max:15', // (Commercial only)
         "MAX_SIZE_ENTERED" => 'num|min:0|max:15', // (Commercial only)
 
-        "AREA_SIZE_UNIT_ID" => 'int|min:0|max:1', // (Commercial only)
-            /* The unit of the size of the area.
-               1 - sq ft, 
-               2 - sq ms, 
-               3 - acres, 
-               4 - hectares
-            */
+        "AREA_SIZE_UNIT_ID" => 'enum|min:0|max:1', // (Commercial only)
 
-        "BUSINESS_FOR_SALE_FLAG" => 'int|min:0|max:1', // (Commercial only)
-            /* 
-                0 - Not a business for sale; 
-                1 - Business for sale
-            */
-
+        "BUSINESS_FOR_SALE_FLAG" => 'enum|min:0|max:1', // (Commercial only)
         "PRICE_PER_UNIT" => 'num|min:0|max:15', // (Commercial only)
 
         /* COMM_CLASS_ORDER (Commercial only)
@@ -244,6 +193,89 @@ class BlmFile {
         "COUNTRY_CODE" => 'string|required|min:1|max:2',
         "EXACT_LATITUDE" => 'num|required|min:1|max:15',
         "EXACT_LONGDITUDE" => 'num|required|min:1|max:15',
+    ];
+
+    protected $enums = [
+        'STATUS_ID' => [
+            0 => 'Available',
+            1 => 'SSTC - Sold Subject To Completion',
+            2 => 'SSTCM - Scotland - Sold Subject To Concluded Missives',
+            3 => 'under offer - sales',
+            4 => 'reserved - sales',
+            5 => 'let agreed - letting',
+        ],
+        "LET_TYPE_ID" => [
+            0 => 'Not specified', // DEFAULT
+            1 => 'Long term',
+            2 => 'Short term',
+            3 => 'Student',
+            4 => 'Commercial'
+        ],
+        "LET_FURN_ID" => [
+            0 => 'Furnished',
+            1 => 'Part furnished',
+            2 => 'Unfurnished',
+            3 => 'Not specified', // DEFAULT
+            4 => 'Furnished', // / unfurnished ??? @todo resolve conflict
+        ],
+        "LET_RENT_FREQUENCY" => [
+            0 => 'Weekly',
+            1 => 'Monthly', // - DEFAULT if null
+            2 => 'Quarterly',
+            3 => 'Annual',
+            // 4 = UNKNOWN
+            5 => 'Per-person per-week - students',
+        ],
+        "TRANS_TYPE_ID" => [
+            1 => 'Resale',
+            2 => 'Lettings',
+        ],
+        "NEW_HOME_FLAG" => [
+            'Y' => 'New Home',
+            'N' => 'Not A New Home', // or empty
+        ],
+        "PRICE_QUALIFIER" => [
+            0 => 'Default',
+            1 => 'POA',
+            2 => 'Guide Price',
+            3 => 'Fixed Price',
+            4 => 'Offers in Excess of',
+            5 => 'OIRO, Offers In The Region Of',
+            6 => 'Sale by Tender',
+            7 => 'From (new homes and commercial only)',
+            // 8 => UNKNOWN
+            9 => 'Shared Ownership',
+            10 => 'Offers Over',
+            11 => 'Part Buy Part Rent',
+            12 => 'Shared Equity',
+            // 13 UNKNOWN
+            14 => 'Equity Loan',
+            15 => 'Offers Invited',
+        ],
+        "PUBLISHED_FLAG" => [
+            0 => 'Hidden/invisible',
+            1 => 'Visible',
+        ],
+        "LET_WASHING_MACHINE_FLAG" => ['Y' => 'Yes', 'N' => 'No', ], // student
+        "LET_DISHWASHER_FLAG" =>  ['Y' => 'Yes', 'N' => 'No', ], // student
+        "LET_BURGLAR_ALARM_FLAG" =>  ['Y' => 'Yes', 'N' => 'No', ], // student
+        "LET_BILL_INC_WATER" =>  ['Y' => 'Yes', 'N' => 'No', ], // student
+        "LET_BILL_INC_GAS" =>  ['Y' => 'Yes', 'N' => 'No', ], // student
+        "LET_BILL_INC_ELECTRICITY" =>  ['Y' => 'Yes', 'N' => 'No', ], // student
+        "LET_BILL_INC_TV_LICIENCE" =>  ['Y' => 'Yes', 'N' => 'No', ], // student
+        "LET_BILL_INC_TV_SUBSCRIPTION" =>  ['Y' => 'Yes', 'N' => 'No', ], // student
+        "LET_BILL_INC_INTERNET" =>  ['Y' => 'Yes', 'N' => 'No', ], // student
+
+        "AREA_SIZE_UNIT_ID" => [
+            1 => 'Square feet',
+            2 => 'Square meters', 
+            3 => 'Acres', 
+            4 => 'Hectares',
+        ],
+        "BUSINESS_FOR_SALE_FLAG" => [
+            0 => 'Not a business for sale',
+            1 => 'Business for sale',
+        ],
     ];
 
     protected $imageExtension = [
@@ -321,7 +353,8 @@ class BlmFile {
             'recursive' => false,
             'min' => 0,
             'max' => 4096,
-            'media' => ''
+            'media' => '',
+            'default' => '',
         ];
 
         foreach($definitions as $definition) {
@@ -342,9 +375,15 @@ class BlmFile {
                 case 'max':
                     $result[$key] = (int) $value;
                 break;
+
                 case 'media':
                     $result[$key] = $value;
                 break;
+
+                case 'default':
+                    $result[$key] = $value;
+                break;
+
             }
         
         }
@@ -656,8 +695,9 @@ class BlmFile {
             return true;
         }
         switch ($name) {
-            case 'Property Count': return ($value == '') ? true : $this->isInt($value);
-            case 'Generated Date': return ($value == '') ? true : $this->isDate($value);
+            case 'Property Count': $this->isInt('Property Count', $value);
+            case 'Generated Date': $this->isDate('Generated Date', $value);
+            return true;
         }
 
         // feed supplier parameters not checked
@@ -907,7 +947,7 @@ class BlmFile {
         }
 
         // check type and size is correct
-        $this->validateDataColumnType($columnName, $columnValue);
+        $this->validateDataColumnType($columnName, $columnValue, $definition);
 
         // check media definitions IMG, FLP, DOC
         $this->validateMediaType($columnName, $columnValue, $definition);
@@ -1011,14 +1051,17 @@ class BlmFile {
             $extensionExpected = strtolower($extensionFound);
 
             if ($agentRefFound !== $agentRefExpected) {
-                throw new \Exception("Error: Not a valid BLM file, (2) Media file name not in correct format, must begin with '{$agentRefExpected}', found '{$value}'");
+                // dd($agentRefFound, $agentRefExpected, $mediaFound, $agentRefFound, $mediaExpected);
+                throw new \Exception("Error: Not a valid BLM file, (2) Media file name not in correct format, must begin with '{$agentRefExpected}', found '{$agentRefFound}', value '{$value}'");
             }
 
             if ($mediaFound !== $mediaExpected) {
+                // dd($agentRefFound, $agentRefExpected, $mediaFound, $agentRefFound, $mediaExpected);
                 throw new \Exception("Error: Not a valid BLM file, (3) Media column '{$name}' file name not in correct format, must begin with '{$agentRefExpected}_{$mediaExpected}_', found '{$value}'");
             }
 
             if ($indexFound !== $indexExpected) {
+                // dd($agentRefFound, $agentRefExpected, $mediaFound, $agentRefFound, $mediaExpected);
                 throw new \Exception("Error: Not a valid BLM file, (4) Media column '{$name}' file name not in correct format, must begin with '{$agentRefExpected}_{$mediaExpected}_{$indexExpected}', found '{$value}'");
             }
 
@@ -1125,7 +1168,9 @@ class BlmFile {
      */
     protected function checkLettingDependantFields($row)
     {
-        $letTypeId = $row['LET_TYPE_ID'] ?? 0;
+        // zx
+        $definition = $this->columnDefinitions[$this->cannonicalColumnName('LET_TYPE_ID')];
+        $letTypeId = $row['LET_TYPE_ID'] ?? $definition['default'];
 
         $studentLettings = array_keys($this->columnDefinitionV3_StudentLettings);
         $commercialLettings = array_keys($this->columnDefinitionV3_CommercialLettings);
@@ -1146,12 +1191,12 @@ class BlmFile {
      * checkLettingDependantField
      * @param String $name of column 
      * @param String $value of column, ignore empty columns
-     * @param Int $letTypeId of the row
+     * @param String $letTypeId of the row
      * @param Int $expectedLetTypeId of the letting type (Student vs Commercial)
      * @param Array $lettingColumns of the letting type (Student vs Commercial)
      * @return Boolean false if the letting type of the row dosn't match the letting type of the column name
      */
-    protected function checkLettingDependantField(String $name, String $value, Int $letTypeId, Int $expectedLetTypeId, Array $lettingColumns)
+    protected function checkLettingDependantField(String $name, String $value, String $letTypeId, Int $expectedLetTypeId, Array $lettingColumns)
     {
         if ('' === $value) {
             return true; // allow rows of different let type id to appear in data
@@ -1174,28 +1219,30 @@ class BlmFile {
      * @return Void
      * @throws Exception on column type not defined
      */
-    protected function validateDataColumnType(String $name, String $value)
+    protected function validateDataColumnType(String $name, String $value, Array $definition)
     {
-        $type = 'string';
-        $definition = $this->columnDefinitions[$this->cannonicalColumnName($name)];
-        if (0 === count($definition)) {
-            return;
-        }
-
         $type = $definition['type'];
         switch ($type) {
             case 'date':
-                $this->isDate($value);
-                return;
+                $this->isDate($name, $value);
+            break;
+
+            case 'enum':
+                $this->isEnum($name, $value);
+            break;
+
             case 'int':
-                $this->isInt($value);
-                return;
+                $this->isInt($name, $value);
+            break;
+            
             case 'num':
-                $this->isNum($value);
-                return;
+                $this->isNum($name, $value);
+            break;
+
             case 'string':
-                $this->isString($value);
-                return;
+                $this->isString($name, $value);
+            break;
+
             default:
                 throw new \Exception("Error: Not a valid BLM file, Column '{$name}' is an unknown type, found '{$type}' with the value '{$value}' ");
         }
@@ -1207,9 +1254,26 @@ class BlmFile {
      * @param String $value
      * @return bool
      */
-    protected function isDate(String $value)
+    protected function isDate(String $name, String $value)
     {
-        return Date($this->formatDate, strtotime($value)) === $value;
+        if (! Date($this->formatDate, strtotime($value)) === $value) {
+            throw new \Exception("Error: Not a valid BLM file, Date '{$name}', value '{$value}', is not in the correct format '{$this->formatDate}'");
+        }
+    }
+
+    /**
+     * is the column value an integer mapped to a value
+     * 
+     * @param String $name of column
+     * @param String $value of data
+     * @return bool
+     */   
+    protected function isEnum(String $name, String $value)
+    {
+        if (! isset($this->enums[$name][$value])) {
+            throw new \Exception("Error: Not a valid BLM file, Enum '{$name}', value '{$value}' is not in the allowed list of values");
+        }
+
     }
 
     /**
@@ -1218,10 +1282,12 @@ class BlmFile {
      * @param String $value
      * @return bool
      */    
-    protected function isInt(String $value)
+    protected function isInt(String $name, String $value)
     {
         $int = strval($value);
-        return ctype_digit($int) && ($int >= 0);
+        if (! ctype_digit($int) && ($int >= 0)) {
+            throw new \Exception("Error: Not a valid BLM file, Int '{$name}', value '{$value}', is not an int");
+        }
     }
 
     /**
@@ -1231,9 +1297,11 @@ class BlmFile {
      * @param String $value
      * @return bool
      */   
-    protected function isNum(String $value)
+    protected function isNum(String $name, String $value)
     {
-        return preg_match("#^\d*(\.\d*)?$#", $value);
+        if (! preg_match("#^\d*(\.\d*)?$#", $value)) {
+            throw new \Exception("Error: Not a valid BLM file, Number '{$name}', value '{$value}', is not a decimal number");
+        }
     }
 
     /**
@@ -1242,7 +1310,7 @@ class BlmFile {
      * @param String $value
      * @return bool
      */   
-    protected function isString(String $value)
+    protected function isString(String $name, String $value)
     {
         return true;
     }

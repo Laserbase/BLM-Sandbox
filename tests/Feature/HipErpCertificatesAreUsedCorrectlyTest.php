@@ -16,8 +16,8 @@ class HipErpCertificatesAreUsedCorrectlyTest extends TestCase
 
     // Required Columns
     private $requiredColumns = [ 
-        'AGENT_REF' => 'XX99XX_FBM2766',
-        'BRANCH_ID' => 'XX99XX',
+        'AGENT_REF' => '999999_FBM2766',
+        'BRANCH_ID' => '999999',
         'STATUS_ID' => '1',
         'CREATE_DATE' => '2019-12-17 15:49:30',
         'UPDATE_DATE' => '2019-12-17 15:49:30',
@@ -41,11 +41,11 @@ class HipErpCertificatesAreUsedCorrectlyTest extends TestCase
         'LET_TYPE_ID' => '0', // 0 = not specified DEFAULT
         'SUMMARY' => 'whatever whatever whatever whatever',
         'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
-        'NEW_HOME_FLAG' => '0',
-        'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_00.jpg',
+        'NEW_HOME_FLAG' => 'N',
+        'MEDIA_IMAGE_00' => '999999_FBM2766_IMG_00.jpg',
 
-        'MEDIA_IMAGE_60' => 'XX99XX_FBM2766_IMG_60.jpg',
-        'MEDIA_DOCUMENT_50' => 'XX99XX_FBM2766_DOC_50.pdf',
+        'MEDIA_IMAGE_60' => '999999_FBM2766_IMG_60.jpg',
+        'MEDIA_DOCUMENT_50' => '999999_FBM2766_DOC_50.pdf',
     ];
 
     public function listMediaColumns()
@@ -86,7 +86,7 @@ class HipErpCertificatesAreUsedCorrectlyTest extends TestCase
 
         $row = $blm->validateData($columnData);
         if ('' === $result) {
-            $this->assertEquals($row['AGENT_REF'], 'XX99XX_FBM2766');
+            $this->assertEquals($row['AGENT_REF'], '999999_FBM2766');
         }
     
     }

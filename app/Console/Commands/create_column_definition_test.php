@@ -22,8 +22,8 @@ class create_column_definition_test extends Command
     protected $description = 'Command create_column_definition_test';
 
     private $data = [
-        'AGENT_REF' => 'XX99XX_FBM2766',
-        'BRANCH_ID' => 'XX99XX',
+        'AGENT_REF' => '999999_FBM2766',
+        'BRANCH_ID' => '999999',
         'STATUS_ID' => '1',
         'CREATE_DATE' => '2019-12-17 15:49:30',
         'UPDATE_DATE' => '2019-12-17 15:49:30',
@@ -50,9 +50,9 @@ class create_column_definition_test extends Command
         'NEW_HOME_FLAG' => '0',
 
         // letting
-        'LET_DATE_AVAILABLE' => 'XX99XX_FBM2766',
-        'LET_BOND' => 'XX99XX_FBM2766',
-        'ADMINISTRATION_FEE' => 'XX99XX_FBM2766',
+        'LET_DATE_AVAILABLE' => '999999_FBM2766',
+        'LET_BOND' => '999999_FBM2766',
+        'ADMINISTRATION_FEE' => '999999_FBM2766',
         'LET_FURN_ID' => 'Y',
         'LET_RENT_FREQUENCY' => 'Y',
         'LET_CONTRACT_IN_MONTHS' => 'Y',
@@ -65,19 +65,19 @@ class create_column_definition_test extends Command
         'LET_BILL_INC_TV_LICIENCE' => 'Y',
         'LET_BILL_INC_TV_SUBSCRIPTION' => 'Y',
         'LET_BILL_INC_INTERNET' => 'Y',
-        'TENURE_TYPE_ID' => 'XX99XX_FBM2766',
+        'TENURE_TYPE_ID' => '999999_FBM2766',
 
         // commercial
-        'MIN_SIZE_ENTERED' => 'XX99XX_FBM2766',
-        'MAX_SIZE_ENTERED' => 'XX99XX_FBM2766',
-        'AREA_SIZE_UNIT_ID' => 'XX99XX_FBM2766',
-        'BUSINESS_FOR_SALE_FLAG' => 'XX99XX_FBM2766',
-        'PRICE_PER_UNIT' => 'XX99XX_FBM2766',
+        'MIN_SIZE_ENTERED' => '999999_FBM2766',
+        'MAX_SIZE_ENTERED' => '999999_FBM2766',
+        'AREA_SIZE_UNIT_ID' => '999999_FBM2766',
+        'BUSINESS_FOR_SALE_FLAG' => '999999_FBM2766',
+        'PRICE_PER_UNIT' => '999999_FBM2766',
         'COMM_CLASS_ORDER_1' => 'A1',
         'COMM_CLASS_ORDER_2' => 'A2',
 
         // media
-        'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_00.jpg',
+        'MEDIA_IMAGE_00' => '999999_FBM2766_IMG_00.jpg',
         'MEDIA_IMAGE_TEXT_00' => 'caption',
     ];
 
@@ -104,7 +104,7 @@ class create_column_definition_test extends Command
         // $contents = str_replace('{{DEFINITION}}', $definition, $template);
 
         foreach($columns as $name => $definition) {
-            // $this->info("        '{$name}' => 'XX99XX_FBM2766',");
+            // $this->info("        '{$name}' => '999999_FBM2766',");
             // continue;
             $data = $this->data;
             if (! isset($data[$name])) {

@@ -17,8 +17,8 @@ class EnsureLettingFieldsAreDependantOnFlagTest extends TestCase
     // Required Columns
     private $testData = [ 
         'ok neutral' => [
-            'AGENT_REF' => 'XX99XX_FBM2766',
-            'BRANCH_ID' => 'XX99XX',
+            'AGENT_REF' => '999999_FBM2766',
+            'BRANCH_ID' => '999999',
             'STATUS_ID' => '1',
             'CREATE_DATE' => '2019-12-17 15:49:30',
             'UPDATE_DATE' => '2019-12-17 15:49:30',
@@ -44,13 +44,13 @@ class EnsureLettingFieldsAreDependantOnFlagTest extends TestCase
             //------------------------------------------------------
             'SUMMARY' => 'whatever whatever whatever whatever',
             'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
-            'NEW_HOME_FLAG' => '0',
-            'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_00.jpg',
+            'NEW_HOME_FLAG' => 'Y',
+            'MEDIA_IMAGE_00' => '999999_FBM2766_IMG_00.jpg',
             'MEDIA_IMAGE_TEXT_00' => 'caption',
         ],
         'ok student letting' => [
-            'AGENT_REF' => 'XX99XX_FBM2766',
-            'BRANCH_ID' => 'XX99XX',
+            'AGENT_REF' => '999999_FBM2766',
+            'BRANCH_ID' => '999999',
             'STATUS_ID' => '1',
             'CREATE_DATE' => '2019-12-17 15:49:30',
             'UPDATE_DATE' => '2019-12-17 15:49:30',
@@ -86,13 +86,13 @@ class EnsureLettingFieldsAreDependantOnFlagTest extends TestCase
             //------------------------------------------------------
             'SUMMARY' => 'whatever whatever whatever whatever',
             'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
-            'NEW_HOME_FLAG' => '0',
-            'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_00.jpg',
+            'NEW_HOME_FLAG' => 'Y',
+            'MEDIA_IMAGE_00' => '999999_FBM2766_IMG_00.jpg',
             'MEDIA_IMAGE_TEXT_00' => 'caption',
         ],
         'error student letting' => [
-            'AGENT_REF' => 'XX99XX_FBM2766',
-            'BRANCH_ID' => 'XX99XX',
+            'AGENT_REF' => '999999_FBM2766',
+            'BRANCH_ID' => '999999',
             'STATUS_ID' => '1',
             'CREATE_DATE' => '2019-12-17 15:49:30',
             'UPDATE_DATE' => '2019-12-17 15:49:30',
@@ -128,13 +128,13 @@ class EnsureLettingFieldsAreDependantOnFlagTest extends TestCase
             //------------------------------------------------------
             'SUMMARY' => 'whatever whatever whatever whatever',
             'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
-            'NEW_HOME_FLAG' => '0',
-            'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_00.jpg',
+            'NEW_HOME_FLAG' => 'Y',
+            'MEDIA_IMAGE_00' => '999999_FBM2766_IMG_00.jpg',
             'MEDIA_IMAGE_TEXT_00' => 'caption',
         ],
         'ok commercial letting' => [
-            'AGENT_REF' => 'XX99XX_FBM2766',
-            'BRANCH_ID' => 'XX99XX',
+            'AGENT_REF' => '999999_FBM2766',
+            'BRANCH_ID' => '999999',
             'STATUS_ID' => '1',
             'CREATE_DATE' => '2019-12-17 15:49:30',
             'UPDATE_DATE' => '2019-12-17 15:49:30',
@@ -166,13 +166,13 @@ class EnsureLettingFieldsAreDependantOnFlagTest extends TestCase
             //-------------------------------------------------------------------
             'SUMMARY' => 'whatever whatever whatever whatever',
             'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
-            'NEW_HOME_FLAG' => '0',
-            'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_00.jpg',
+            'NEW_HOME_FLAG' => 'Y',
+            'MEDIA_IMAGE_00' => '999999_FBM2766_IMG_00.jpg',
             'MEDIA_IMAGE_TEXT_00' => 'caption'
         ],
         'error commercial letting' => [
-            'AGENT_REF' => 'XX99XX_FBM2766',
-            'BRANCH_ID' => 'XX99XX',
+            'AGENT_REF' => '999999_FBM2766',
+            'BRANCH_ID' => '999999',
             'STATUS_ID' => '1',
             'CREATE_DATE' => '2019-12-17 15:49:30',
             'UPDATE_DATE' => '2019-12-17 15:49:30',
@@ -204,8 +204,8 @@ class EnsureLettingFieldsAreDependantOnFlagTest extends TestCase
             //-------------------------------------------------------------------
             'SUMMARY' => 'whatever whatever whatever whatever',
             'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
-            'NEW_HOME_FLAG' => '0',
-            'MEDIA_IMAGE_00' => 'XX99XX_FBM2766_IMG_00.jpg',
+            'NEW_HOME_FLAG' => 'Y',
+            'MEDIA_IMAGE_00' => '999999_FBM2766_IMG_00.jpg',
             'MEDIA_IMAGE_TEXT_00' => 'caption',
             ],
         ];
@@ -245,7 +245,7 @@ Log::debug("testData=".print_r($testData, true));
         $row = $blm->validateData($columnData);
 
         if ('ok' === $status) {
-            $this->assertEquals($row['AGENT_REF'], 'XX99XX_FBM2766');
+            $this->assertEquals($row['AGENT_REF'], '999999_FBM2766');
         }
     
     }
