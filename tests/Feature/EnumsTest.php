@@ -61,7 +61,14 @@ class EnumTest extends TestCase
             ['PROP_SUB_ID', "-1", "Enum 'PROP_SUB_ID', value '-1' is not in the allowed list of values"],
             ['PROP_SUB_ID',  "0", ""],
             ['PROP_SUB_ID',  "1", ""],
-            ['PROP_SUB_ID',  "2", ""],
+
+            ['PROP_SUB_ID',  "68", ""],
+            ['PROP_SUB_ID',  "69", "Enum 'PROP_SUB_ID', value '69' is not in the allowed list of values"],
+            ['PROP_SUB_ID',  "70", "Enum 'PROP_SUB_ID', value '70' is not in the allowed list of values"],
+            ['PROP_SUB_ID',  "71", ""],
+
+            ['PROP_SUB_ID',  "511", ""],
+            ['PROP_SUB_ID',  "512", "Enum 'PROP_SUB_ID', value '512' is not in the allowed list of values"],
 
             ['TENURE_TYPE_ID',            "X", "Enum 'TENURE_TYPE_ID', value 'X' is not in the allowed list of values"],
             ['TENURE_TYPE_ID',             "", ""], // not required
