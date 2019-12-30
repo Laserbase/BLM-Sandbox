@@ -695,9 +695,13 @@ class BlmFile {
             return true;
         }
         switch ($name) {
-            case 'Property Count': $this->isInt('Property Count', $value);
-            case 'Generated Date': $this->isDate('Generated Date', $value);
-            return true;
+            case 'Property Count': 
+                $this->isInt('Property Count', $value);
+            break;
+            
+            case 'Generated Date': 
+                $this->isDate('Generated Date', $value);
+            break;
         }
 
         // feed supplier parameters not checked
