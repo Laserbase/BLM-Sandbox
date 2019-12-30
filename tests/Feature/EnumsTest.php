@@ -56,6 +56,13 @@ class EnumTest extends TestCase
             ['STATUS_ID',  "5", ""],
             ['STATUS_ID',  "6", "Enum 'STATUS_ID', value '6' is not in the allowed list of values"],
 
+            ['PROP_SUB_ID',  "X", "Enum 'PROP_SUB_ID', value 'X' is not in the allowed list of values"],
+            ['PROP_SUB_ID',   "", "Data field 'PROP_SUB_ID' is too small, minimum length is '1', found '0'"], 
+            ['PROP_SUB_ID', "-1", "Enum 'PROP_SUB_ID', value '-1' is not in the allowed list of values"],
+            ['PROP_SUB_ID',  "0", ""],
+            ['PROP_SUB_ID',  "1", ""],
+            ['PROP_SUB_ID',  "2", ""],
+
             ['LET_TYPE_ID',  "X", "Enum 'LET_TYPE_ID', value 'X' is not in the allowed list of values"],
             ['LET_TYPE_ID',   "", ""], // default 0
             ['LET_TYPE_ID', "-1", "Data field 'LET_TYPE_ID' is too big, maximum length is '1', found '2'"],

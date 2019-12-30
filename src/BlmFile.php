@@ -36,14 +36,14 @@ class BlmFile {
     protected $columnDefinitions = [];
     protected $columnDefinitionMaster = [
         // 'type|required|min:0|max:10:recursive'
-        //      type = string | date | int | num
-        //      required = column must be in data feed
+        //      type = date | enum | int | num | string
+        // required = column must be in data feed
         // min:0 = value is optional
-        //      otherwise value must be given
+        //      otherwise a value must be given
         // max:n = maximum length in characters for a column value
         // recursive = field name can be repeated
         //       with an underscore followed by an index number
-        // enum = enumerated int
+        // enum = enumerated values (0,1,3), (0-3), ('Y', 'N')
 
         "AGENT_REF" => 'string|required|min:1|max:20',
         "BRANCH_ID" => 'int|required|min:1|max:10', // provided by Rightmove
@@ -69,11 +69,11 @@ class BlmFile {
 
         "NEW_HOME_FLAG" => 'enum|required|min:0|max:1|default:N', // Y / N or empty
 
-        "BEDROOMS" => 'int|required|min:1',
+        "BEDROOMS" => 'int|required|min:1|max:10',
         "PRICE" => 'num|required|min:1',
         "PRICE_QUALIFIER" => 'enum|required|min:0|max:2|default:0',
         
-        "PROP_SUB_ID" => 'int|required|min:1', // One of the valid property types. Ref. Property Type table
+        "PROP_SUB_ID" => 'enum|required|min:1|default:0', // One of the valid property types. Ref. Property Type table
 
         "ADDRESS_1" => 'string|required|min:1|max:60',
         "ADDRESS_2" => 'string|required|min:1|max:60',
@@ -203,6 +203,128 @@ class BlmFile {
             3 => 'under offer - sales',
             4 => 'reserved - sales',
             5 => 'let agreed - letting',
+        ],
+        "TENURE_TYPE_ID" => [//] 'int|min:0|max:1', // required in spec - not in data
+            1 => 'Freehold',
+            2 => 'Leasehold',
+            3 => 'Feudal',
+            4 => 'Commonhold',
+            5 => 'Share of Freehold',
+        ],
+        "PROP_SUB_ID" => [
+            0 => 'Not Specified',
+            1 => 'Terraced',
+            2 => 'End of Terrace',
+            3 => 'Semi-Detached',
+            4 => 'Detached',
+            5 => 'Mews',
+            6 => 'Cluster House',
+            7 => 'Ground Flat',
+            8 => 'Flat',
+            9 => 'Studio',
+            10 => 'Ground Maisonette',
+            11 => 'Maisonette',
+            12 => 'Bungalow',
+            13 => 'Terraced Bungalow',
+            14 => 'Semi-Detached Bungalow',
+            15 => 'Detached Bungalow',
+            16 => 'Mobile Home',
+            20 => 'Land',
+            21 => 'Link Detached',
+            22 => 'Town House',
+            23 => 'Cottage',
+            24 => 'Chalet',
+            27 => 'Villa',
+            28 => 'Apartment',
+            29 => 'Penthouse',
+            30 => 'Finca',
+            43 => 'Barn Conversion',
+            44 => 'Serviced Apartments',
+            45 => 'Parking',
+            46 => 'Sheltered Housing',
+            47 => 'Retirement Property',
+            48 => 'House Share',
+            49 => 'Flat Share',
+            50 => 'Park Home',
+            51 => 'Garages',
+            52 => 'Farm House',
+            53 => 'Equestrian Facility',
+            56 => 'Duplex',
+            59 => 'Triplex',
+            62 => 'Longere',
+            65 => 'Gite',
+            68 => 'Barn',
+            71 => 'Trulli',
+            74 => 'Mill',
+            77 => 'Ruins',
+            80 => 'Restaurant',
+            83 => 'Cafe',
+            86 => 'Mill',
+            92 => 'Castle',
+            95 => 'Village',
+            101 => 'Cave House',
+            104 => 'Cortijo',
+            107 => 'Farm Land',
+            110 => 'Plot',
+            113 => 'Country House',
+            116 => 'Stone House',
+            117 => 'Caravan',
+            118 => 'Lodge',
+            119 => 'Log Cabin',
+            120 => 'Manor House',
+            121 => 'Stately Home',
+            125 => 'Off-Plan',
+            128 => 'Semi-detached Villa',
+            131 => 'Detached Villa',
+            134 => 'Bar / Nightclub',
+            137 => 'Shop',
+            140 => 'Riad',
+            141 => 'House Boat',
+            142 => 'Hotel Room',
+            143 => 'Block of Apartments',
+            144 => 'Private Halls',
+            178 => 'Office',
+            181 => 'Business Park',
+            184 => 'Serviced Office',
+            187 => 'Retail Property (high street)',
+            190 => 'Retail Property (out of town)',
+            193 => 'Convenience Store',
+            196 => 'Garage',
+            199 => 'Hairdresser / Barber Shop',
+            202 => 'Hotel',
+            205 => 'Petrol Station',
+            208 => 'Post Office',
+            211 => 'Pub',
+            214 => 'Workshop',
+            217 => 'Distribution Warehouse',
+            220 => 'Factory',
+            223 => 'Heavy Industrial',
+            226 => 'Industrial Park',
+            229 => 'Light Industrial',
+            232 => 'Storage',
+            235 => 'Showroom',
+            238 => 'Warehouse',
+            241 => 'Land',
+            244 => 'Commercial Development',
+            247 => 'Industrial Development',
+            250 => 'Residential Development',
+            253 => 'Commercial Property',
+            256 => 'Data Centre',
+            259 => 'Farm',
+            262 => 'Healthcare Facility',
+            265 => 'Marine Property',
+            268 => 'Mixed Use',
+            271 => 'Research & Development Facility',
+            274 => 'Science Park',
+            277 => 'Guest House',
+            280 => 'Hospitality',
+            283 => 'Leisure Facility',
+            298 => 'Takeaway',
+            301 => 'Childcare Facility',
+            304 => 'Smallholding',
+            307 => 'Place of Worship',
+            310 => 'Trade Counter',
+            511 => 'Coach House',
         ],
         "LET_TYPE_ID" => [
             0 => 'Not specified', // DEFAULT
@@ -1282,15 +1404,15 @@ class BlmFile {
     }
 
     /**
-     * is the column value an int
+     * is the column value an integer
      * 
      * @param String $value
      * @return bool
      */    
     protected function isInt(String $name, String $value)
     {
-        $int = strval($value);
-        if (! ctype_digit($int) && ($int >= 0)) {
+        Log::debug("nsme='{$name}', value='{$value}' , ctype='".ctype_digit($value)."'");
+        if (! ctype_digit($value)) {
             throw new \Exception("Error: Not a valid BLM file, Int '{$name}', value '{$value}', is not an int");
         }
     }
