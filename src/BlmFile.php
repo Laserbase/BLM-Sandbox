@@ -64,7 +64,7 @@ class BlmFile {
         "LET_FURN_ID" => 'enum|required|min:0|max:1', // column required, data optional
         "LET_RENT_FREQUENCY" => 'enum|required|min:0|max:1|default:1',
 
-        "TENURE_TYPE_ID" => 'int|min:0|max:1', // required in spec - not in data
+        "TENURE_TYPE_ID" => 'enum|min:0|max:1', // required in spec - not in data
         "TRANS_TYPE_ID" => 'enum|required|min:1|max:1', // 1 = resale, 2 = lettings
 
         "NEW_HOME_FLAG" => 'enum|required|min:0|max:1|default:N', // Y / N or empty
@@ -204,7 +204,7 @@ class BlmFile {
             4 => 'reserved - sales',
             5 => 'let agreed - letting',
         ],
-        "TENURE_TYPE_ID" => [//] 'int|min:0|max:1', // required in spec - not in data
+        "TENURE_TYPE_ID" => [//] 'enum|min:0|max:1', // required in spec - not in data
             1 => 'Freehold',
             2 => 'Leasehold',
             3 => 'Feudal',
@@ -1294,7 +1294,6 @@ class BlmFile {
      */
     protected function checkLettingDependantFields($row)
     {
-        // zx
         $definition = $this->columnDefinitions[$this->cannonicalColumnName('LET_TYPE_ID')];
         $letTypeId = $row['LET_TYPE_ID'] ?? $definition['default'];
 
@@ -1382,7 +1381,6 @@ class BlmFile {
      */
     protected function isDate(String $name, String $value)
     {
-        Log::debug("{$name}===>'{$this->formatDate}'=<<".Date($this->formatDate, strtotime($value)).">>, strtotime'".strtotime($value)."', value='{$value}'");
         if (Date($this->formatDate, strtotime($value)) !== $value) {
             throw new \Exception("Error: Not a valid BLM file, Date '{$name}', value '{$value}', is not in the correct format '{$this->formatDate}'");
         }
@@ -1411,7 +1409,6 @@ class BlmFile {
      */    
     protected function isInt(String $name, String $value)
     {
-        Log::debug("nsme='{$name}', value='{$value}' , ctype='".ctype_digit($value)."'");
         if (! ctype_digit($value)) {
             throw new \Exception("Error: Not a valid BLM file, Int '{$name}', value '{$value}', is not an int");
         }
@@ -1426,6 +1423,7 @@ class BlmFile {
      */   
     protected function isNum(String $name, String $value)
     {
+        Log::debug("nsme='{$name}', value='{$value}' , ctype='".ctype_digit($value)."'");
         if (! preg_match("#^\d*(\.\d*)?$#", $value)) {
             throw new \Exception("Error: Not a valid BLM file, Number '{$name}', value '{$value}', is not a decimal number");
         }

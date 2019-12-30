@@ -59,7 +59,7 @@ class IntTest extends TestCase
             ['BRANCH_ID',  "99999999999", "Data field 'BRANCH_ID' is too big, maximum length is '10', found '11'"], // 11
 
             ['BEDROOMS',            "X", "Int 'BEDROOMS', value 'X', is not an int"],
-            ['BEDROOMS',             "", "Data field 'BEDROOMS' is too small, minimum length is '1'"], 
+            ['BEDROOMS',             "", "Data field 'BEDROOMS' is too small, minimum length is '1'"], // required
             ['BEDROOMS',           "-1", "Int 'BEDROOMS', value '-1', is not an int"],
             ['BEDROOMS',            "0", ""],
             ['BEDROOMS',            "1", ""],
@@ -70,6 +70,19 @@ class IntTest extends TestCase
             ['BEDROOMS',    "999999999", ""], // 9
             ['BEDROOMS',   "9999999999", ""], // 10
             ['BEDROOMS',  "99999999999", "Data field 'BEDROOMS' is too big, maximum length is '10', found '11'"], // 11
+
+            ['LET_CONTRACT_IN_MONTHS',            "X", "Int 'LET_CONTRACT_IN_MONTHS', value 'X', is not an int"],
+            ['LET_CONTRACT_IN_MONTHS',             "", ""], 
+            ['LET_CONTRACT_IN_MONTHS',           "-1", "Int 'LET_CONTRACT_IN_MONTHS', value '-1', is not an int"],
+            ['LET_CONTRACT_IN_MONTHS',            "0", ""],
+            ['LET_CONTRACT_IN_MONTHS',            "1", ""],
+            ['LET_CONTRACT_IN_MONTHS',           "1.", "Int 'LET_CONTRACT_IN_MONTHS', value '1.', is not an int"],
+            ['LET_CONTRACT_IN_MONTHS',          "1.0", "Data field 'LET_CONTRACT_IN_MONTHS' is too big, maximum length is '2', found '3'"],
+            ['LET_CONTRACT_IN_MONTHS',          "0.0", "Data field 'LET_CONTRACT_IN_MONTHS' is too big, maximum length is '2', found '3'"],
+            ['LET_CONTRACT_IN_MONTHS',          "0.1", "Data field 'LET_CONTRACT_IN_MONTHS' is too big, maximum length is '2', found '3'"],
+            ['LET_CONTRACT_IN_MONTHS',            "9", ""], // 1
+            ['LET_CONTRACT_IN_MONTHS',           "99", ""], // 2
+            ['LET_CONTRACT_IN_MONTHS',          "999", "Data field 'LET_CONTRACT_IN_MONTHS' is too big, maximum length is '2', found '3'"], // 3
 
         ];
     }

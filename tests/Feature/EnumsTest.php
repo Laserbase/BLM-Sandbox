@@ -63,6 +63,24 @@ class EnumTest extends TestCase
             ['PROP_SUB_ID',  "1", ""],
             ['PROP_SUB_ID',  "2", ""],
 
+            ['TENURE_TYPE_ID',            "X", "Enum 'TENURE_TYPE_ID', value 'X' is not in the allowed list of values"],
+            ['TENURE_TYPE_ID',             "", ""], // not required
+            ['TENURE_TYPE_ID',           "-1", "Data field 'TENURE_TYPE_ID' is too big, maximum length is '1', found '2'"],
+            ['TENURE_TYPE_ID',            "0", "Enum 'TENURE_TYPE_ID', value '0' is not in the allowed list of values"],
+            ['TENURE_TYPE_ID',            "1", ""],
+            ['TENURE_TYPE_ID',            "2", ""],
+            ['TENURE_TYPE_ID',            "3", ""],
+            ['TENURE_TYPE_ID',            "4", ""],
+            ['TENURE_TYPE_ID',            "5", ""],
+            ['TENURE_TYPE_ID',            "6", "Enum 'TENURE_TYPE_ID', value '6' is not in the allowed list of values"],
+            ['TENURE_TYPE_ID',           "1.", "Data field 'TENURE_TYPE_ID' is too big, maximum length is '1'"],
+            ['TENURE_TYPE_ID',          "1.0", "Data field 'TENURE_TYPE_ID' is too big, maximum length is '1'"],
+            ['TENURE_TYPE_ID',          "0.0", "Data field 'TENURE_TYPE_ID' is too big, maximum length is '1'"],
+            ['TENURE_TYPE_ID',          "0.1", "Data field 'TENURE_TYPE_ID' is too big, maximum length is '1'"],
+            ['TENURE_TYPE_ID',            "9", "Enum 'TENURE_TYPE_ID', value '9' is not in the allowed list of values"], // 1
+            ['TENURE_TYPE_ID',           "99", "Data field 'TENURE_TYPE_ID' is too big, maximum length is '1', found '2'"],  // 2
+            ['TENURE_TYPE_ID',  "99999999999", "Data field 'TENURE_TYPE_ID' is too big, maximum length is '1', found '11'"], // 11
+
             ['LET_TYPE_ID',  "X", "Enum 'LET_TYPE_ID', value 'X' is not in the allowed list of values"],
             ['LET_TYPE_ID',   "", ""], // default 0
             ['LET_TYPE_ID', "-1", "Data field 'LET_TYPE_ID' is too big, maximum length is '1', found '2'"],
