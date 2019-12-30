@@ -1256,7 +1256,8 @@ class BlmFile {
      */
     protected function isDate(String $name, String $value)
     {
-        if (! Date($this->formatDate, strtotime($value)) === $value) {
+        Log::debug("{$name}===>'{$this->formatDate}'=<<".Date($this->formatDate, strtotime($value)).">>, strtotime'".strtotime($value)."', value='{$value}'");
+        if (Date($this->formatDate, strtotime($value)) !== $value) {
             throw new \Exception("Error: Not a valid BLM file, Date '{$name}', value '{$value}', is not in the correct format '{$this->formatDate}'");
         }
     }
