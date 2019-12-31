@@ -46,29 +46,29 @@ class DateTest extends TestCase
     public function listEnumFields()
     {
         return [
-            ['CREATE_DATE',  "X", "Date 'CREATE_DATE', value 'X', is not in the correct format 'Y-m-d H:i:s'"],
+            ['CREATE_DATE',  "X", "Data field 'CREATE_DATE', value 'X', is not in the correct format 'Y-m-d H:i:s'"],
             ['CREATE_DATE',  "", ""], // optional
             ['CREATE_DATE',  '2019-01-01 00:00:00', ""], // ok
-            ['CREATE_DATE',  "yesterday", "Date 'CREATE_DATE', value 'yesterday', is not in the correct format 'Y-m-d H:i:s'"],
-            ['CREATE_DATE',  "2019-1-1 12:30:55", "Date 'CREATE_DATE', value '2019-1-1 12:30:55', is not in the correct format 'Y-m-d H:i:s'"],
-            ['CREATE_DATE',  '2019-01-01', "Date 'CREATE_DATE', value '2019-01-01', is not in the correct format 'Y-m-d H:i:s'"],
-            ['CREATE_DATE',  '2019-29-06 12:00:05', "Date 'CREATE_DATE', value '2019-29-06 12:00:05', is not in the correct format 'Y-m-d H:i:s'"],
+            ['CREATE_DATE',  "yesterday", "Data field 'CREATE_DATE', value 'yesterday', is not in the correct format 'Y-m-d H:i:s'"],
+            ['CREATE_DATE',  "2019-1-1 12:30:55", "Data field 'CREATE_DATE', value '2019-1-1 12:30:55', is not in the correct format 'Y-m-d H:i:s'"],
+            ['CREATE_DATE',  '2019-01-01', "Data field 'CREATE_DATE', value '2019-01-01', is not in the correct format 'Y-m-d H:i:s'"],
+            ['CREATE_DATE',  '2019-29-06 12:00:05', "Data field 'CREATE_DATE', value '2019-29-06 12:00:05', is not in the correct format 'Y-m-d H:i:s'"],
 
-            ['UPDATE_DATE',  "X", "Date 'UPDATE_DATE', value 'X', is not in the correct format 'Y-m-d H:i:s'"],
+            ['UPDATE_DATE',  "X", "Data field 'UPDATE_DATE', value 'X', is not in the correct format 'Y-m-d H:i:s'"],
             ['UPDATE_DATE',  "", ""], // optional
             ['UPDATE_DATE',  '2019-01-01 00:00:00', ""], // ok
-            ['UPDATE_DATE',  "yesterday", "Date 'UPDATE_DATE', value 'yesterday', is not in the correct format 'Y-m-d H:i:s'"],
-            ['UPDATE_DATE',  "2019-1-1 12:30:55", "Date 'UPDATE_DATE', value '2019-1-1 12:30:55', is not in the correct format 'Y-m-d H:i:s'"],
-            ['UPDATE_DATE',  '2019-01-01', "Date 'UPDATE_DATE', value '2019-01-01', is not in the correct format 'Y-m-d H:i:s'"],
-            ['UPDATE_DATE',  '2019-29-06 12:00:05', "Date 'UPDATE_DATE', value '2019-29-06 12:00:05', is not in the correct format 'Y-m-d H:i:s'"],
+            ['UPDATE_DATE',  "yesterday", "Data field 'UPDATE_DATE', value 'yesterday', is not in the correct format 'Y-m-d H:i:s'"],
+            ['UPDATE_DATE',  "2019-1-1 12:30:55", "Data field 'UPDATE_DATE', value '2019-1-1 12:30:55', is not in the correct format 'Y-m-d H:i:s'"],
+            ['UPDATE_DATE',  '2019-01-01', "Data field 'UPDATE_DATE', value '2019-01-01', is not in the correct format 'Y-m-d H:i:s'"],
+            ['UPDATE_DATE',  '2019-29-06 12:00:05', "Data field 'UPDATE_DATE', value '2019-29-06 12:00:05', is not in the correct format 'Y-m-d H:i:s'"],
 
-            ['LET_DATE_AVAILABLE',  "X", "Date 'LET_DATE_AVAILABLE', value 'X', is not in the correct format 'Y-m-d H:i:s'"],
+            ['LET_DATE_AVAILABLE',  "X", "Data field 'LET_DATE_AVAILABLE', value 'X', is not in the correct format 'Y-m-d H:i:s'"],
             ['LET_DATE_AVAILABLE',  "", ""], // optional
             ['LET_DATE_AVAILABLE',  '2019-01-01 00:00:00', ""], // ok
-            ['LET_DATE_AVAILABLE',  "yesterday", "Date 'LET_DATE_AVAILABLE', value 'yesterday', is not in the correct format 'Y-m-d H:i:s'"],
-            ['LET_DATE_AVAILABLE',  "2019-1-1 12:30:55", "Date 'LET_DATE_AVAILABLE', value '2019-1-1 12:30:55', is not in the correct format 'Y-m-d H:i:s'"],
-            ['LET_DATE_AVAILABLE',  '2019-01-01', "Date 'LET_DATE_AVAILABLE', value '2019-01-01', is not in the correct format 'Y-m-d H:i:s'"],
-            ['LET_DATE_AVAILABLE',  '2019-29-06 12:00:05', "Date 'LET_DATE_AVAILABLE', value '2019-29-06 12:00:05', is not in the correct format 'Y-m-d H:i:s'"],
+            ['LET_DATE_AVAILABLE',  "yesterday", "Data field 'LET_DATE_AVAILABLE', value 'yesterday', is not in the correct format 'Y-m-d H:i:s'"],
+            ['LET_DATE_AVAILABLE',  "2019-1-1 12:30:55", "Data field 'LET_DATE_AVAILABLE', value '2019-1-1 12:30:55', is not in the correct format 'Y-m-d H:i:s'"],
+            ['LET_DATE_AVAILABLE',  '2019-01-01', "Data field 'LET_DATE_AVAILABLE', value '2019-01-01', is not in the correct format 'Y-m-d H:i:s'"],
+            ['LET_DATE_AVAILABLE',  '2019-29-06 12:00:05', "Data field 'LET_DATE_AVAILABLE', value '2019-29-06 12:00:05', is not in the correct format 'Y-m-d H:i:s'"],
 
         ];
     }

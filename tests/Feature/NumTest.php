@@ -46,9 +46,9 @@ class NumTest extends TestCase
     {
         return [
             // 'num|min:0', // deposit amount
-            ['LET_BOND',            "X", "Number 'LET_BOND', value 'X', is not a decimal number"],
+            ['LET_BOND',            "X", "Data field 'LET_BOND', value 'X', is not a decimal number"],
             ['LET_BOND',             "", ""], // optional 
-            ['LET_BOND',           "-1", "Number 'LET_BOND', value '-1', is not a decimal number"],
+            ['LET_BOND',           "-1", "Data field 'LET_BOND', value '-1', is not a decimal number"],
             ['LET_BOND',       "0", ""],
             ['LET_BOND',       "1", ""],
             ['LET_BOND',           "1.", ""],
@@ -59,9 +59,9 @@ class NumTest extends TestCase
             ['LET_BOND',  "99999999999", ""],
 
             // "PRICE" => 'num|required|min:1',
-            ['PRICE',                 "X", "Number 'PRICE', value 'X', is not a decimal number"],
+            ['PRICE',                 "X", "Data field 'PRICE', value 'X', is not a decimal number"],
             ['PRICE',                  "", "Data field 'PRICE' is too small, minimum length is '1'"], // required
-            ['PRICE',                "-1", "Number 'PRICE', value '-1', is not a decimal number"],
+            ['PRICE',                "-1", "Data field 'PRICE', value '-1', is not a decimal number"],
             ['PRICE',            "0", ""],
             ['PRICE',            "1", ""],
             ['PRICE',           "1.", ""],
@@ -70,14 +70,14 @@ class NumTest extends TestCase
             ['PRICE',   "9.99999999", ""],
             ['PRICE',  "99.99999999", ""],
 
-            ['PRICE',    "0..0", "Number 'PRICE', value '0..0', is not a decimal number"],
-            ['PRICE',  " 99.99", "Number 'PRICE', value ' 99.99', is not a decimal number"],
-            ['PRICE',  "+99.99", "Number 'PRICE', value '+99.99', is not a decimal number"],
+            ['PRICE',    "0..0", "Data field 'PRICE', value '0..0', is not a decimal number"],
+            ['PRICE',  " 99.99", "Data field 'PRICE', value ' 99.99', is not a decimal number"],
+            ['PRICE',  "+99.99", "Data field 'PRICE', value '+99.99', is not a decimal number"],
 
             // "MIN_SIZE_ENTERED" => 'num|min:0|max:15', // (Commercial only)
-            ['MIN_SIZE_ENTERED',            "X", "Number 'MIN_SIZE_ENTERED', value 'X', is not a decimal number"],
+            ['MIN_SIZE_ENTERED',            "X", "Data field 'MIN_SIZE_ENTERED', value 'X', is not a decimal number"],
             ['MIN_SIZE_ENTERED',             "", ""], // not required
-            ['MIN_SIZE_ENTERED',           "-1", "Number 'MIN_SIZE_ENTERED', value '-1', is not a decimal number"],
+            ['MIN_SIZE_ENTERED',           "-1", "Data field 'MIN_SIZE_ENTERED', value '-1', is not a decimal number"],
             ['MIN_SIZE_ENTERED',            "0", ""],
             ['MIN_SIZE_ENTERED',            "1", ""],
             ['MIN_SIZE_ENTERED',           "1.", ""],

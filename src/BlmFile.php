@@ -1382,7 +1382,7 @@ class BlmFile {
     protected function isDate(String $name, String $value)
     {
         if (Date($this->formatDate, strtotime($value)) !== $value) {
-            throw new \Exception("Error: Not a valid BLM file, Date '{$name}', value '{$value}', is not in the correct format '{$this->formatDate}'");
+            throw new \Exception("Error: Not a valid BLM file, Data field '{$name}', value '{$value}', is not in the correct format '{$this->formatDate}'");
         }
     }
 
@@ -1396,7 +1396,7 @@ class BlmFile {
     protected function isEnum(String $name, String $value)
     {
         if (! isset($this->enums[$name][$value])) {
-            throw new \Exception("Error: Not a valid BLM file, Enum '{$name}', value '{$value}' is not in the allowed list of values");
+            throw new \Exception("Error: Not a valid BLM file, Data field '{$name}', value '{$value}' is not in the allowed list of values");
         }
 
     }
@@ -1410,7 +1410,7 @@ class BlmFile {
     protected function isInt(String $name, String $value)
     {
         if (! ctype_digit($value)) {
-            throw new \Exception("Error: Not a valid BLM file, Int '{$name}', value '{$value}', is not an int");
+            throw new \Exception("Error: Not a valid BLM file, Data field '{$name}', value '{$value}', is not an int");
         }
     }
 
@@ -1424,7 +1424,7 @@ class BlmFile {
     protected function isNum(String $name, String $value)
     {
         if (! preg_match("#^\d*(\.\d*)?$#", $value)) {
-            throw new \Exception("Error: Not a valid BLM file, Number '{$name}', value '{$value}', is not a decimal number");
+            throw new \Exception("Error: Not a valid BLM file, Data field '{$name}', value '{$value}', is not a decimal number");
         }
     }
 

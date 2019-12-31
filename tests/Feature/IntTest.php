@@ -45,38 +45,38 @@ class IntTest extends TestCase
     public function listEnumFields()
     {
         return [
-            ['BRANCH_ID',            "X", "Int 'BRANCH_ID', value 'X', is not an int"],
+            ['BRANCH_ID',            "X", "Data field 'BRANCH_ID', value 'X', is not an int"],
             ['BRANCH_ID',             "", "Data field 'BRANCH_ID' is too small, minimum length is '1'"], 
-            ['BRANCH_ID',           "-1", "Int 'BRANCH_ID', value '-1', is not an int"],
+            ['BRANCH_ID',           "-1", "Data field 'BRANCH_ID', value '-1', is not an int"],
             ['BRANCH_ID',       "0", ""],
             ['BRANCH_ID',       "1", ""],
-            ['BRANCH_ID',           "1.", "Int 'BRANCH_ID', value '1.', is not an int"],
-            ['BRANCH_ID',          "1.0", "Int 'BRANCH_ID', value '1.0', is not an int"],
-            ['BRANCH_ID',          "0.0", "Int 'BRANCH_ID', value '0.0', is not an int"],
-            ['BRANCH_ID',          "0.1", "Int 'BRANCH_ID', value '0.1', is not an int"],
+            ['BRANCH_ID',           "1.", "Data field 'BRANCH_ID', value '1.', is not an int"],
+            ['BRANCH_ID',          "1.0", "Data field 'BRANCH_ID', value '1.0', is not an int"],
+            ['BRANCH_ID',          "0.0", "Data field 'BRANCH_ID', value '0.0', is not an int"],
+            ['BRANCH_ID',          "0.1", "Data field 'BRANCH_ID', value '0.1', is not an int"],
             ['BRANCH_ID',    "999999999", ""], // 9
             ['BRANCH_ID',   "9999999999", ""], // 10
             ['BRANCH_ID',  "99999999999", "Data field 'BRANCH_ID' is too big, maximum length is '10', found '11'"], // 11
 
-            ['BEDROOMS',            "X", "Int 'BEDROOMS', value 'X', is not an int"],
+            ['BEDROOMS',            "X", "Data field 'BEDROOMS', value 'X', is not an int"],
             ['BEDROOMS',             "", "Data field 'BEDROOMS' is too small, minimum length is '1'"], // required
-            ['BEDROOMS',           "-1", "Int 'BEDROOMS', value '-1', is not an int"],
+            ['BEDROOMS',           "-1", "Data field 'BEDROOMS', value '-1', is not an int"],
             ['BEDROOMS',            "0", ""],
             ['BEDROOMS',            "1", ""],
-            ['BEDROOMS',           "1.", "Int 'BEDROOMS', value '1.', is not an int"],
-            ['BEDROOMS',          "1.0", "Int 'BEDROOMS', value '1.0', is not an int"],
-            ['BEDROOMS',          "0.0", "Int 'BEDROOMS', value '0.0', is not an int"],
-            ['BEDROOMS',          "0.1", "Int 'BEDROOMS', value '0.1', is not an int"],
+            ['BEDROOMS',           "1.", "Data field 'BEDROOMS', value '1.', is not an int"],
+            ['BEDROOMS',          "1.0", "Data field 'BEDROOMS', value '1.0', is not an int"],
+            ['BEDROOMS',          "0.0", "Data field 'BEDROOMS', value '0.0', is not an int"],
+            ['BEDROOMS',          "0.1", "Data field 'BEDROOMS', value '0.1', is not an int"],
             ['BEDROOMS',    "999999999", ""], // 9
             ['BEDROOMS',   "9999999999", ""], // 10
             ['BEDROOMS',  "99999999999", "Data field 'BEDROOMS' is too big, maximum length is '10', found '11'"], // 11
 
-            ['LET_CONTRACT_IN_MONTHS',            "X", "Int 'LET_CONTRACT_IN_MONTHS', value 'X', is not an int"],
+            ['LET_CONTRACT_IN_MONTHS',            "X", "Data field 'LET_CONTRACT_IN_MONTHS', value 'X', is not an int"],
             ['LET_CONTRACT_IN_MONTHS',             "", ""], 
-            ['LET_CONTRACT_IN_MONTHS',           "-1", "Int 'LET_CONTRACT_IN_MONTHS', value '-1', is not an int"],
+            ['LET_CONTRACT_IN_MONTHS',           "-1", "Data field 'LET_CONTRACT_IN_MONTHS', value '-1', is not an int"],
             ['LET_CONTRACT_IN_MONTHS',            "0", ""],
             ['LET_CONTRACT_IN_MONTHS',            "1", ""],
-            ['LET_CONTRACT_IN_MONTHS',           "1.", "Int 'LET_CONTRACT_IN_MONTHS', value '1.', is not an int"],
+            ['LET_CONTRACT_IN_MONTHS',           "1.", "Data field 'LET_CONTRACT_IN_MONTHS', value '1.', is not an int"],
             ['LET_CONTRACT_IN_MONTHS',          "1.0", "Data field 'LET_CONTRACT_IN_MONTHS' is too big, maximum length is '2', found '3'"],
             ['LET_CONTRACT_IN_MONTHS',          "0.0", "Data field 'LET_CONTRACT_IN_MONTHS' is too big, maximum length is '2', found '3'"],
             ['LET_CONTRACT_IN_MONTHS',          "0.1", "Data field 'LET_CONTRACT_IN_MONTHS' is too big, maximum length is '2', found '3'"],
