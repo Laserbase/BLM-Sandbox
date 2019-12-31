@@ -1416,14 +1416,13 @@ class BlmFile {
 
     /**
      * is the column value a number, possibly with decimals
-     * length if defined includes decimal point // 99.99 = 5 // pic(99.99)
+     * max length if defined includes decimal point // 99.99 = 5 // pic(99.99)
      * 
      * @param String $value
      * @return bool
      */   
     protected function isNum(String $name, String $value)
     {
-        Log::debug("nsme='{$name}', value='{$value}' , ctype='".ctype_digit($value)."'");
         if (! preg_match("#^\d*(\.\d*)?$#", $value)) {
             throw new \Exception("Error: Not a valid BLM file, Number '{$name}', value '{$value}', is not a decimal number");
         }

@@ -42,7 +42,7 @@ class EnumTest extends TestCase
         'NEW_HOME_FLAG' => 'N',
     ];
 
-    public function listEnumFields()
+    public function listFields()
     {
         return [
             ['STATUS_ID',  "X", "Enum 'STATUS_ID', value 'X' is not in the allowed list of values"],
@@ -255,7 +255,7 @@ class EnumTest extends TestCase
     }
 
     /**
-     * @dataProvider listEnumFields
+     * @dataProvider listFields
      * @test
      */
     public function test_Enum($fieldName, $value, $result)
