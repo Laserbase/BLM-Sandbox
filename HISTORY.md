@@ -8,6 +8,7 @@ Instead using PHP gererator function to split processing to discrete chunks so t
 
 # 2020-01-01 Fix enum index if numeric has leading zeros
 - Change isEnum to ensure leading zeros do not affect index resolution, length checks still hold
+- Add CircleCi badge to readme.md
 
 # 2019-12-30 Check PROP_SUB_ID
 - Add test for PROP_SUB_ID
