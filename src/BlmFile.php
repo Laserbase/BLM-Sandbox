@@ -43,7 +43,7 @@ class BlmFile {
         // max:n = maximum length in characters for a column value
         // recursive = field name can be repeated
         //       with an underscore followed by an index number
-        // enum = enumerated values (0,1,3), (0-3), ('Y', 'N')
+        // enum = enumerated values (0,1,3), (0-3), (2-10),  ('Y', 'N')
 
         "AGENT_REF" => 'string|required|min:1|max:20',
         "BRANCH_ID" => 'int|required|min:1|max:10', // provided by Rightmove
@@ -101,6 +101,7 @@ class BlmFile {
 
         "DESCRIPTION" => 'string|required|min:1|max:32768', 
             /* Basic HTML tags can be used for bold, underlining, italicising
+                <b></b> <u></u> <i></i>
                 ??? <b></b> vs <strong></strong> vs both ???
             */
 
@@ -1233,20 +1234,38 @@ class BlmFile {
             if (0 !== strpos($name, "MEDIA_DOCUMENT_TEXT")) {
                 continue;
             }
-            $index = (Int) substr($name, -2);
-            $found = in_array($value, ['HIP', 'EPC']);
-            
-            if ($found) {
-                if ($index <= $this->lastDocumentIndex) {
-                    throw new \Exception("Error: Not a valid BLM file, Certificate image caption '{$name}' must not be 'HIP' or 'EPC', found '{$value}'");
-                }
+
+            $index = (Int) substr($name, -2); // zx
+            if ($index <= $this->lastDocumentIndex) {
                 continue;
             }
 
-            if ($index > $this->lastDocumentIndex) {
-                throw new \Exception("Error: Not a valid BLM file, HIP/EPC Certificate caption '{$name}' must be 'HIP' or 'EPC', found '{$value}'");
+            // ---------------------------------------------------------
+            // Extra variables added to aid comprehension --------------
+            $captionRequired = ('' !== $row["MEDIA_DOCUMENT_{$index}"]);
+            $captionMustBeEmpty = ! $captionRequired;
+
+            $captionMissing = ('' === $value);
+            $captionFound = $captionMissing;
+
+            if ($captionMustBeEmpty && $captionMissing) {
+                // nothing to see here, move along, all ok
+                continue;
             }
 
+            if ($captionRequired && $captionMissing) {
+                throw new \Exception("Error: Not a valid BLM file, Data field 'MEDIA_DOCUMENT_{$index}' HIP/EPC Certificate caption '{$name}' must be 'HIP' or 'EPC'");
+            }
+            if ($captionMustBeEmpty && $captionFound) {
+                throw new \Exception("Error: Not a valid BLM file, Data field caption '{$name}' must be empty when 'MEDIA_DOCUMENT_{$index}' is empty, found '{$value}'");
+            }
+            // ---------------------------------------------------------
+
+            if (in_array($value, ['HIP', 'EPC'])) {
+                continue;
+            }
+
+            throw new \Exception("Error: Not a valid BLM file, HIP/EPC Certificate caption '{$name}' must be 'HIP' or 'EPC', found '{$value}'");
         }
     }
 

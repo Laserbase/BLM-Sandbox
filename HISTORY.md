@@ -9,6 +9,41 @@ Instead using PHP gererator function to split processing to discrete chunks so t
 # 2020-01-01 Fix enum index if numeric has leading zeros
 - Change isEnum to ensure leading zeros do not affect index resolution, length checks still hold
 - Add CircleCi badge to readme.md
+- Add test file from https://github.com/clauddiu/SimpleBLM/blob/master/tests/Clauddiu/BLM/data/data.blm
+- Updated updated 
+## Changes made to data to fix errors
+```
+1) Tests\Feature\ClauddiuTest::test_ClauddiuFile
+Exception: Error: Not a valid BLM file, Data field 'Generated Date', value '19-May-2010 12:29', is not in the correct format 'Y-m-d H:i:s'
+
+1) Tests\Feature\ClauddiuTest::test_ClauddiuFile
+Exception: Error: Not a valid BLM file, media column 'MEDIA_DOCUMENT_00', value 'http://www.expertagent.co.uk/EstateAgentSoftware/EstateAgencyProperties.aspx?pid=0d7b19ca-0d1d-419e-b8f8-4d4b5302067f&aid={AF7A9B19-2AB8-4C80-8104-09A06F878CA4}' must end in one of '.pdf'
+
+Exception: Error: Not a valid BLM file, media column 'MEDIA_DOCUMENT_50', value 'http://www.expertagent.co.uk/in4glestates/{AF7A9B19-2AB8-4C80-8104-09A06F878CA4}/{0d7b19ca-0d1d-419e-b8f8-4d4b5302067f}/HIPS/12lang epc.jpg' must end in one of '.pdf'
+
+1) Tests\Feature\ClauddiuTest::test_ClauddiuFile
+Exception: Error: Not a valid BLM file, Media text column 'MEDIA_DOCUMENT_00' wrong format, 
+found 'http://www.expertagent.co.uk/EstateAgentSoftware/EstateAgencyProperties.aspx?pid=0d7b19ca-0d1d-419e-b8f8-4d4b5302067f&aid={AF7A9B19-2AB8-4C80-8104-09A06F878CA4}.pdf', 
+expected format is '<BRANCH>_<AGENT_REF>_<MEDIATYPE>_<INDEX>.<FILE EXTENSION>'
+999999_500790_DOC_00.pdf
+
+1) Tests\Feature\ClauddiuTest::test_ClauddiuFile
+Exception: Error: Not a valid BLM file, Media text column 'MEDIA_DOCUMENT_50' wrong format, found '
+http://www.expertagent.co.uk/in4glestates/{AF7A9B19-2AB8-4C80-8104-09A06F878CA4}/{0d7b19ca-0d1d-419e-b8f8-4d4b5302067f}/HIPS/12lang epc.pdf
+', expected format is '<BRANCH>_<AGENT_REF>_<MEDIATYPE>_<INDEX>.<FILE EXTENSION>'
+999999_500790_DOC_50.pdf
+
+1) Tests\Feature\ClauddiuTest::test_ClauddiuFile
+Exception: Error: Not a valid BLM file, HIP/EPC image caption 'MEDIA_IMAGE_TEXT_60' must be 'HIP' or 'EPC', found ''
+
+1) Tests\Feature\ClauddiuTest::test_ClauddiuFile
+Exception: Error: Not a valid BLM file, media column 'MEDIA_DOCUMENT_50', value '
+http://www.expertagent.co.uk/in4glestates/{AF7A9B19-2AB8-4C80-8104-09A06F878CA4}/{78e395bb-7028-495e-8d7d-a8d2df0c3ec7}/HIPS/22 Park View,Hatch End (Energy Performance Certificate) 11015450.jpg
+' must end in one of '.pdf'
+
+truncated to property count to 1
+
+```
 
 # 2019-12-30 Check PROP_SUB_ID
 - Add test for PROP_SUB_ID
