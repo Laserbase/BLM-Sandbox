@@ -73,7 +73,7 @@ class BlmFile {
         "PRICE" => 'num|required|min:1',
         "PRICE_QUALIFIER" => 'enum|required|min:0|max:2|default:0',
         
-        "PROP_SUB_ID" => 'enum|required|min:1|default:0', // One of the valid property types. Ref. Property Type table
+        "PROP_SUB_ID" => 'enum|required|min:1|max:3|default:0', // One of the valid property types. Ref. Property Type table
 
         "ADDRESS_1" => 'string|required|min:1|max:60',
         "ADDRESS_2" => 'string|required|min:1|max:60',
@@ -1395,6 +1395,13 @@ class BlmFile {
      */   
     protected function isEnum(String $name, String $value)
     {
+        if (ctype_digit($value)) {
+            $value = ltrim($value, '0');
+            if ('' === $value) {
+                $value = '0';
+            }
+        }
+
         if (! isset($this->enums[$name][$value])) {
             throw new \Exception("Error: Not a valid BLM file, Data field '{$name}', value '{$value}' is not in the allowed list of values");
         }

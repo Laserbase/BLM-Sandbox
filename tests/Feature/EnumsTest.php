@@ -45,6 +45,7 @@ class EnumTest extends TestCase
     public function listFields()
     {
         return [
+            // STATUS_ID 'enum|required|min:1|max:1', //
             ['STATUS_ID',  "X", "Data field 'STATUS_ID', value 'X' is not in the allowed list of values"],
             ['STATUS_ID',   "", "Data field 'STATUS_ID' is too small, minimum length is '1', found '0'"],
             ['STATUS_ID', "-1", "Data field 'STATUS_ID' is too big, maximum length is '1', found '2'"],
@@ -56,6 +57,15 @@ class EnumTest extends TestCase
             ['STATUS_ID',  "5", ""],
             ['STATUS_ID',  "6", "Data field 'STATUS_ID', value '6' is not in the allowed list of values"],
 
+            ['STATUS_ID',  "00", "Data field 'STATUS_ID' is too big, maximum length is '1', found '2'"],
+            ['STATUS_ID',  "000", "Data field 'STATUS_ID' is too big, maximum length is '1', found '3'"],
+            ['STATUS_ID',  "0000", "Data field 'STATUS_ID' is too big, maximum length is '1', found '4'"],
+
+            ['STATUS_ID',  "01", "Data field 'STATUS_ID' is too big, maximum length is '1', found '2' "],
+            ['STATUS_ID',  "001", "Data field 'STATUS_ID' is too big, maximum length is '1', found '3' "],
+            ['STATUS_ID',  "0001", "Data field 'STATUS_ID' is too big, maximum length is '1', found '4' "],
+
+            // PROP_SUB_ID 'enum|required|min:1|max:3|default:0'
             ['PROP_SUB_ID',  "X", "Data field 'PROP_SUB_ID', value 'X' is not in the allowed list of values"],
             ['PROP_SUB_ID',   "", "Data field 'PROP_SUB_ID' is too small, minimum length is '1', found '0'"], 
             ['PROP_SUB_ID', "-1", "Data field 'PROP_SUB_ID', value '-1' is not in the allowed list of values"],
@@ -69,7 +79,17 @@ class EnumTest extends TestCase
 
             ['PROP_SUB_ID',  "511", ""],
             ['PROP_SUB_ID',  "512", "Data field 'PROP_SUB_ID', value '512' is not in the allowed list of values"],
+            ['PROP_SUB_ID',  "9999", "Data field 'PROP_SUB_ID' is too big, maximum length is '3', found '4'"],
 
+            ['PROP_SUB_ID',  "00", ""],
+            ['PROP_SUB_ID',  "000", ""],
+            ['PROP_SUB_ID',  "0000", "Data field 'PROP_SUB_ID' is too big, maximum length is '3', found '4'"],
+
+            ['PROP_SUB_ID',  "01", ""],
+            ['PROP_SUB_ID',  "001", ""],
+            ['PROP_SUB_ID',  "0001", "Data field 'PROP_SUB_ID' is too big, maximum length is '3', found '4'"],
+
+            // TENURE_TYPE_ID 'enum|min:0|max:1', 
             ['TENURE_TYPE_ID',            "X", "Data field 'TENURE_TYPE_ID', value 'X' is not in the allowed list of values"],
             ['TENURE_TYPE_ID',             "", ""], // not required
             ['TENURE_TYPE_ID',           "-1", "Data field 'TENURE_TYPE_ID' is too big, maximum length is '1', found '2'"],
@@ -88,6 +108,7 @@ class EnumTest extends TestCase
             ['TENURE_TYPE_ID',           "99", "Data field 'TENURE_TYPE_ID' is too big, maximum length is '1', found '2'"],  // 2
             ['TENURE_TYPE_ID',  "99999999999", "Data field 'TENURE_TYPE_ID' is too big, maximum length is '1', found '11'"], // 11
 
+            // LET_TYPE_ID 'enum|required|min:0|max:1|default:0', 
             ['LET_TYPE_ID',  "X", "Data field 'LET_TYPE_ID', value 'X' is not in the allowed list of values"],
             ['LET_TYPE_ID',   "", ""], // default 0
             ['LET_TYPE_ID', "-1", "Data field 'LET_TYPE_ID' is too big, maximum length is '1', found '2'"],
@@ -127,14 +148,20 @@ class EnumTest extends TestCase
             ['TRANS_TYPE_ID',  "2", ""],
             ['TRANS_TYPE_ID',  "3", "Data field 'TRANS_TYPE_ID', value '3' is not in the allowed list of values"],
 
+            // NEW_HOME_FLAG 'enum|required|min:0|max:1|default:N'
             ['NEW_HOME_FLAG',  "X", "Data field 'NEW_HOME_FLAG', value 'X' is not in the allowed list of values"],
             ['NEW_HOME_FLAG',   "", ""], // default N
             ['NEW_HOME_FLAG', "-1", "Data field 'NEW_HOME_FLAG' is too big, maximum length is '1', found '2'"],
             ['NEW_HOME_FLAG',  "Y", ""],
             ['NEW_HOME_FLAG',  "N", ""], // default
-            ['NEW_HOME_FLAG',  "0", "Data field 'NEW_HOME_FLAG', value '0' is not in the allowed list of values"],
-            ['NEW_HOME_FLAG',  "1", "Data field 'NEW_HOME_FLAG', value '1' is not in the allowed list of values"],
 
+            ['NEW_HOME_FLAG',  "0", "Data field 'NEW_HOME_FLAG', value '0' is not in the allowed list of values"],
+            ['NEW_HOME_FLAG',  "00", "Data field 'NEW_HOME_FLAG' is too big, maximum length is '1', found '2'"],
+
+            ['NEW_HOME_FLAG',  "1", "Data field 'NEW_HOME_FLAG', value '1' is not in the allowed list of values"],
+            ['NEW_HOME_FLAG',  "01", "Data field 'NEW_HOME_FLAG' is too big, maximum length is '1', found '2'"],
+
+            // PRICE_QUALIFIER 'enum|required|min:0|max:2|default:0'
             ['PRICE_QUALIFIER',  "X", "Data field 'PRICE_QUALIFIER', value 'X' is not in the allowed list of values"],
             ['PRICE_QUALIFIER',   "", ""], // default 0
             ['PRICE_QUALIFIER', "-1", "Data field 'PRICE_QUALIFIER', value '-1' is not in the allowed list of values"],
@@ -155,6 +182,7 @@ class EnumTest extends TestCase
             ['PRICE_QUALIFIER',  "15", ""],
             ['PRICE_QUALIFIER',  "16", "Data field 'PRICE_QUALIFIER', value '16' is not in the allowed list of values"],
         
+            // PUBLISHED_FLAG 'enum|required|min:1|max:1'
             ['PUBLISHED_FLAG',  "X", "Data field 'PUBLISHED_FLAG', value 'X' is not in the allowed list of values"],
             ['PUBLISHED_FLAG',   "", "Data field 'PUBLISHED_FLAG' is too small, minimum length is '1', found '0'"], 
             ['PUBLISHED_FLAG', "-1", "Data field 'PUBLISHED_FLAG' is too big, maximum length is '1', found '2'"],
@@ -234,6 +262,7 @@ class EnumTest extends TestCase
             ['LET_BILL_INC_INTERNET',  "0", "Data field 'LET_BILL_INC_INTERNET', value '0' is not in the allowed list of values"],
             ['LET_BILL_INC_INTERNET',  "1", "Data field 'LET_BILL_INC_INTERNET', value '1' is not in the allowed list of values"],
 
+            // AREA_SIZE_UNIT_ID 'enum|min:0|max:1'
             ['AREA_SIZE_UNIT_ID',  "X", "Data field 'AREA_SIZE_UNIT_ID', value 'X' is not in the allowed list of values"],
             ['AREA_SIZE_UNIT_ID',   "", ""],
             ['AREA_SIZE_UNIT_ID', "-1", "Data field 'AREA_SIZE_UNIT_ID' is too big, maximum length is '1', found '2'"],
@@ -244,6 +273,7 @@ class EnumTest extends TestCase
             ['AREA_SIZE_UNIT_ID',  "4", ""],
             ['AREA_SIZE_UNIT_ID',  "5", "Data field 'AREA_SIZE_UNIT_ID', value '5' is not in the allowed list of values"],
 
+            // BUSINESS_FOR_SALE_FLAG 'enum|min:0|max:1', // (Commercial only)
             ['BUSINESS_FOR_SALE_FLAG',  "X", "Data field 'BUSINESS_FOR_SALE_FLAG', value 'X' is not in the allowed list of values"],
             ['BUSINESS_FOR_SALE_FLAG',   "", ""], 
             ['BUSINESS_FOR_SALE_FLAG', "-1", "Data field 'BUSINESS_FOR_SALE_FLAG' is too big, maximum length is '1', found '2'"],
