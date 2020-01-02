@@ -10,7 +10,8 @@ Instead using PHP gererator function to split processing to discrete chunks so t
 - Change isEnum to ensure leading zeros do not affect index resolution, length checks still hold
 - Add CircleCi badge to readme.md
 - Add test file from https://github.com/clauddiu/SimpleBLM/blob/master/tests/Clauddiu/BLM/data/data.blm
-- Updated updated 
+- Update property/certificate image caption checks
+
 ## Changes made to data to fix errors
 ```
 1) Tests\Feature\ClauddiuTest::test_ClauddiuFile

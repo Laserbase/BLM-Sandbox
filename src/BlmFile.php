@@ -12,6 +12,7 @@ class BlmFile {
     protected $lastDocumentIndex = 49;
     protected $letTypeId_StudentLetting = 3;
     protected $letTypeId_CommercialLetting = 4;
+    protected $erpHipCaptions = ['HIP', 'EPC'];
 
     protected $sectionTags = [
         'HEADER' => '#HEADER#',
@@ -104,8 +105,6 @@ class BlmFile {
                 <b></b> <u></u> <i></i>
                 ??? <b></b> vs <strong></strong> vs both ???
             */
-
-
     ];
 
     protected $columnDefinitionV3_StudentLettings = [
@@ -1086,26 +1085,28 @@ class BlmFile {
      */
     protected function validateRowRules(Array $row)
     {
-        // MEDIA_IMAGE_00               - main image
-        // MEDIA_IMAGE_01..59           - IMG
-        // MEDIA_IMAGE_60..99           - is for EPC, HIP images
+        // MEDIA_IMAGE_00               - IMG main image
+        // MEDIA_IMAGE_01..59           - IMG property images
+        // MEDIA_IMAGE_60..99           - IMG EPC, HIP images
         // MEDIA_IMAGE_TEXT_60..99      - must contain EPC, HIP only
         // MEDIA_IMAGE_TEXT_00..99      - must have an entry in MEDIA_IMAGE_01..99
+        //
         // MEDIA_<type>_..              - must be valid filename <BRANCH_ID>_<AGENT_REF>_<type>_##.ext
+        //
         // MEDIA_DOCUMENT_00..49        - DOC, filename of document
         // MEDIA_DOCUMENT_50..99        - filename of EPC
+        //
         // MEDIA_DOCUMENT_TEXT_50       - must read 'EPC'
         // MEDIA_DOCUMENT_TEXT_51..99   - must read 'EPC' or 'HIP'
-        // MEDIA_FLOOR_PLAN_01..99      - FLP
+        //
+        // MEDIA_FLOOR_PLAN_01..99      - FLP floor plans
         // MEDIA_FLOOR_PLAN_TEXT_01..99 -
 
         $this->checkAllMediaTextColumnsForOrphans($row);
         $this->checkAllMediaFilenameFormat($row);
-        $this->checkAllImageCaption($row);
-        $this->checkEpcHipCertificatesCaption($row);
-        $this->checkEpcHipHaveCaption($row);
+        $this->checkImageCertificatesCaption($row);
+        $this->checkDocumentCertificatesCaption($row);
         $this->checkLettingDependantFields($row);
-
     }
 
     /**
@@ -1115,11 +1116,18 @@ class BlmFile {
     {
         $textColumns = [];
         foreach ($row as $name => $value) {
-            if (preg_match("#^MEDIA_.*_TEXT_.*$#", $name)) {
-                $mediaColumn = str_replace('TEXT_', '', $name);
-                if (! isset($row[$mediaColumn])) {
-                    throw new \Exception("Error: Not a valid BLM file, Media text column '{$name}' missing media column '{$mediaColumn}'");
-                }
+            if (! preg_match("#^MEDIA_.*_TEXT_.*$#", $name)) {
+                continue;
+            }
+
+            $mediaColumn = str_replace('TEXT_', '', $name);
+            if (! isset($row[$mediaColumn])) {
+                throw new \Exception("Error: Not a valid BLM file, Media caption column '{$name}' missing media column '{$mediaColumn}', caption passed '{$value}'");
+            }
+
+            $mediaValue = $row[$mediaColumn];
+            if (('' === $mediaValue) && ('' !== $value)) {
+                throw new \Exception("Error: Not a valid BLM file, Media caption column '{$name}' must be empty because media column '{$mediaColumn}' is empty, caption passed '{$value}'");
             }
         }
     }
@@ -1178,17 +1186,14 @@ class BlmFile {
             $extensionExpected = strtolower($extensionFound);
 
             if ($agentRefFound !== $agentRefExpected) {
-                // dd($agentRefFound, $agentRefExpected, $mediaFound, $agentRefFound, $mediaExpected);
                 throw new \Exception("Error: Not a valid BLM file, (2) Media file name not in correct format, must begin with '{$agentRefExpected}', found '{$agentRefFound}', value '{$value}'");
             }
 
             if ($mediaFound !== $mediaExpected) {
-                // dd($agentRefFound, $agentRefExpected, $mediaFound, $agentRefFound, $mediaExpected);
                 throw new \Exception("Error: Not a valid BLM file, (3) Media column '{$name}' file name not in correct format, must begin with '{$agentRefExpected}_{$mediaExpected}_', found '{$value}'");
             }
 
             if ($indexFound !== $indexExpected) {
-                // dd($agentRefFound, $agentRefExpected, $mediaFound, $agentRefFound, $mediaExpected);
                 throw new \Exception("Error: Not a valid BLM file, (4) Media column '{$name}' file name not in correct format, must begin with '{$agentRefExpected}_{$mediaExpected}_{$indexExpected}', found '{$value}'");
             }
 
@@ -1197,38 +1202,63 @@ class BlmFile {
     }
 
     /**
-     * checkAllImageCaption($row);
+     * checkImageCertificatesCaption($row);
      */
-    protected function checkAllImageCaption($row)
+    protected function checkImageCertificatesCaption($row)
     {
         $mediaColumns = [];
         foreach ($row as $name => $value) {
             if (0 !== strpos($name, "MEDIA_IMAGE_TEXT")) {
-                continue;
-            }
-            $index = (Int) substr($name, -2);
-            $found = in_array($value, ['HIP', 'EPC']);
-            
-            if ($found) {
-                if ($index <= $this->lastMediaImageIndex) {
-                    throw new \Exception("Error: Not a valid BLM file, Property image caption '{$name}' must not be 'HIP' or 'EPC', found '{$value}'");
-                }
+                // not an image caption column
                 continue;
             }
 
-            if ($index > $this->lastMediaImageIndex) {
-                throw new \Exception("Error: Not a valid BLM file, HIP/EPC image caption '{$name}' must be 'HIP' or 'EPC', found '{$value}'");
+            $index = substr($name, -2);
+            $imageName = "MEDIA_IMAGE_{$index}";
+            
+            if ( ! isset($row[$imageName])) {
+                throw new \Exception("Error: Not a valid BLM file, Certificate Image caption '{$name}' missing data field '{$imageName}', caption passed '{$value}' ");
+            }
+            $imageValue = $row[$imageName];
+
+            // ---------------------------------------------------------
+            // Extra variables added to aid comprehension --------------
+            $certificateImage = ($index > $this->lastMediaImageIndex);
+            $propertyImage = ! $certificateImage;
+            // ---------------------------------------------------------
+
+            $captionMustBeEmpty = ('' === $imageValue);
+            $captionMissing = ('' === $value);
+
+            if ($captionMustBeEmpty && $captionMissing) {
+                // image is empty and caption is empty - nothing to do
+                continue;
+            }
+
+            $found = in_array($value, $this->erpHipCaptions);
+            $range = "('".implode("', '", $this->erpHipCaptions)."')";
+
+            if ($propertyImage) {
+                if ($found) {
+                    throw new \Exception("Error: Not a valid BLM file, Property image caption '{$name}' must not be in {$range}, found '{$value}'");
+                }
+
+                continue;
+            }
+
+            if (! $found) {
+                throw new \Exception("Error: Not a valid BLM file, Certificate image caption '{$name}' must be in {$range}, found '{$value}'");
             }
 
         }
     }
 
     /**
-     * checkEpcHipCertificatesCaption($row)
+     * checkDocumentCertificatesCaption($row)
      * 
      * @param Array $row of property data
      */
-    protected function checkEpcHipCertificatesCaption($row)
+    protected function checkDocumentCertificatesCaption($row)
     {
         foreach ($row as $name => $value) {
             if (0 !== strpos($name, "MEDIA_DOCUMENT_TEXT")) {
@@ -1240,9 +1270,11 @@ class BlmFile {
                 continue;
             }
 
+            $documentName = "MEDIA_DOCUMENT_{$index}";
+
             // ---------------------------------------------------------
             // Extra variables added to aid comprehension --------------
-            $captionRequired = ('' !== $row["MEDIA_DOCUMENT_{$index}"]);
+            $captionRequired = ('' !== $row[$documentName]);
             $captionMustBeEmpty = ! $captionRequired;
 
             $captionMissing = ('' === $value);
@@ -1254,55 +1286,18 @@ class BlmFile {
             }
 
             if ($captionRequired && $captionMissing) {
-                throw new \Exception("Error: Not a valid BLM file, Data field 'MEDIA_DOCUMENT_{$index}' HIP/EPC Certificate caption '{$name}' must be 'HIP' or 'EPC'");
+                throw new \Exception("Error: Not a valid BLM file, Data field 'MEDIA_DOCUMENT_{$index}' HIP/EPC Certificate caption '{$name}' must be in ('".implode("', '", $this->erpHipCaptions)."')");
             }
             if ($captionMustBeEmpty && $captionFound) {
                 throw new \Exception("Error: Not a valid BLM file, Data field caption '{$name}' must be empty when 'MEDIA_DOCUMENT_{$index}' is empty, found '{$value}'");
             }
             // ---------------------------------------------------------
 
-            if (in_array($value, ['HIP', 'EPC'])) {
-                continue;
-            }
-
-            throw new \Exception("Error: Not a valid BLM file, HIP/EPC Certificate caption '{$name}' must be 'HIP' or 'EPC', found '{$value}'");
-        }
-    }
-
-    /**
-     * checkEpcHipHaveCaption($row)
-     * 
-     * @param Array $row of property data
-     */
-    protected function checkEpcHipHaveCaption(Array $row)
-    {
-        foreach ($row as $name => $value) {
-            if (0 !== strpos($name, "MEDIA_")) {
-                continue;
-            }
-            if (strpos($name, "TEXT")) {
-                continue;
-            }
-
-            $certificateType = 'certificate document';
-            $lastCertificateIndex = $this->lastDocumentIndex;
-            if (0 === strpos($name, "MEDIA_IMAGE")) {
-                $certificateType = 'certificate image';
-                $lastCertificateIndex = $this->lastMediaImageIndex;
-            }
-
-            $index = substr($name, -2);
-            if ($index <= $lastCertificateIndex) {
-                continue;
-            }
-
-            $target = substr($name, 0, strlen($name)-3).'_TEXT_'.$index;
-            if (! isset($row[$target])) {
-                throw new \Exception("Error: Not a valid BLM file, Missing {$certificateType} caption, Field '{$target}' must have a caption of 'HIP' or 'EPC'");
+            if (! in_array($value, $this->erpHipCaptions)) {
+                throw new \Exception("Error: Not a valid BLM file, HIP/EPC Certificate caption '{$name}' must be in '".implode("', '", $this->erpHipCaptions)."', found '{$value}'");
             }
 
         }
-
     }
 
     /**

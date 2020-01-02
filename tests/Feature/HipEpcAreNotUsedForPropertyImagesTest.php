@@ -42,7 +42,10 @@ class HipEpcAreNotUsedForPropertyImagesTest extends TestCase
         'SUMMARY' => 'whatever whatever whatever whatever',
         'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
         'NEW_HOME_FLAG' => 'N',
+
         'MEDIA_IMAGE_00' => '999999_FBM2766_IMG_00.jpg',
+        'MEDIA_IMAGE_01' => '999999_FBM2766_IMG_01.jpg',
+        'MEDIA_IMAGE_02' => '',
 
         'MEDIA_IMAGE_59' => '999999_FBM2766_IMG_59.jpg',
         'MEDIA_IMAGE_60' => '999999_FBM2766_IMG_60.jpg',
@@ -56,16 +59,39 @@ class HipEpcAreNotUsedForPropertyImagesTest extends TestCase
     public function listMediaColumns()
     {
         return [
-             // IMG name           - value    - result
+             // 1st property IMG   - value    - result
+             ['MEDIA_IMAGE_TEXT_01',        '', ""],
+             ['MEDIA_IMAGE_TEXT_01', 'caption', ""],
+             ['MEDIA_IMAGE_TEXT_01', 'HIP'    , "Property image caption 'MEDIA_IMAGE_TEXT_01' must not be in ('HIP', 'EPC'), found 'HIP'"],
+             ['MEDIA_IMAGE_TEXT_01', 'EPC'    , "Property image caption 'MEDIA_IMAGE_TEXT_01' must not be in ('HIP', 'EPC'), found 'EPC'"],
+
+             // 2nd property IMG   - value    - result
+             ['MEDIA_IMAGE_TEXT_02',        '', ""],
+             ['MEDIA_IMAGE_TEXT_02', 'caption', "Media caption column 'MEDIA_IMAGE_TEXT_02' must be empty because media column 'MEDIA_IMAGE_02' is empty, caption passed 'caption'"],
+             ['MEDIA_IMAGE_TEXT_02', 'HIP'    , "Media caption column 'MEDIA_IMAGE_TEXT_02' must be empty because media column 'MEDIA_IMAGE_02' is empty, caption passed 'HIP'"],
+             ['MEDIA_IMAGE_TEXT_02', 'EPC'    , "Media caption column 'MEDIA_IMAGE_TEXT_02' must be empty because media column 'MEDIA_IMAGE_02' is empty, caption passed 'EPC'"],
+
+             // Missing IMG       - value    - result
+             ['MEDIA_IMAGE_TEXT_03',        '', "Media caption column 'MEDIA_IMAGE_TEXT_03' missing media column 'MEDIA_IMAGE_03', caption passed ''"],
+             ['MEDIA_IMAGE_TEXT_03', 'caption', "Media caption column 'MEDIA_IMAGE_TEXT_03' missing media column 'MEDIA_IMAGE_03', caption passed 'caption'"],
+             ['MEDIA_IMAGE_TEXT_03', 'HIP'    , "Media caption column 'MEDIA_IMAGE_TEXT_03' missing media column 'MEDIA_IMAGE_03', caption passed 'HIP'"],
+             ['MEDIA_IMAGE_TEXT_03', 'EPC'    , "Media caption column 'MEDIA_IMAGE_TEXT_03' missing media column 'MEDIA_IMAGE_03', caption passed 'EPC'"],
+
+             // Last property IMG  - value    - result
+             ['MEDIA_IMAGE_TEXT_59',        '', ""],
              ['MEDIA_IMAGE_TEXT_59', 'caption', ""],
-             ['MEDIA_IMAGE_TEXT_59', 'HIP'    , "Property image caption 'MEDIA_IMAGE_TEXT_59' must not be 'HIP' or 'EPC', found 'HIP'"],
-             ['MEDIA_IMAGE_TEXT_59', 'EPC'    , "Property image caption 'MEDIA_IMAGE_TEXT_59' must not be 'HIP' or 'EPC', found 'EPC'"],
+             ['MEDIA_IMAGE_TEXT_59', 'HIP'    , "Property image caption 'MEDIA_IMAGE_TEXT_59' must not be in ('HIP', 'EPC'), found 'HIP'"],
+             ['MEDIA_IMAGE_TEXT_59', 'EPC'    , "Property image caption 'MEDIA_IMAGE_TEXT_59' must not be in ('HIP', 'EPC'), found 'EPC'"],
  
-             ['MEDIA_IMAGE_TEXT_60', 'caption', "HIP/EPC image caption 'MEDIA_IMAGE_TEXT_60' must be 'HIP' or 'EPC', found 'caption'"],
+             // 1st certificate   - value    - result
+             ['MEDIA_IMAGE_TEXT_60',        '', "Certificate image caption 'MEDIA_IMAGE_TEXT_60' must be in ('HIP', 'EPC'), found ''"],
+             ['MEDIA_IMAGE_TEXT_60', 'caption', "Certificate image caption 'MEDIA_IMAGE_TEXT_60' must be in ('HIP', 'EPC'), found 'caption'"],
              ['MEDIA_IMAGE_TEXT_60', 'HIP'    , ""],
              ['MEDIA_IMAGE_TEXT_60', 'EPC'    , ""],
  
-             ['MEDIA_IMAGE_TEXT_61', 'caption', "HIP/EPC image caption 'MEDIA_IMAGE_TEXT_61' must be 'HIP' or 'EPC', found 'caption'"],
+             // 2nd certificate   - value    - result
+             ['MEDIA_IMAGE_TEXT_61',        '', "Certificate image caption 'MEDIA_IMAGE_TEXT_61' must be in ('HIP', 'EPC'), found ''"],
+             ['MEDIA_IMAGE_TEXT_61', 'caption', "Certificate image caption 'MEDIA_IMAGE_TEXT_61' must be in ('HIP', 'EPC'), found 'caption'"],
              ['MEDIA_IMAGE_TEXT_61', 'HIP'    , ""],
              ['MEDIA_IMAGE_TEXT_61', 'EPC'    , ""],
 

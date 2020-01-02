@@ -60,7 +60,7 @@ class AllMediaTextColumnsHaveAMediaColumnTest extends TestCase
 
         $blm->validateDefinition($columnKeys);
 
-        $this->expectExceptionMessage("Error: Not a valid BLM file, Media text column 'MEDIA_IMAGE_TEXT_01' missing media column 'MEDIA_IMAGE_01'");
+        $this->expectExceptionMessage("Media caption column 'MEDIA_IMAGE_TEXT_01' missing media column 'MEDIA_IMAGE_01', caption passed 'NO MEDIA_IMAGE_01'");
         $row = $blm->validateData($columnData);
     }
 

@@ -42,21 +42,53 @@ class HipErpCertificatesAreUsedCorrectlyTest extends TestCase
         'SUMMARY' => 'whatever whatever whatever whatever',
         'DESCRIPTION' => 'whatever whatever whatever whatever whatever whatever',
         'NEW_HOME_FLAG' => 'N',
+
         'MEDIA_IMAGE_00' => '999999_FBM2766_IMG_00.jpg',
 
         'MEDIA_IMAGE_60' => '999999_FBM2766_IMG_60.jpg',
+        'MEDIA_IMAGE_TEXT_60' => 'EPC',
+
         'MEDIA_DOCUMENT_50' => '999999_FBM2766_DOC_50.pdf',
+        'MEDIA_DOCUMENT_TEXT_50' => 'HIP',
     ];
 
     public function listMediaColumns()
     {
         return [
-            ['MEDIA_IMAGE_TEXT_60', 'HIP', "Missing certificate document caption, Field 'MEDIA_DOCUMENT_TEXT_50' must have a caption of 'HIP' or 'EPC'"],
-            ['MEDIA_IMAGE_TEXT_60', 'EPC', "Missing certificate document caption, Field 'MEDIA_DOCUMENT_TEXT_50' must have a caption of 'HIP' or 'EPC'"],
- 
-            ['MEDIA_DOCUMENT_TEXT_50', 'HIP', "Missing certificate image caption, Field 'MEDIA_IMAGE_TEXT_60' must have a caption of 'HIP' or 'EPC'"],
-            ['MEDIA_DOCUMENT_TEXT_50', 'EPC', "Missing certificate image caption, Field 'MEDIA_IMAGE_TEXT_60' must have a caption of 'HIP' or 'EPC'"],
+            // images
 
+            ['MEDIA_IMAGE_TEXT_60',    '', 'required', "Certificate image caption 'MEDIA_IMAGE_TEXT_60' must be in ('HIP', 'EPC'), found ''"],
+            ['MEDIA_IMAGE_TEXT_60',    '',    'unset', "Media caption column 'MEDIA_IMAGE_TEXT_60' missing media column 'MEDIA_IMAGE_60', caption passed ''"],
+            ['MEDIA_IMAGE_TEXT_60',    '',         '', ""],
+
+            ['MEDIA_IMAGE_TEXT_60', 'HIP', 'required', ""],
+            ['MEDIA_IMAGE_TEXT_60', 'HIP',    'unset', "Media caption column 'MEDIA_IMAGE_TEXT_60' missing media column 'MEDIA_IMAGE_60', caption passed 'HIP'"],
+            ['MEDIA_IMAGE_TEXT_60', 'HIP',         '', "Media caption column 'MEDIA_IMAGE_TEXT_60' must be empty because media column 'MEDIA_IMAGE_60' is empty, caption passed 'HIP'"],
+
+            ['MEDIA_IMAGE_TEXT_60', 'EPC', 'required', ""],
+            ['MEDIA_IMAGE_TEXT_60', 'EPC',    'unset', "Media caption column 'MEDIA_IMAGE_TEXT_60' missing media column 'MEDIA_IMAGE_60', caption passed 'EPC'"],
+            ['MEDIA_IMAGE_TEXT_60', 'EPC',         '', "Media caption column 'MEDIA_IMAGE_TEXT_60' must be empty because media column 'MEDIA_IMAGE_60' is empty, caption passed 'EPC'"],
+ 
+            ['MEDIA_IMAGE_TEXT_60', 'ERR', 'required', "Certificate image caption 'MEDIA_IMAGE_TEXT_60' must be in ('HIP', 'EPC'), found 'ERR'"],
+            ['MEDIA_IMAGE_TEXT_60', 'ERR',    'unset', "Media caption column 'MEDIA_IMAGE_TEXT_60' missing media column 'MEDIA_IMAGE_60', caption passed 'ERR'"],
+            ['MEDIA_IMAGE_TEXT_60', 'ERR',         '', "Media caption column 'MEDIA_IMAGE_TEXT_60' must be empty because media column 'MEDIA_IMAGE_60' is empty, caption passed 'ERR'"],
+
+            // certificates
+            ['MEDIA_DOCUMENT_TEXT_50',    '', 'required', "Data field 'MEDIA_DOCUMENT_50' HIP/EPC Certificate caption 'MEDIA_DOCUMENT_TEXT_50' must be in ('HIP', 'EPC')"],
+            ['MEDIA_DOCUMENT_TEXT_50',    '',    'unset', "Media caption column 'MEDIA_DOCUMENT_TEXT_50' missing media column 'MEDIA_DOCUMENT_50', caption passed ''"],
+            ['MEDIA_DOCUMENT_TEXT_50',    '',         '', ""],
+
+            ['MEDIA_DOCUMENT_TEXT_50', 'HIP', 'required', ""],
+            ['MEDIA_DOCUMENT_TEXT_50', 'HIP',    'unset', " Media caption column 'MEDIA_DOCUMENT_TEXT_50' missing media column 'MEDIA_DOCUMENT_50', caption passed 'HIP'"],
+            ['MEDIA_DOCUMENT_TEXT_50', 'HIP',         '', "Media caption column 'MEDIA_DOCUMENT_TEXT_50' must be empty because media column 'MEDIA_DOCUMENT_50' is empty, caption passed 'HIP'"],
+
+            ['MEDIA_DOCUMENT_TEXT_50', 'EPC', 'required', ""],
+            ['MEDIA_DOCUMENT_TEXT_50', 'EPC',    'unset', "Media caption column 'MEDIA_DOCUMENT_TEXT_50' missing media column 'MEDIA_DOCUMENT_50', caption passed 'EPC'"],
+            ['MEDIA_DOCUMENT_TEXT_50', 'EPC',         '', "Media caption column 'MEDIA_DOCUMENT_TEXT_50' must be empty because media column 'MEDIA_DOCUMENT_50' is empty, caption passed 'EPC'"],
+
+            ['MEDIA_DOCUMENT_TEXT_50', 'ERR', 'required', "HIP/EPC Certificate caption 'MEDIA_DOCUMENT_TEXT_50' must be in 'HIP', 'EPC', found 'ERR'"],
+            ['MEDIA_DOCUMENT_TEXT_50', 'ERR',    'unset', "Media caption column 'MEDIA_DOCUMENT_TEXT_50' missing media column 'MEDIA_DOCUMENT_50', caption passed 'ERR'"],
+            ['MEDIA_DOCUMENT_TEXT_50', 'ERR',         '', "Media caption column 'MEDIA_DOCUMENT_TEXT_50' must be empty because media column 'MEDIA_DOCUMENT_50' is empty, caption passed 'ERR'"],
              
         ];
     }
@@ -65,10 +97,31 @@ class HipErpCertificatesAreUsedCorrectlyTest extends TestCase
      * @dataProvider listMediaColumns
      * @test
      */
-    public function test_HipErpCertificatesAreUsedCorrectlyTest(String $name, String $value, String $result)
+    public function test_HipErpCertificatesAreUsedCorrectlyTest(String $name, String $value, String $required, String $result)
     {
+        $mediaColumn = str_replace('_TEXT', '', $name);
+
         $requiredColumns = $this->requiredColumns;
         $requiredColumns[$name] = $value;
+
+        switch ($required) {
+            case 'unset':
+                unset($requiredColumns[$mediaColumn]);
+            break;
+
+            case 'required':
+                // SKIP
+            break;
+
+            case '':
+            default:
+                $requiredColumns[$mediaColumn] = '';
+            break;
+        }
+
+        if ($result === 'AAAjjj') {
+            dd($name, $value, $requiredColumns, $mediaColumn);
+        }
 
         $columnKeys = implode('^', array_keys($requiredColumns)).'^~';
         $columnData = implode('^', array_values($requiredColumns)).'^~';
