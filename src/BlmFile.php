@@ -171,15 +171,13 @@ class BlmFile {
         // "MEDIA_IMAGE_60" => 'string|required|min:0|max:20|recursive|media:img', // Name of the property EPC graphic. MEDIA_IMAGE_60 is for EPC Graphics that would be shown on site.
         // "MEDIA_IMAGE_TEXT_60" => 'string|required|min:0|max:3|recursive|media:text', // Caption to go with the EPC of MEDIA_IMAGE_60, this MUST READ “EPC”.
 
-        "MEDIA_FLOOR_PLAN" => 'string|min:0|max:100|recursive|media:flp',
+        "MEDIA_FLOOR_PLAN" => 'string|min:0|max:100|recursive|media:flp|url:optional',
         "MEDIA_FLOOR_PLAN_TEXT" => 'string|min:0|max:20|recursive|media:text',
 
-        "MEDIA_DOCUMENT" => 'string|min:0|max:200|recursive|media:doc',
+        "MEDIA_DOCUMENT" => 'string|min:0|max:200|recursive|media:doc|url:optional',
         "MEDIA_DOCUMENT_TEXT" => 'string|min:0|max:20|recursive|media:text',
-        // "MEDIA_DOCUMENT_50" => 'string|min:0|max:200|recursive|media:doc',
-        // "MEDIA_DOCUMENT_TEXT_50" => 'string|min:0|max:3|recursive|media:text',
 
-        "MEDIA_VIRTUAL_TOUR" => 'string|min:0|max:200|recursive|media:tour',
+        "MEDIA_VIRTUAL_TOUR" => 'string|min:0|max:200|recursive|media:tour|url:required',
         "MEDIA_VIRTUAL_TOUR_TEXT" => 'string|min:0|max:20|recursive|media:text',
         //-------------------------------------------------------------------
     ];
@@ -477,6 +475,7 @@ class BlmFile {
             'max' => 4096,
             'media' => '',
             'default' => '',
+            'url' => 'deny',
         ];
 
         foreach($definitions as $definition) {
@@ -491,6 +490,10 @@ class BlmFile {
 
             $key = substr($definition, 0, strpos($definition, ':'));
             $value = substr($definition, strpos($definition, ':')+1);
+            if ('' === $key) {
+                $key = $definition;
+                $value = $definition;
+            }
 
             switch ($key) {
                 case 'min':
@@ -498,11 +501,7 @@ class BlmFile {
                     $result[$key] = (int) $value;
                 break;
 
-                case 'media':
-                    $result[$key] = $value;
-                break;
-
-                case 'default':
+                default:
                     $result[$key] = $value;
                 break;
 
@@ -1137,9 +1136,6 @@ class BlmFile {
      */
     protected function checkAllMediaFilenameFormat(Array $row)
     {
-        // <AGENT_REF>_<MEDIATYPE>_<n>.<file extension>
-        $regex = "#^(.*)_(.*)_([0-9]{2,2})(\.[A-Za-z]{3,3})$#";
-        
         $definition = [];
 
         $branchId = '';
@@ -1150,56 +1146,108 @@ class BlmFile {
         $mediaColumns = [];
         foreach ($row as $name => $value) {
             $definition = $this->columnDefinitions[$this->cannonicalColumnName($name)];
-            if ('' === $definition['media']) {
+
+            $definitionMedia = $definition['media'];
+            if ('' === $definitionMedia) {
                 continue;
             }
+            if ('text' === $definitionMedia) {
+                continue;
+            }
+
             if (('' === $value) && (0 === $definition['min'])) {
                 // value optional
                 continue;
             }
 
-            if (0 !== strpos($name, "MEDIA_")) {
-                continue;
-            }
-            if (strpos($name, "TEXT")) {
-                continue;
-            }
+            $isUrl = preg_match('#^([a-z]+)://#i', $value, $matches);
+            $isUrlDenied = !in_array($definition['url'], ['optional', 'required']);
 
-            if (! preg_match($regex, $value, $matches)) {
-                throw new \Exception("Error: Not a valid BLM file, Media text column '{$name}' wrong format, found '{$value}', expected format is '<BRANCH>_<AGENT_REF>_<MEDIATYPE>_<INDEX>.<FILE EXTENSION>'");
-            }
+            if ($isUrl) {
+                if ($isUrlDenied) {
+                    throw new \Exception("Error: Not a valid BLM file, Media column '{$name}' wrong format, found '{$value}', is not a valid url '{$expectedFileNameFormat}'");
+                }
+                $this->checkUrlFormat($name, $value, $matches);
+                
+                return;
+            } 
 
-            $mediaTypes = array_keys($this->imageExtension);
-            $mediaType = $definition['media'];
-            if (! in_array($mediaType, $mediaTypes)) {
-                throw new \Exception("Error: Not a valid BLM file, (1) Media column '{$name}' file name using unknown media type '{$mediaType}', expecting one of '".implode("', '", $mediaTypes)."', found '{$value}'");
-            }
-
-            $agentRefFound = $matches[1];
-            $mediaFound = $matches[2];
-            $indexFound = $matches[3];
-            $extensionFound = $matches[4];
-
-            $agentRefExpected = $row['AGENT_REF'];
-            $mediaExpected = strtoupper($mediaType);
-            $indexExpected = substr($name, -2);
-            $extensionExpected = strtolower($extensionFound);
-
-            if ($agentRefFound !== $agentRefExpected) {
-                throw new \Exception("Error: Not a valid BLM file, (2) Media file name not in correct format, must begin with '{$agentRefExpected}', found '{$agentRefFound}', value '{$value}'");
-            }
-
-            if ($mediaFound !== $mediaExpected) {
-                throw new \Exception("Error: Not a valid BLM file, (3) Media column '{$name}' file name not in correct format, must begin with '{$agentRefExpected}_{$mediaExpected}_', found '{$value}'");
-            }
-
-            if ($indexFound !== $indexExpected) {
-                throw new \Exception("Error: Not a valid BLM file, (4) Media column '{$name}' file name not in correct format, must begin with '{$agentRefExpected}_{$mediaExpected}_{$indexExpected}', found '{$value}'");
-            }
+            $this->checkFilenameFormat($name, $value, $row, $definition);
 
         }
 
     }
+    
+    /**
+     * checkFilenameFormat()
+     *
+     * @param String $name
+     * @param String $value
+     * @param Array $matches
+     * @throws Exception if url schema is not correct
+     */
+   protected function checkUrlFormat(String $name, String $value, Array $matches)
+   {
+        $scheme = $matches[1];
+        if (! in_array($scheme, ['http', 'https']) ) {
+            throw new \Exception("Error: Not a valid BLM file, Media column '{$name}' wrong format, '{$scheme}' is not a valid url scheme, found '{$value}");
+        }
+
+   }
+
+    /**
+     * checkFilenameFormat()
+     * 
+     * @param String $name
+     * @param String $value
+     * @param Array $row
+     * @param Array $definition
+     * @throws Exception if file name format is not correct
+     */
+    protected function checkFilenameFormat(String $name, String $value, Array $row, Array $definition)
+    {
+        $regex = "#^(.*)_(.*)_([0-9]{2,2})(\.[A-Za-z]{3,3})$#";
+        $expectedFileNameFormat = '<BRANCH>_<AGENT_REF>_<MEDIATYPE>_<INDEX>.<FILE EXTENSION>';
+        
+        $definitionMedia = $definition['media'];
+        $mediaTypes = array_keys($this->imageExtension);
+        if (! in_array($definitionMedia, $mediaTypes)) {
+            throw new \Exception("Error: Not a valid BLM file, (1) Media column '{$name}' file name using unknown media type '{$definitionMedia}', expecting one of '".implode("', '", $mediaTypes)."', found '{$value}'");
+        }
+
+        if (! preg_match($regex, $value, $matches)) {
+            throw new \Exception("Error: Not a valid BLM file, Media text column '{$name}' wrong format, found '{$value}', expected format is '{$expectedFileNameFormat}'");
+        }
+               
+        $agentRefFound = $matches[1];
+        $mediaFound = $matches[2];
+        $indexFound = $matches[3];
+        $extensionFound = $matches[4];
+
+        $agentRefExpected = $row['AGENT_REF'];
+        $mediaExpected = strtoupper($definitionMedia);
+        $indexExpected = substr($name, -2);
+
+        $extensionExpected = strtolower($extensionFound);
+        $extension = strtolower(substr($value, -4));
+        $extensionAllowed = $this->imageExtension[$definitionMedia] ?? [];
+
+        if (! in_array($extension, $extensionAllowed)) {
+            throw new \Exception("Error: Not a valid BLM file, media column '{$name}', value '{$value}' must end in one of '".implode("', '", $extensionAllowed)."'");
+        }
+
+        if ($agentRefFound !== $agentRefExpected) {
+            throw new \Exception("Error: Not a valid BLM file, (2) Media file name not in correct format, must begin with '{$agentRefExpected}', found '{$agentRefFound}', value '{$value}'");
+        }
+
+        if ($mediaFound !== $mediaExpected) {
+            throw new \Exception("Error: Not a valid BLM file, (3) Media column '{$name}' file name not in correct format, must begin with '{$agentRefExpected}_{$mediaExpected}_', found '{$value}'");
+        }
+
+        if ($indexFound !== $indexExpected) {
+            throw new \Exception("Error: Not a valid BLM file, (4) Media column '{$name}' file name not in correct format, must begin with '{$agentRefExpected}_{$mediaExpected}_{$indexExpected}', found '{$value}'");
+        }
+}
 
     /**
      * checkImageCertificatesCaption($row);
@@ -1265,7 +1313,7 @@ class BlmFile {
                 continue;
             }
 
-            $index = (Int) substr($name, -2); // zx
+            $index = (Int) substr($name, -2);
             if ($index <= $this->lastDocumentIndex) {
                 continue;
             }
@@ -1484,25 +1532,17 @@ class BlmFile {
             return;
         }
 
-        switch ($media) {
-            case 'doc':
+        switch ($media) { // zx
             case 'img':
+            case 'doc':
             case 'flp':
-                $extension = strtolower(substr($value, -4));
-                $allowed = $this->imageExtension[$media];
-
-                if (! in_array($extension, $allowed)) {
-                    throw new \Exception("Error: Not a valid BLM file, media column '{$name}', value '{$value}' must end in one of '".implode("', '", $allowed)."'");
-                }
-            break;
-            
             case 'tour':
             case 'text':    
                 // skip
             break;
 
             default:
-            throw new \Exception("Error: Not a valid BLM file, Column '{$name}' is an unknown media type, found '{$media}' ");
+                throw new \Exception("Error: Not a valid BLM file, Column '{$name}' is an unknown media type, found '{$media}' ");
 
         }
 

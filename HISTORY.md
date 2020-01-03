@@ -6,6 +6,9 @@ No advantage over using file_get_contents() and parsing contents.
 
 Instead using PHP gererator function to split processing to discrete chunks so that only the current row is in memory.
 
+# 2020-01-02 Add url type for media
+- Add check for media types that accept a filename or url
+
 # 2020-01-01 Fix enum index if numeric has leading zeros
 - Change isEnum to ensure leading zeros do not affect index resolution, length checks still hold
 - Add CircleCi badge to readme.md
