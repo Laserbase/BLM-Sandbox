@@ -49,6 +49,13 @@ class MediaFilesnamesThatCanBeUrlTest extends TestCase
     {
         return [
             // name          - value                      - result
+            ['MEDIA_IMAGE_00', '999999_FBM2766_IMG_00.jpg'        , ""],
+            ['MEDIA_IMAGE_00', 'http://127.0.0.1:80/mfp1-aaa.jpg' , "Media column 'MEDIA_IMAGE_00' must be a filename, found a url 'http://127.0.0.1:80/mfp1-aaa.jpg'"],
+            ['MEDIA_IMAGE_00', 'https://127.0.0.1:80/mfp1-bbb.jpg', "Media column 'MEDIA_IMAGE_00' must be a filename, found a url 'https://127.0.0.1:80/mfp1-bbb.jpg'"],
+            ['MEDIA_IMAGE_00', 'file:///passwd'                   , "Media column 'MEDIA_IMAGE_00' must be a filename, found a url 'file:///passwd'"],
+            ['MEDIA_IMAGE_00', 'http://127.0.0.1:80/mfp.jpg'      , "Media column 'MEDIA_IMAGE_00' must be a filename, found a url 'http://127.0.0.1:80/mfp.jpg'"],
+
+            // name          - value                      - result
             ['MEDIA_IMAGE_01', '999999_FBM2766_IMG_01.jpg', ""],
             ['MEDIA_IMAGE_01', '999999_FBMxxxx_IMG_01.jpg', "Media file name not in correct format, must begin with '999999_FBM2766', found '999999_FBMxxxx', value '999999_FBMxxxx_IMG_01.jpg'"],
             ['MEDIA_IMAGE_01', '999999_FBM2766_xxx_01.jpg', "must begin with '999999_FBM2766_IMG_', found '999999_FBM2766_xxx_01.jpg'"],

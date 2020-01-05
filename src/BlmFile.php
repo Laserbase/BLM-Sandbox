@@ -778,7 +778,7 @@ class BlmFile {
      * 
      * @param String $name name of the header item
      * @param String $value of the header item
-     * @return Bool
+     * @return Bool true if ok
      */
     protected function validateHeaderItem(String $name, String $value)
     {
@@ -840,15 +840,16 @@ class BlmFile {
      */
     protected function validateColumnCount(Array $values)
     {
-        $count_values = count($values);
-        $count_columns = count($this->columnKeys); // todo
-        if ($count_values !== $count_columns) {
-            throw new \Exception("Error: Not a valid BLM file, The number of row fields '{$count_values}' is different to the number expected '{$count_columns}'");
+        $countValues = count($values);
+        $countColumns = count($this->columnKeys);
+        if ($countValues !== $countColumns) {
+            throw new \Exception("Error: Not a valid BLM file, The number of row fields '{$countValues}' is different to the number expected '{$countColumns}'");
         }
     }
 
     /**
-     * validateColumn
+     * validateColumn()
+     * Is columnName in the list of allowed columns
      * 
      * @throws Exception on column name not in the specification
      */
@@ -884,10 +885,10 @@ class BlmFile {
 
     /**
      * check ##DEFINITION## section
-     *      for has all required columns
+     *      has all required columns
      * 
      * @return Void
-     * @throws Exception on missing required columns
+     * @throws Exception on missing a required column
      */
     protected function validateRequiredColumns()
     {
@@ -908,6 +909,8 @@ class BlmFile {
 
     /**
      * validateMediaColumnsMustAppearAfterAllOtherFields()
+     * 
+     * @throws Exception on finding a non media column after a media column
      */
     protected function validateMediaColumnsMustAppearAfterAllOtherFields()
     {
@@ -926,6 +929,7 @@ class BlmFile {
 
     /**
      * read and yield next data row
+     * Logs message if property count is different from expected value
      * 
      * @return Void
      * @throws Exception on incorrect data termination
@@ -963,13 +967,13 @@ class BlmFile {
      *      2019-12-10 14:33 made public
      * 
      * @param String $str
-     * @return Array of [columnsName => columnValue]
-     * @throws Exception on data founf in data termination sequence
+     * @return Array of [columnName => columnValue]
+     * @throws Exception on data found in data termination sequence
      */
     public function validateData(String $str) : Array
     {
         // The final field should be finished with the EOF delimiter and then EOR delimiter.
-        //  Which means that there is a blank slot that needs to be accounted for
+        //  Which means that there is a blank column that needs to be accounted for
         //  using array_pop() to remove it
         $values = $this->extractRowValues($str);
         $tmp = array_pop($values);
@@ -1088,6 +1092,8 @@ class BlmFile {
 
     /**
      * checkAllMediaTextColumnsForOrphans
+     * 
+     * @throws Exception if a media caption is found without a media column or the size is wrong
      */
     protected function checkAllMediaTextColumnsForOrphans($row)
     {
@@ -1111,6 +1117,8 @@ class BlmFile {
 
     /**
      * checkAllMediaFilenameFormat
+     * 
+     * @throws Exception 
      */
     protected function checkAllMediaFilenameFormat(Array $row)
     {
@@ -1139,16 +1147,13 @@ class BlmFile {
             }
 
             $isUrl = preg_match('#^([a-z]+)://#i', $value, $matches);
-            $isUrlDenied = !in_array($definition['url'], ['optional', 'required']);
-
             if ($isUrl) {
-                if ($isUrlDenied) {
-                    throw new \Exception("Error: Not a valid BLM file, Media column '{$name}' wrong format, found '{$value}', is not a valid url '{$expectedFileNameFormat}'");
-                }
-                $this->checkUrlFormat($name, $value, $matches);
+                $this->checkUrlFormat($name, $value, $matches, $definition);
                 
                 return;
-            } 
+            } else {
+                //
+            }
 
             $this->checkFilenameFormat($name, $value, $row, $definition);
 
@@ -1162,10 +1167,16 @@ class BlmFile {
      * @param String $name
      * @param String $value
      * @param Array $matches
-     * @throws Exception if url schema is not correct
+     * @throws Exception if url schema is not correct or denied by specification
      */
-   protected function checkUrlFormat(String $name, String $value, Array $matches)
+   protected function checkUrlFormat(String $name, String $value, Array $matches, Array $definition)
    {
+        $isUrlDenied = !in_array($definition['url'], ['optional', 'required']);
+        if ($isUrlDenied) {
+            // @todo add test
+            throw new \Exception("Error: Not a valid BLM file, Media column '{$name}' must be a filename, found a url '{$value}'");
+        }
+
         $scheme = $matches[1];
         if (! in_array($scheme, ['http', 'https']) ) {
             throw new \Exception("Error: Not a valid BLM file, Media column '{$name}' wrong format, '{$scheme}' is not a valid url scheme, found '{$value}");
