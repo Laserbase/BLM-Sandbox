@@ -328,8 +328,8 @@ class BlmFile {
             0 => 'Not specified', // DEFAULT
             1 => 'Long term',
             2 => 'Short term',
-            3 => 'Student',
-            4 => 'Commercial'
+            3 => 'Student', // columnDefinitionV3_StudentLettings
+            4 => 'Commercial' // columnDefinitionV3_CommercialLettings
         ],
         "LET_FURN_ID" => [
             0 => 'Furnished',
@@ -563,7 +563,7 @@ class BlmFile {
     /**
      * return column definitions for the specified version
      * 
-     * @param String $version default ''
+     * @param String $version default use the current version, initially '3'
      * @return Array of column definitions
      */
     protected function getAllColumnDefinitions(String $version = '')
@@ -623,6 +623,8 @@ class BlmFile {
 
     /**
      * read header section
+     * 
+     * @throws Exception on any error found
      */
     protected function readHeader()
     {
@@ -662,6 +664,8 @@ class BlmFile {
 
     /**
      * check ##HEADER## section
+     * 
+     * @throws Exception on header missing required items
      */
     protected function checkHeader()
     {
@@ -717,7 +721,7 @@ class BlmFile {
 
     /**
      * Return next non empty line
-     *      contrast with readDataLine() whick allows fields to have carriage returns
+     *      contrast with readDataLine() which allows fields to have carriage returns
      * 
      * @return String
      */
@@ -767,33 +771,7 @@ class BlmFile {
         return $str;
     }
 
-    /**
-     * read named ##HEADER## item from string
-     *      sets header 0n success
-     * 
-     * @throws Exception on name/value not as expected
-     * @todo change to any header item in any order including feed-supplier created items
-     */
-    protected function readHeaderItem(String $name)
-    {
-        $str = $this->readContentLine();
-
-        if (! preg_match("/^{$name} *:.*$/", $str)) {
-            throw new \Exception("Error: Not a valid BLM file, header item '{$name}' missing, found '{$str}'");
-        }
-
-        if (! preg_match("/^{$name} *:(.*)$/", trim($str), $matches)) {
-            throw new \Exception("Error: Not a valid BLM file, header item '{$name}' missing value");
-        }
-
-        $value = trim($matches[1]);
-
-        if (! $this->validateHeaderItem($name, $value)) {
-            throw new \Exception("Error: Not a valid BLM file, invalid header item '{$name}' failed with value '{$value}'");
-        }
-
-        $this->{$name} = $value;
-    }
+//    protected function readHeaderItem(String $name)
 
     /**
      * check header item is correct
