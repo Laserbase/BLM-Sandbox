@@ -86,7 +86,7 @@ class HipErpCertificatesAreUsedCorrectlyTest extends TestCase
             ['MEDIA_DOCUMENT_TEXT_50', 'EPC',    'unset', "Media caption column 'MEDIA_DOCUMENT_TEXT_50' missing media column 'MEDIA_DOCUMENT_50', caption passed 'EPC'"],
             ['MEDIA_DOCUMENT_TEXT_50', 'EPC',         '', "Media caption column 'MEDIA_DOCUMENT_TEXT_50' must be empty because media column 'MEDIA_DOCUMENT_50' is empty, caption passed 'EPC'"],
 
-            ['MEDIA_DOCUMENT_TEXT_50', 'ERR', 'required', "HIP/EPC Certificate caption 'MEDIA_DOCUMENT_TEXT_50' must be in 'HIP', 'EPC', found 'ERR'"],
+            ['MEDIA_DOCUMENT_TEXT_50', 'ERR', 'required', "HIP/EPC Certificate caption 'MEDIA_DOCUMENT_TEXT_50' must be in ('HIP', 'EPC'), found 'ERR'"],
             ['MEDIA_DOCUMENT_TEXT_50', 'ERR',    'unset', "Media caption column 'MEDIA_DOCUMENT_TEXT_50' missing media column 'MEDIA_DOCUMENT_50', caption passed 'ERR'"],
             ['MEDIA_DOCUMENT_TEXT_50', 'ERR',         '', "Media caption column 'MEDIA_DOCUMENT_TEXT_50' must be empty because media column 'MEDIA_DOCUMENT_50' is empty, caption passed 'ERR'"],
              

@@ -398,7 +398,10 @@ class BlmFile {
         ],
     ];
 
-    protected $imageExtension = [
+    protected $columnTypes = [ // zx
+        'date', 'enum', 'int', 'num', 'string'
+    ];
+    protected $mediaTypes = [ // media code => [ filename extensions ]
         'img' => ['.jpg', '.gif', '.png'],
         'flp' => ['.jpg', '.gif', '.png'],
         'doc' => ['.pdf']
@@ -1063,6 +1066,8 @@ class BlmFile {
 
     /**
      * check that inter column relationships are correct
+     * 
+     * @return void
      */
     protected function validateRowRules(Array $row)
     {
@@ -1118,7 +1123,8 @@ class BlmFile {
     /**
      * checkAllMediaFilenameFormat
      * 
-     * @throws Exception 
+     * @param Array $row of columnName => columnValue pairs
+     * @return void 
      */
     protected function checkAllMediaFilenameFormat(Array $row)
     {
@@ -1151,8 +1157,6 @@ class BlmFile {
                 $this->checkUrlFormat($name, $value, $matches, $definition);
                 
                 return;
-            } else {
-                //
             }
 
             $this->checkFilenameFormat($name, $value, $row, $definition);
@@ -1167,7 +1171,8 @@ class BlmFile {
      * @param String $name
      * @param String $value
      * @param Array $matches
-     * @throws Exception if url schema is not correct or denied by specification
+     * @return void 
+     * @throws Exception if url schema is not allowed or urls are denied by specification
      */
    protected function checkUrlFormat(String $name, String $value, Array $matches, Array $definition)
    {
@@ -1191,6 +1196,7 @@ class BlmFile {
      * @param String $value
      * @param Array $row
      * @param Array $definition
+     * @return void 
      * @throws Exception if file name format is not correct
      */
     protected function checkFilenameFormat(String $name, String $value, Array $row, Array $definition)
@@ -1199,15 +1205,15 @@ class BlmFile {
         $expectedFileNameFormat = '<BRANCH>_<AGENT_REF>_<MEDIATYPE>_<INDEX>.<FILE EXTENSION>';
         
         $definitionMedia = $definition['media'];
-        $mediaTypes = array_keys($this->imageExtension);
-        if (! in_array($definitionMedia, $mediaTypes)) {
+        $mediaTypes = array_keys($this->mediaTypes);
+        if (! in_array($definitionMedia, $mediaTypes)) {// zx
             throw new \Exception("Error: Not a valid BLM file, (1) Media column '{$name}' file name using unknown media type '{$definitionMedia}', expecting one of '".implode("', '", $mediaTypes)."', found '{$value}'");
         }
 
         if (! preg_match($regex, $value, $matches)) {
             throw new \Exception("Error: Not a valid BLM file, Media text column '{$name}' wrong format, found '{$value}', expected format is '{$expectedFileNameFormat}'");
         }
-               
+
         $agentRefFound = $matches[1];
         $mediaFound = $matches[2];
         $indexFound = $matches[3];
@@ -1219,10 +1225,10 @@ class BlmFile {
 
         $extensionExpected = strtolower($extensionFound);
         $extension = strtolower(substr($value, -4));
-        $extensionAllowed = $this->imageExtension[$definitionMedia] ?? [];
+        $extensionsAllowed = $this->mediaTypes[$definitionMedia] ?? [];
 
-        if (! in_array($extension, $extensionAllowed)) {
-            throw new \Exception("Error: Not a valid BLM file, media column '{$name}', value '{$value}' must end in one of '".implode("', '", $extensionAllowed)."'");
+        if (! in_array($extension, $extensionsAllowed)) {
+            throw new \Exception("Error: Not a valid BLM file, media column '{$name}', value '{$value}' must end in one of '".implode("', '", $extensionsAllowed)."'");
         }
 
         if ($agentRefFound !== $agentRefExpected) {
@@ -1239,7 +1245,11 @@ class BlmFile {
 }
 
     /**
-     * checkImageCertificatesCaption($row);
+     * checkImageCertificatesCaption($row)
+     * Check image certificate caption HIP/EPC
+     *
+     * @param Array $row
+     * @return void 
      */
     protected function checkImageCertificatesCaption($row)
     {
@@ -1262,10 +1272,9 @@ class BlmFile {
             // Extra variables added to aid comprehension --------------
             $certificateImage = ($index > $this->lastMediaImageIndex);
             $propertyImage = ! $certificateImage;
-            // ---------------------------------------------------------
-
             $captionMustBeEmpty = ('' === $imageValue);
             $captionMissing = ('' === $value);
+            // ---------------------------------------------------------
 
             if ($captionMustBeEmpty && $captionMissing) {
                 // image is empty and caption is empty - nothing to do
@@ -1294,6 +1303,7 @@ class BlmFile {
      * checkDocumentCertificatesCaption($row)
      * 
      * @param Array $row of property data
+     * @throws Exception on error
      */
     protected function checkDocumentCertificatesCaption($row)
     {
@@ -1316,22 +1326,23 @@ class BlmFile {
 
             $captionMissing = ('' === $value);
             $captionFound = $captionMissing;
+            // ---------------------------------------------------------
 
             if ($captionMustBeEmpty && $captionMissing) {
                 // nothing to see here, move along, all ok
                 continue;
             }
+            $erpHipCaptions = "('".implode("', '", $this->erpHipCaptions)."')";
 
             if ($captionRequired && $captionMissing) {
-                throw new \Exception("Error: Not a valid BLM file, Data field 'MEDIA_DOCUMENT_{$index}' HIP/EPC Certificate caption '{$name}' must be in ('".implode("', '", $this->erpHipCaptions)."')");
+                throw new \Exception("Error: Not a valid BLM file, Data field 'MEDIA_DOCUMENT_{$index}' HIP/EPC Certificate caption '{$name}' must be in {$erpHipCaptions}");
             }
             if ($captionMustBeEmpty && $captionFound) {
                 throw new \Exception("Error: Not a valid BLM file, Data field caption '{$name}' must be empty when 'MEDIA_DOCUMENT_{$index}' is empty, found '{$value}'");
             }
-            // ---------------------------------------------------------
 
             if (! in_array($value, $this->erpHipCaptions)) {
-                throw new \Exception("Error: Not a valid BLM file, HIP/EPC Certificate caption '{$name}' must be in '".implode("', '", $this->erpHipCaptions)."', found '{$value}'");
+                throw new \Exception("Error: Not a valid BLM file, HIP/EPC Certificate caption '{$name}' must be in {$erpHipCaptions}, found '{$value}'");
             }
 
         }
@@ -1341,6 +1352,7 @@ class BlmFile {
      * checkLettingDependantFields
      * 
      * @param Array $row of data
+     * @return void 
      * @throws Exception on Letting field used on non letting data
      */
     protected function checkLettingDependantFields($row)
@@ -1365,6 +1377,7 @@ class BlmFile {
 
     /**
      * checkLettingDependantField
+     * 
      * @param String $name of column 
      * @param String $value of column, ignore empty columns
      * @param String $letTypeId of the row
@@ -1428,7 +1441,7 @@ class BlmFile {
      * is the column value a date string in the correct format
      * 
      * @param String $value
-     * @return bool
+     * @throws Exception if date is in the wrong format
      */
     protected function isDate(String $name, String $value)
     {
@@ -1442,7 +1455,8 @@ class BlmFile {
      * 
      * @param String $name of column
      * @param String $value of data
-     * @return bool
+     * @return void 
+     * @throws Exception the value is not in the set of enums
      */   
     protected function isEnum(String $name, String $value)
     {
@@ -1462,8 +1476,10 @@ class BlmFile {
     /**
      * is the column value an integer
      * 
+     * @param String $name
      * @param String $value
-     * @return bool
+     * @return void 
+     * @throws Exception if the value is not an integer
      */    
     protected function isInt(String $name, String $value)
     {
@@ -1476,8 +1492,10 @@ class BlmFile {
      * is the column value a number, possibly with decimals
      * max length if defined includes decimal point // 99.99 = 5 // pic(99.99)
      * 
+     * @param String $name
      * @param String $value
-     * @return bool
+     * @return void 
+     * @throws Exception if value is not a decimal number
      */   
     protected function isNum(String $name, String $value)
     {
@@ -1489,8 +1507,9 @@ class BlmFile {
     /**
      * is the column value a string
      * 
+     * @param String $name
      * @param String $value
-     * @return bool
+     * @return Boolean true
      */   
     protected function isString(String $name, String $value)
     {
@@ -1503,6 +1522,7 @@ class BlmFile {
      * @param String $name used for reporting
      * @param String $value
      * @param Array $definition = []
+     * @return void 
      */
     protected function validateMediaType(String $name, String $value, Array $definition = [])
     {
@@ -1519,24 +1539,13 @@ class BlmFile {
         if ('' === $media) {
             // media column without special handling
             return;
-        }
+        } // zx
 
-        switch ($media) { // zx
-            case 'img':
-            case 'doc':
-            case 'flp':
-            case 'tour':
-            case 'text':    
-                // skip
-            break;
-
-            default:
-                throw new \Exception("Error: Not a valid BLM file, Column '{$name}' is an unknown media type, found '{$media}' ");
-
+        if (! in_array($media, ['img', 'doc', 'flp', 'tour', 'text'])) {
+            throw new \Exception("Error: Not a valid BLM file, Column '{$name}' is an unknown media type, found '{$media}' ");
         }
 
     }
-
 
     /**
      * check property sub id is valid for drop down search on rightmove.com
