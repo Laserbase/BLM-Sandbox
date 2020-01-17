@@ -398,7 +398,7 @@ class BlmFile {
         ],
     ];
 
-    protected $columnTypes = [ // zx
+    protected $columnTypes = [
         'date', 'enum', 'int', 'num', 'string'
     ];
     protected $mediaTypes = [ // media code => [ filename extensions ]
@@ -618,7 +618,7 @@ class BlmFile {
         $this->readHeader();
         $this->checkHeader();
 
-        $str = $this->readDefinition(); // @todo move to checking definition
+        $str = $this->readDefinition();
         $this->validateDefinition($str);
         
         $this->checkDataSection();
@@ -677,6 +677,7 @@ class BlmFile {
             throw new \Exception("Error: Not a valid BLM file, invalid header, missing item(s) '".implode("', '", $diff)."' ");
         }
 
+        $this->validateDataSeparators();
         $this->selectVersionColumnDefinitions();
     }
 
@@ -829,7 +830,6 @@ class BlmFile {
             $this->validateColumn($column);
         }
 
-        $this->validateDataSeparators();
         $this->validateRequiredColumns();
         $this->validateMediaColumnsMustAppearAfterAllOtherFields();
     }
@@ -870,18 +870,35 @@ class BlmFile {
      * 
      * @return Void
      * @throws Exception on incorrect EOF (End-Of-Field) and EOR (End-Of-Record) characters
-     * @todo check for regex characters handled as separators
      */
     protected function validateDataSeparators()
     {
-        if ($this->header['EOF'] == $this->header['EOR'] ) {
-            throw new \Exception("Error: Not a valid BLM file, EndOfField character '{$this->header['EOF']}' must be different than EndOfRecord character '{$this->header['EOR']}'");
+        $EOF = $this->header['EOF'];
+        $EOR = $this->header['EOR'];
+
+        if ($EOF == $EOR ) {
+            throw new \Exception("Error: Not a valid BLM file, EndOfField character '{$EOF}' must be different than EndOfRecord character '{$EOR}', defaults '^' and '~'");
         }
-        if (strlen($this->header['EOF']) != 1) {
-            throw new \Exception("Error: '".strlen($this->header['EOF'])."' Not a valid BLM file, EndOfField character '{$this->header['EOF']}' must be a singe character, default '^' ");
+        if (strlen($EOF) != 1) {
+            throw new \Exception("Error: Not a valid BLM file, EndOfField character '{$EOF}' must be a singe character, default '^' ");
         }
-        if (strlen($this->header['EOR']) != 1) {
-            throw new \Exception("Error: Not a valid BLM file, EndOfRecord character '{$this->header['EOR']}' must be a singe character, default '~' ");
+        if (strlen($EOR) != 1) {
+            throw new \Exception("Error: Not a valid BLM file, EndOfRecord character '{$EOR}' must be a singe character, default '~' ");
+        }
+
+        if (ctype_alnum($EOF)) {
+            throw new \Exception("Error: Not a valid BLM file, EndOfField character '{$EOF}' must be a symbol character, default '^' ");
+        }
+        if (ctype_alnum($EOR)) {
+            throw new \Exception("Error: Not a valid BLM file, EndOfRecord character '{$EOR}' must be a symbol character, default '~' ");
+        }
+
+        $invalidSymbols = "#()[]{}<>$&_,." . "`'" . '"';
+        if (strpos($invalidSymbols, $EOF) !== false) {
+            throw new \Exception("Error: Not a valid BLM file, EndOfField character '{$EOF}' must be a valid symbol, default '^' ");
+        }
+        if (strpos($invalidSymbols, $EOR) !== false) {
+            throw new \Exception("Error: Not a valid BLM file, EndOfRecord character '{$EOR}' must be a valid symbol character, default '~' ");
         }
 
     }
@@ -1178,7 +1195,6 @@ class BlmFile {
    {
         $isUrlDenied = !in_array($definition['url'], ['optional', 'required']);
         if ($isUrlDenied) {
-            // @todo add test
             throw new \Exception("Error: Not a valid BLM file, Media column '{$name}' must be a filename, found a url '{$value}'");
         }
 
@@ -1206,7 +1222,7 @@ class BlmFile {
         
         $definitionMedia = $definition['media'];
         $mediaTypes = array_keys($this->mediaTypes);
-        if (! in_array($definitionMedia, $mediaTypes)) {// zx
+        if (! in_array($definitionMedia, $mediaTypes)) {
             throw new \Exception("Error: Not a valid BLM file, (1) Media column '{$name}' file name using unknown media type '{$definitionMedia}', expecting one of '".implode("', '", $mediaTypes)."', found '{$value}'");
         }
 
@@ -1539,7 +1555,7 @@ class BlmFile {
         if ('' === $media) {
             // media column without special handling
             return;
-        } // zx
+        }
 
         if (! in_array($media, ['img', 'doc', 'flp', 'tour', 'text'])) {
             throw new \Exception("Error: Not a valid BLM file, Column '{$name}' is an unknown media type, found '{$media}' ");

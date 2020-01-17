@@ -19,6 +19,12 @@ Homestead.json
 # Rocketeer PHP task runner and deployment package. https://github.com/rocketeers/rocketeer
 .rocketeer/
 
+# sonarQube
+.scannerwork/
+conf/sonar-project.properties
+sonar-project.properties
+sonarscanner.cmd
+
 #
 composer.lock
 .phpunit.result.cache
