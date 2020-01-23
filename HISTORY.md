@@ -8,6 +8,7 @@ Instead using PHP gererator function to split processing to discrete chunks so t
 
 # 2020-01-23 Ensure columns are unique
 - Add test for repeated column names
+- check that all column names in file are specified
 
 # 2020-01-17 Add more character EOF/EOR checks to validateDataSeparators()
 - Add more character EOF/EOR checks to validateDataSeparators()
