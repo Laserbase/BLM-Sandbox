@@ -826,6 +826,8 @@ class BlmFile {
         $columnKeys = explode($this->EOF, $str);
         $this->columnKeys = $columnKeys;
 
+        $this->validateDuplicatedColumns();
+
         foreach ($columnKeys as $column) {
             $this->validateColumn($column);
         }
@@ -899,6 +901,24 @@ class BlmFile {
         }
         if (strpos($invalidSymbols, $EOR) !== false) {
             throw new \Exception("Error: Not a valid BLM file, EndOfRecord character '{$EOR}' must be a valid symbol character, default '~' ");
+        }
+
+    }
+
+    /**
+     * validateDuplicatedColumns
+     * 
+     * throws Exception on finding duplicate definition column name
+     */
+    protected function validateDuplicatedColumns()
+    {
+        $keys =[];
+        foreach ($this->columnKeys as $index => $name) {
+            if (isset($keys[$name])) {
+                throw new \Exception("Error: Not a valid BLM file, Definition column '{$name}' must only appear once");
+            }
+
+            $keys[$name] = $index;
         }
 
     }
